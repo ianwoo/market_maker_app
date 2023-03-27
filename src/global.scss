@@ -1,0 +1,53 @@
+.App {
+  .tabs {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    padding: 8px;
+    .tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid black;
+      cursor: pointer;
+
+      &.selected {
+        background: black;
+        color: white;
+        cursor: auto;
+      }
+    }
+  }
+  .component {
+    .home {
+      .currentCapitalBalance {
+        .exchanges {
+          text-align: center;
+          display: flex;
+          .labels {
+            display: flex;
+            flex-direction: column;
+          }
+          .exchange {
+            border: 1px solid black;
+            width: 420px;
+            .accounts {
+              display: flex;
+              .account {
+                display: flex;
+                flex-direction: column;
+                width: 210px;
+              }
+            }
+          }
+          .total {
+            display: flex;
+            flex-direction: column;
+          }
+        }
+      }
+    }
+  }
+}

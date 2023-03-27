@@ -1,24 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import AlgoControl from "./components/AlgoControl";
+import HomePanel from "./components/HomePanel";
+import Intervention from "./components/Intervention";
+import "./global.scss";
+
+const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
+
+const components = [<HomePanel />, <AlgoControl />, <Intervention />];
 
 function App() {
+  const [selectedTabIdx, setSelectedTabIdx] = useState<number>(0);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="tabs">
+        {tabs.map((tab, i) => (
+          <div className={"tab" + (selectedTabIdx === i ? " selected" : "")} onClick={() => setSelectedTabIdx(i)}>
+            <span>{tab}</span>
+          </div>
+        ))}
+      </div>
+      <div className="component">{components[selectedTabIdx]}</div>
     </div>
   );
 }
