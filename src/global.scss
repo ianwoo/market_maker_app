@@ -80,11 +80,29 @@
       .flex {
         display: flex;
         justify-content: space-between;
+        .range-controls {
+          display: flex;
+          justify-content: space-between;
+        }
         .order-book {
           display: flex;
           flex-direction: column;
           padding: 16px;
           width: 66%;
+          gap: 8px;
+          .headers {
+            display: flex;
+            justify-content: space-between;
+          }
+          .order {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 69px;
+            border: 1px solid black;
+            border-radius: 8px;
+            padding: 0 8px;
+          }
         }
         .sweep-and-peg {
           width: 33%;

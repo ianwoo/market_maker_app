@@ -1,26 +1,114 @@
+import { useState } from "react";
+
 const orderBookDummyData = [
-  { price: 0.00838282, supply: 816.816 },
-  { price: 0.00508547, supply: 745.953 },
-  { price: 0.00223873, supply: 613.184 },
-  { price: 0.0019977, supply: 567.743 },
-  { price: 0.00180763, supply: 468.297 },
-  { price: 0.00115504, supply: 372.553 },
-  { price: 0.00105263, supply: 299.027 },
-  { price: 0.00072402, supply: 267.585 },
-  { price: 0.00071632, supply: 123.55 },
-  { price: 0.00066819, supply: 100.55 },
-  { price: 0.00011713, supply: 21.07 },
+  { price: 0.00001466, supply: 1308.788 },
+  { price: 0.00001368, supply: 803.769 },
+  { price: 0.0000127, supply: 699.805 },
+  { price: 0.00001221, supply: 697.907 },
+  { price: 0.00001172, supply: 650.751 },
+  { price: 0.00001124, supply: 153.924 },
+  { price: 0.00001075, supply: 136.344 },
+  { price: 0.00001055, supply: 120.578 },
+  { price: 0.00001036, supply: 111.834 },
+  { price: 0.00001016, supply: 76.633 },
+  { price: 0.00000997, supply: 63.3 },
 ];
 
-const orderBookDummySpotPrice = 0.00000875;
+const orderBookDummySpotPrice = 0.00000977;
+
+type Order = {
+  price: number;
+  supply: number;
+};
+
+type Group = {
+  grouping: number;
+  price: string;
+  supply: number;
+  dev: string;
+};
+
+const countDecimals = function (value: number) {
+  if (Math.floor(value) === value) return 0;
+  return value.toString().split(".")[1].length || 0;
+};
 
 const Intervention = () => {
+  const [priceRangeInc, setPriceRangeInc] = useState<number>(0);
+  const [aboveOfferRangeInc, setAboveOfferRangeInc] = useState<number>(0);
+
   return (
     <div className="intervention">
       <h1>Intervention</h1>
       <div className="flex">
         <div className="order-book">
-          <span>(TBD: Dynamic Order Book + Cancel Individual Orders)</span>
+          <div className="spot-price field col">
+            <b>Spot Price</b>
+            <b>{orderBookDummySpotPrice}</b>
+          </div>
+          <div className="range-controls">
+            <div className="field col">
+              <span>% Above Offer Range Increment</span>
+              <input
+                type="number"
+                onChange={(e) =>
+                  Number(e.target.value) > 0 ? setAboveOfferRangeInc(Number(e.target.value)) : setAboveOfferRangeInc(0)
+                }
+              ></input>
+            </div>
+            <div className="field col">
+              <span>Price Range Increment</span>
+              <input
+                type="number"
+                onChange={(e) =>
+                  Number(e.target.value) > 0 ? setPriceRangeInc(Number(e.target.value)) : setPriceRangeInc(0)
+                }
+              ></input>
+            </div>
+            <button>Cancel Orders</button>
+          </div>
+          <div className="headers">
+            <div className="header">% Above Offer</div>
+            <div className="header">Price</div>
+            <div className="header">Supply</div>
+          </div>
+          {aboveOfferRangeInc === 0 && priceRangeInc === 0
+            ? orderBookDummyData.map((o, i) => (
+                <div className="order" key={i}>
+                  <div className="deviation">{Math.floor((o.price / orderBookDummySpotPrice) * 100 - 100)}%</div>
+                  <div className="price">{o.price}</div>
+                  <div className="supply">{o.supply}</div>
+                </div>
+              ))
+            : orderBookDummyData
+                .reduce((acc: Group[], next: Order) => {
+                  const _decimals = countDecimals(orderBookDummySpotPrice);
+                  const _grouping = Math.floor((next.price - orderBookDummySpotPrice) / priceRangeInc);
+                  const _existingGroup = acc.find((group) => group.grouping === _grouping);
+                  _existingGroup
+                    ? (_existingGroup.supply = _existingGroup.supply + next.supply)
+                    : acc.push({
+                        grouping: _grouping,
+                        supply: next.supply,
+                        price:
+                          (orderBookDummySpotPrice + _grouping * priceRangeInc).toFixed(_decimals).toString() +
+                          " - " +
+                          (orderBookDummySpotPrice + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString(),
+                        dev:
+                          Math.floor(((next.price - priceRangeInc) / orderBookDummySpotPrice) * 100 - 100).toString() +
+                          "% - " +
+                          Math.floor((next.price / orderBookDummySpotPrice) * 100 - 100).toString() +
+                          "%",
+                      });
+                  return acc;
+                }, [])
+                .map((g, i) => (
+                  <div className="order">
+                    <div className="deviation">{g.dev}</div>
+                    <div className="price">{g.price}</div>
+                    <div className="supply">{g.supply}</div>
+                  </div>
+                ))}
           <button>Stop Volume Algo</button>
         </div>
         <div className="sweep-and-peg">

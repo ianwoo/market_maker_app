@@ -54,7 +54,7 @@ const HomePanel = () => {
             <span>MTM</span>
           </div>
           {dummyData.exchanges.map((ex, i) => (
-            <div className="exchange">
+            <div className="exchange" key={i}>
               <span>{ex.exchangeName}</span>
               <div className="accounts">
                 {ex.accounts.map((acc, i) => (
