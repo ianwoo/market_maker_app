@@ -90,9 +90,36 @@
           padding: 16px;
           width: 66%;
           gap: 8px;
+          .stop-algo {
+            margin-bottom: 16px;
+          }
+          .spot-price {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+          }
+          .deviation {
+            width: 230px;
+          }
+          .price {
+            width: 242px;
+            text-align: center;
+          }
+          .supply {
+            width: 142px;
+            text-align: right;
+          }
           .headers {
             display: flex;
             justify-content: space-between;
+          }
+          .range-controls {
+            .field.col {
+              &.active {
+                color: blue;
+                background: lightblue;
+              }
+            }
           }
           .order {
             display: flex;

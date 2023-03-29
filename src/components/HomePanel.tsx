@@ -58,7 +58,7 @@ const HomePanel = () => {
               <span>{ex.exchangeName}</span>
               <div className="accounts">
                 {ex.accounts.map((acc, i) => (
-                  <div className="account">
+                  <div className="account" key={i}>
                     <span>{acc.accountName}</span>
                     <span>{acc.tokenBalance}</span>
                     <span>{acc.usdcBalance}</span>

@@ -28,6 +28,12 @@ type Group = {
   dev: string;
 };
 
+enum ActiveGrouping {
+  None = -1,
+  Percent = 0,
+  Price = 1,
+}
+
 const countDecimals = function (value: number) {
   if (Math.floor(value) === value) return 0;
   return value.toString().split(".")[1].length || 0;
@@ -37,41 +43,47 @@ const Intervention = () => {
   const [priceRangeInc, setPriceRangeInc] = useState<number>(0);
   const [aboveOfferRangeInc, setAboveOfferRangeInc] = useState<number>(0);
 
+  const [activeGrouping, setActiveGrouping] = useState<ActiveGrouping>(-1);
+
   return (
     <div className="intervention">
       <h1>Intervention</h1>
       <div className="flex">
         <div className="order-book">
-          <button>Stop Volume Algo</button>
+          <button className="stop-algo">Stop Volume Algo</button>
           <div className="spot-price field col">
             <b>Spot Price</b>
             <b>{orderBookDummySpotPrice}</b>
           </div>
           <div className="range-controls">
-            <div className="field col">
+            <div className={"field col deviation" + (activeGrouping === ActiveGrouping.Percent ? " active" : "")}>
               <span>% Above Offer Range Increment</span>
               <input
                 type="number"
-                onChange={(e) =>
-                  Number(e.target.value) > 0 ? setAboveOfferRangeInc(Number(e.target.value)) : setAboveOfferRangeInc(0)
-                }
-              ></input>
+                onChange={(e) => {
+                  setPriceRangeInc(0);
+                  Number(e.target.value) > 0 ? setAboveOfferRangeInc(Number(e.target.value)) : setAboveOfferRangeInc(0);
+                  setActiveGrouping(ActiveGrouping.Percent);
+                }}
+              />
             </div>
-            <div className="field col">
+            <div className={"field col price" + (activeGrouping === ActiveGrouping.Price ? " active" : "")}>
               <span>Price Range Increment</span>
               <input
                 type="number"
-                onChange={(e) =>
-                  Number(e.target.value) > 0 ? setPriceRangeInc(Number(e.target.value)) : setPriceRangeInc(0)
-                }
-              ></input>
+                onChange={(e) => {
+                  setAboveOfferRangeInc(0);
+                  Number(e.target.value) > 0 ? setPriceRangeInc(Number(e.target.value)) : setPriceRangeInc(0);
+                  setActiveGrouping(ActiveGrouping.Price);
+                }}
+              />
             </div>
-            <button>Cancel Orders</button>
+            <button className="supply">Cancel Orders</button>
           </div>
           <div className="headers">
-            <div className="header">% Above Offer</div>
-            <div className="header">Price</div>
-            <div className="header">Supply</div>
+            <div className="header deviation">% Above Offer</div>
+            <div className="header price">Price</div>
+            <div className="header supply">Supply</div>
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
             ? orderBookDummyData.map((o, i) => (

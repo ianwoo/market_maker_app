@@ -15,7 +15,11 @@ function App() {
     <div className="App">
       <div className="tabs">
         {tabs.map((tab, i) => (
-          <div className={"tab" + (selectedTabIdx === i ? " selected" : "")} onClick={() => setSelectedTabIdx(i)}>
+          <div
+            key={i}
+            className={"tab" + (selectedTabIdx === i ? " selected" : "")}
+            onClick={() => setSelectedTabIdx(i)}
+          >
             <span>{tab}</span>
           </div>
         ))}
