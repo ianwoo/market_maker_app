@@ -21,6 +21,7 @@
     }
   }
   .component {
+    padding-left: 8px;
     .home {
       .currentCapitalBalance {
         .exchanges {
@@ -49,7 +50,50 @@
         }
       }
     }
+    .field {
+      display: flex;
+      justify-content: space-between;
+      &.col {
+        flex-direction: column;
+      }
+    }
     .algo-control {
+      display: flex;
+      justify-content: space-between;
+
+      .field-group {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 16px;
+      }
+      .vol-algo {
+        width: 33%;
+        .field {
+          margin-bottom: 16px;
+        }
+      }
+      .order-book-depth {
+        width: 66%;
+      }
+    }
+    .intervention {
+      .flex {
+        display: flex;
+        justify-content: space-between;
+        .order-book {
+          display: flex;
+          flex-direction: column;
+          padding: 16px;
+          width: 66%;
+        }
+        .sweep-and-peg {
+          width: 33%;
+          padding: 16px;
+          .field {
+            margin-bottom: 16px;
+          }
+        }
+      }
     }
   }
 }
