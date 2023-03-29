@@ -42,6 +42,7 @@ const Intervention = () => {
       <h1>Intervention</h1>
       <div className="flex">
         <div className="order-book">
+          <button>Stop Volume Algo</button>
           <div className="spot-price field col">
             <b>Spot Price</b>
             <b>{orderBookDummySpotPrice}</b>
@@ -83,33 +84,60 @@ const Intervention = () => {
             : orderBookDummyData
                 .reduce((acc: Group[], next: Order) => {
                   const _decimals = countDecimals(orderBookDummySpotPrice);
+
                   const _grouping = Math.floor((next.price - orderBookDummySpotPrice) / priceRangeInc);
-                  const _existingGroup = acc.find((group) => group.grouping === _grouping);
+                  const _percentGrouping = Math.floor(
+                    Math.floor((next.price / orderBookDummySpotPrice) * 100 - 100) / aboveOfferRangeInc
+                  );
+
+                  const _existingGroup =
+                    aboveOfferRangeInc === 0
+                      ? acc.find((group) => group.grouping === _grouping)
+                      : acc.find((group) => group.grouping === _percentGrouping);
+
+                  const _groupingPrice =
+                    (orderBookDummySpotPrice + _grouping * priceRangeInc).toFixed(_decimals).toString() +
+                    " - " +
+                    (orderBookDummySpotPrice + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
+
+                  const _percentGroupingPrice =
+                    (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * orderBookDummySpotPrice)
+                      .toFixed(_decimals)
+                      .toString() +
+                    " - " +
+                    ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * orderBookDummySpotPrice)
+                      .toFixed(_decimals)
+                      .toString();
+
+                  const _deviation =
+                    Math.floor(((next.price - priceRangeInc) / orderBookDummySpotPrice) * 100 - 100).toString() +
+                    "% - " +
+                    Math.floor((next.price / orderBookDummySpotPrice) * 100 - 100).toString() +
+                    "%";
+
+                  const _percentDeviation =
+                    (_percentGrouping * aboveOfferRangeInc).toString() +
+                    "% - " +
+                    ((_percentGrouping + 1) * aboveOfferRangeInc).toString() +
+                    "%";
+
                   _existingGroup
                     ? (_existingGroup.supply = _existingGroup.supply + next.supply)
                     : acc.push({
-                        grouping: _grouping,
+                        grouping: aboveOfferRangeInc === 0 ? _grouping : _percentGrouping,
                         supply: next.supply,
-                        price:
-                          (orderBookDummySpotPrice + _grouping * priceRangeInc).toFixed(_decimals).toString() +
-                          " - " +
-                          (orderBookDummySpotPrice + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString(),
-                        dev:
-                          Math.floor(((next.price - priceRangeInc) / orderBookDummySpotPrice) * 100 - 100).toString() +
-                          "% - " +
-                          Math.floor((next.price / orderBookDummySpotPrice) * 100 - 100).toString() +
-                          "%",
+                        price: aboveOfferRangeInc === 0 ? _groupingPrice : _percentGroupingPrice,
+                        dev: aboveOfferRangeInc === 0 ? _deviation : _percentDeviation,
                       });
                   return acc;
                 }, [])
                 .map((g, i) => (
-                  <div className="order">
+                  <div className="order" key={i}>
                     <div className="deviation">{g.dev}</div>
                     <div className="price">{g.price}</div>
                     <div className="supply">{g.supply}</div>
                   </div>
                 ))}
-          <button>Stop Volume Algo</button>
         </div>
         <div className="sweep-and-peg">
           <h2>Sweep and Peg</h2>
