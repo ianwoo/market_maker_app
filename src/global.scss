@@ -24,24 +24,23 @@
     padding-left: 8px;
     .home {
       .currentCapitalBalance {
-        .exchanges {
+        .accounts {
           text-align: center;
           display: flex;
           .labels {
             display: flex;
             flex-direction: column;
-          }
-          .exchange {
-            border: 1px solid black;
-            width: 420px;
-            .accounts {
-              display: flex;
-              .account {
-                display: flex;
-                flex-direction: column;
-                width: 210px;
-              }
+            span {
+              width: 200px;
+              text-align: right;
+              padding-right: 8px;
             }
+          }
+          .account {
+            border: 1px solid black;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
           }
           .total {
             display: flex;

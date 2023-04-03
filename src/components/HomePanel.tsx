@@ -1,81 +1,36 @@
-const dummyData = {
-  exchanges: [
-    {
-      exchangeName: "ByBit",
-      accounts: [
-        {
-          accountName: "Account 1",
-          tokenBalance: 100,
-          usdcBalance: 100,
-          btcBalance: 100,
-          mtm: 300,
-        },
-        {
-          accountName: "Account 2",
-          tokenBalance: 100,
-          usdcBalance: 100,
-          btcBalance: 100,
-          mtm: 300,
-        },
-      ],
-    },
-    {
-      exchangeName: "Uniswap",
-      accounts: [
-        {
-          accountName: "Account 3",
-          tokenBalance: 100,
-          usdcBalance: 100,
-          btcBalance: 100,
-          mtm: 300,
-        },
-      ],
-    },
-  ],
-  totals: {
-    tokenBalanceTotal: 300,
-    usdcBalanceTotal: 300,
-    btcBalanceTotal: 300,
-  },
+type Props = {
+  accountUpdate: any;
 };
 
-const HomePanel = () => {
+const HomePanel = (props: Props) => {
+  const { accountUpdate } = props;
+
   return (
     <div className="home">
       <div className="currentCapitalBalance">
         <h1>Current Capital Balance</h1>
-        <div className="exchanges">
+        <div className="accounts">
           <div className="labels">
             <span>Exchange Name</span>
             <span>Account Name</span>
-            <span>Token Balance</span>
-            <span>USDC Balance</span>
-            <span>BTC Balance</span>
-            <span>MTM</span>
-          </div>
-          {dummyData.exchanges.map((ex, i) => (
-            <div className="exchange" key={i}>
-              <span>{ex.exchangeName}</span>
-              <div className="accounts">
-                {ex.accounts.map((acc, i) => (
-                  <div className="account" key={i}>
-                    <span>{acc.accountName}</span>
-                    <span>{acc.tokenBalance}</span>
-                    <span>{acc.usdcBalance}</span>
-                    <span>{acc.btcBalance}</span>
-                    <span>{acc.mtm}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-          <div className="total">
+            <span>Coin</span>
+            <span>Free</span>
+            <span>Locked</span>
             <span>Total</span>
-            <span>-</span>
-            <span>{dummyData.totals.tokenBalanceTotal}</span>
-            <span>{dummyData.totals.usdcBalanceTotal}</span>
-            <span>{dummyData.totals.btcBalanceTotal}</span>
+            <span>MTM Price</span>
           </div>
+          {accountUpdate &&
+            accountUpdate.map((acc: any, i: number) => (
+              <div className="account" key={i}>
+                <span>{acc.exchange}</span>
+                <span>{acc.account}</span>
+                <span>{acc.coin}</span>
+                <span>{acc.free}</span>
+                <span>{acc.locked}</span>
+                <span>{acc.total}</span>
+                <span>${acc.price}</span>
+              </div>
+            ))}
         </div>
       </div>
     </div>
