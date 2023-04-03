@@ -8,8 +8,14 @@ const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
 
 const components = [<HomePanel />, <AlgoControl />, <Intervention />];
 
+const websocket = new WebSocket("ws://192.168.1.102:8055");
+
 function App() {
   const [selectedTabIdx, setSelectedTabIdx] = useState<number>(0);
+
+  // websocket.onmessage = (event) => {
+  //   console.log(event.data);
+  // };
 
   return (
     <div className="App">

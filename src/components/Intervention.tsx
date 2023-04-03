@@ -68,7 +68,7 @@ const Intervention = () => {
               />
             </div>
             <div className={"field col price" + (activeGrouping === ActiveGrouping.Price ? " active" : "")}>
-              <span>Price Range Increment</span>
+              <span>$ Price Range Increment</span>
               <input
                 type="number"
                 onChange={(e) => {
