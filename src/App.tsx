@@ -39,7 +39,11 @@ function App() {
   const components = [
     <HomePanel accountUpdate={accountUpdate} />,
     <AlgoControl />,
-    <Intervention orderBookUpdate={orderBookUpdate} />,
+    accountUpdate.length > 0 ? (
+      <Intervention orderBookUpdate={orderBookUpdate} spotPrice={accountUpdate[0].price} />
+    ) : (
+      <div>Loading...</div>
+    ),
   ];
 
   return (
