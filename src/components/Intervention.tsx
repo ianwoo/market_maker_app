@@ -24,6 +24,11 @@ enum ActiveGrouping {
   Price = 1,
 }
 
+type PriceRange = {
+  from: number;
+  to: number;
+};
+
 const countDecimals = function (value: number) {
   if (Math.floor(value) === value) return 0;
   return value.toString().split(".")[1].length || 0;
@@ -39,6 +44,9 @@ const Intervention = (props: Props) => {
   const [aboveOfferRangeInc, setAboveOfferRangeInc] = useState<number>(0);
 
   const [activeGrouping, setActiveGrouping] = useState<ActiveGrouping>(-1);
+
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<PriceRange[]>([]);
+  const [highlightedGroups, setHighlightedGroups] = useState<number[]>([]);
 
   return (
     <div className="intervention">
@@ -158,7 +166,51 @@ const Intervention = (props: Props) => {
                   return acc;
                 }, [])
                 .map((g, i) => (
-                  <div className={"order " + (orderType ? "bid" : "ask")} key={i}>
+                  <div
+                    className={
+                      "order " +
+                      (orderType ? "bid" : "ask") +
+                      (highlightedGroups.includes(g.grouping) ? " selected" : "")
+                    }
+                    key={i}
+                    onClick={() => {
+                      //if $ value price range increment...
+                      if (aboveOfferRangeInc === 0 && !highlightedGroups.includes(g.grouping)) {
+                        setSelectedPriceRanges([
+                          ...selectedPriceRanges,
+                          {
+                            from: spotPrice + g.grouping * priceRangeInc,
+                            to: spotPrice + (g.grouping + 1) * priceRangeInc,
+                          },
+                        ]);
+                        setHighlightedGroups([...highlightedGroups, g.grouping]);
+                      } else if (priceRangeInc === 0 && !highlightedGroups.includes(g.grouping)) {
+                        //if % value price range increment...
+                        setSelectedPriceRanges([
+                          ...selectedPriceRanges,
+                          {
+                            from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * spotPrice,
+                            to: ((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1,
+                          },
+                        ]);
+                        setHighlightedGroups([...highlightedGroups, g.grouping]);
+                      } else if (aboveOfferRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
+                        const _targetFromPrice = spotPrice + g.grouping * priceRangeInc;
+                        const _priceRangesTargetRemoved = selectedPriceRanges.filter(
+                          (r) => r.from !== _targetFromPrice
+                        );
+                        setSelectedPriceRanges(_priceRangesTargetRemoved);
+                        setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
+                      } else if (priceRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
+                        const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * spotPrice;
+                        const _priceRangesTargetRemoved = selectedPriceRanges.filter(
+                          (r) => r.from !== _targetFromPrice
+                        );
+                        setSelectedPriceRanges(_priceRangesTargetRemoved);
+                        setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
+                      }
+                    }}
+                  >
                     <div className="deviation">{g.dev}</div>
                     <div className="price">{g.price}</div>
                     <div className="supply">{g.supply}</div>
