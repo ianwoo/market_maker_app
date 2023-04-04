@@ -1,24 +1,8 @@
 import { useState } from "react";
+import { OrderBookUpdate } from "../App";
 
-const orderBookDummyData = [
-  { price: 0.00001466, supply: 1308.788 },
-  { price: 0.00001368, supply: 803.769 },
-  { price: 0.0000127, supply: 699.805 },
-  { price: 0.00001221, supply: 697.907 },
-  { price: 0.00001172, supply: 650.751 },
-  { price: 0.00001124, supply: 153.924 },
-  { price: 0.00001075, supply: 136.344 },
-  { price: 0.00001055, supply: 120.578 },
-  { price: 0.00001036, supply: 111.834 },
-  { price: 0.00001016, supply: 76.633 },
-  { price: 0.00000997, supply: 63.3 },
-];
-
-const orderBookDummySpotPrice = 0.00000977;
-
-type Order = {
-  price: number;
-  supply: number;
+type Props = {
+  orderBookUpdate: OrderBookUpdate[];
 };
 
 type Group = {
@@ -34,12 +18,16 @@ enum ActiveGrouping {
   Price = 1,
 }
 
+const orderBookDummySpotPrice = 15;
+
 const countDecimals = function (value: number) {
   if (Math.floor(value) === value) return 0;
   return value.toString().split(".")[1].length || 0;
 };
 
-const Intervention = () => {
+const Intervention = (props: Props) => {
+  const { orderBookUpdate } = props;
+
   const [priceRangeInc, setPriceRangeInc] = useState<number>(0);
   const [aboveOfferRangeInc, setAboveOfferRangeInc] = useState<number>(0);
 
@@ -86,20 +74,21 @@ const Intervention = () => {
             <div className="header supply">Supply</div>
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
-            ? orderBookDummyData.map((o, i) => (
+            ? orderBookUpdate[0].ask.map((o, i) => (
                 <div className="order" key={i}>
-                  <div className="deviation">{Math.floor((o.price / orderBookDummySpotPrice) * 100 - 100)}%</div>
-                  <div className="price">{o.price}</div>
-                  <div className="supply">{o.supply}</div>
+                  <div className="deviation">{Math.floor((o[0] / orderBookDummySpotPrice) * 100 - 100)}%</div>
+                  <div className="price">{o[0]}</div>
+                  <div className="supply">{o[1]}</div>
                 </div>
               ))
-            : orderBookDummyData
-                .reduce((acc: Group[], next: Order) => {
+            : orderBookUpdate[0].ask
+                .reduce((acc: Group[], next: [number, number]) => {
+                  //                   tuple: [price, supply]
                   const _decimals = countDecimals(orderBookDummySpotPrice);
 
-                  const _grouping = Math.floor((next.price - orderBookDummySpotPrice) / priceRangeInc);
+                  const _grouping = Math.floor((next[0] - orderBookDummySpotPrice) / priceRangeInc);
                   const _percentGrouping = Math.floor(
-                    Math.floor((next.price / orderBookDummySpotPrice) * 100 - 100) / aboveOfferRangeInc
+                    Math.floor((next[0] / orderBookDummySpotPrice) * 100 - 100) / aboveOfferRangeInc
                   );
 
                   const _existingGroup =
@@ -122,9 +111,9 @@ const Intervention = () => {
                       .toString();
 
                   const _deviation =
-                    Math.floor(((next.price - priceRangeInc) / orderBookDummySpotPrice) * 100 - 100).toString() +
+                    Math.floor(((next[0] - priceRangeInc) / orderBookDummySpotPrice) * 100 - 100).toString() +
                     "% - " +
-                    Math.floor((next.price / orderBookDummySpotPrice) * 100 - 100).toString() +
+                    Math.floor((next[0] / orderBookDummySpotPrice) * 100 - 100).toString() +
                     "%";
 
                   const _percentDeviation =
@@ -134,10 +123,10 @@ const Intervention = () => {
                     "%";
 
                   _existingGroup
-                    ? (_existingGroup.supply = _existingGroup.supply + next.supply)
+                    ? (_existingGroup.supply = _existingGroup.supply + next[1])
                     : acc.push({
                         grouping: aboveOfferRangeInc === 0 ? _grouping : _percentGrouping,
-                        supply: next.supply,
+                        supply: next[1],
                         price: aboveOfferRangeInc === 0 ? _groupingPrice : _percentGroupingPrice,
                         dev: aboveOfferRangeInc === 0 ? _deviation : _percentDeviation,
                       });
