@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { OrderBookUpdate } from "../App";
+import SweepAndPeg from "./SweepAndPeg";
 
 type Props = {
   orderBookUpdate: OrderBookUpdate[];
@@ -54,12 +55,14 @@ const Intervention = (props: Props) => {
       websocket.send(
         JSON.stringify({
           action: "CANCEL_ORDERS",
+          request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
           from_px: pr.from,
           to_px: pr.to,
         })
       );
     });
     //to do: create state for handling confirmation of order cancellation
+    //basically just match request_id and then show feedback of order cancellations still processing
   };
 
   return (
@@ -263,64 +266,7 @@ const Intervention = (props: Props) => {
                   </div>
                 ))}
         </div>
-        <div className="sweep-and-peg">
-          <h2>Sweep and Peg</h2>
-          <div className="tabs">
-            <div className="tab selected">Buy</div>
-            <div className="tab">Sell</div>
-          </div>
-          <div className="field">
-            <b>Limit Price (Target)</b>
-            <input />
-          </div>
-          <div className="field">
-            <b>Amount</b>
-            <div className="field col">
-              <input />
-              <select>
-                <option>USD</option>
-                <option>QTY</option>
-              </select>
-            </div>
-          </div>
-          <div className="field">
-            <b>Aggressiveness / Timing</b>
-            <select>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-          <div className="field">
-            <b>Peg Additional Orders</b>
-            <input type="checkbox" />
-          </div>
-          <b>Price Range</b>
-          <div className="field">
-            <span>From</span>
-            <input />
-            <span>To</span>
-            <input />
-          </div>
-          <div className="field">
-            <b>Amount</b>
-            <div className="field col">
-              <input />
-              <select>
-                <option>USD</option>
-                <option>QTY</option>
-              </select>
-            </div>
-          </div>
-          <div className="field">
-            <b>Aggressiveness / Timing</b>
-            <select>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </div>
-        </div>
+        <SweepAndPeg websocket={websocket} />
       </div>
     </div>
   );
