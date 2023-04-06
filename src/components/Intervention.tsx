@@ -4,6 +4,7 @@ import { OrderBookUpdate } from "../App";
 type Props = {
   orderBookUpdate: OrderBookUpdate[];
   spotPrice: number;
+  websocket: WebSocket;
 };
 
 enum OrderType {
@@ -35,7 +36,7 @@ const countDecimals = function (value: number) {
 };
 
 const Intervention = (props: Props) => {
-  const { orderBookUpdate, spotPrice } = props;
+  const { orderBookUpdate, spotPrice, websocket } = props;
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orders, setOrders] = useState<[number, number][]>(orderBookUpdate[0].ask);
@@ -47,6 +48,19 @@ const Intervention = (props: Props) => {
 
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<PriceRange[]>([]);
   const [highlightedGroups, setHighlightedGroups] = useState<number[]>([]);
+
+  const cancelOrders = () => {
+    selectedPriceRanges.forEach((pr, i) => {
+      websocket.send(
+        JSON.stringify({
+          action: "CANCEL_ORDERS",
+          from_px: pr.from,
+          to_px: pr.to,
+        })
+      );
+    });
+    //to do: create state for handling confirmation of order cancellation
+  };
 
   return (
     <div className="intervention">
@@ -109,7 +123,7 @@ const Intervention = (props: Props) => {
                 }}
               />
             </div>
-            <button className="supply" disabled={selectedPriceRanges.length === 0}>
+            <button className="supply" onClick={cancelOrders} disabled={selectedPriceRanges.length === 0}>
               Cancel Orders
             </button>
           </div>

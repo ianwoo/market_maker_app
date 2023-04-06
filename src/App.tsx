@@ -40,7 +40,7 @@ function App() {
     <HomePanel accountUpdate={accountUpdate} />,
     <AlgoControl />,
     accountUpdate.length > 0 ? (
-      <Intervention orderBookUpdate={orderBookUpdate} spotPrice={accountUpdate[0].price} />
+      <Intervention orderBookUpdate={orderBookUpdate} spotPrice={accountUpdate[0].price} websocket={websocket} />
     ) : (
       <div>Loading...</div>
     ),
