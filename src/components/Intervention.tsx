@@ -62,6 +62,8 @@ const Intervention = (props: Props) => {
             <div
               className={"tab" + (orderType === OrderType.Ask ? " selected" : "")}
               onClick={() => {
+                setSelectedPriceRanges([]);
+                setHighlightedGroups([]);
                 setOrderType(OrderType.Ask);
                 setOrders(orderBookUpdate[0].ask);
               }}
@@ -71,6 +73,8 @@ const Intervention = (props: Props) => {
             <div
               className={"tab" + (orderType === OrderType.Bid ? " selected" : "")}
               onClick={() => {
+                setSelectedPriceRanges([]);
+                setHighlightedGroups([]);
                 setOrderType(OrderType.Bid);
                 setOrders(orderBookUpdate[0].bid);
               }}
@@ -84,6 +88,8 @@ const Intervention = (props: Props) => {
               <input
                 type="number"
                 onChange={(e) => {
+                  setSelectedPriceRanges([]);
+                  setHighlightedGroups([]);
                   setPriceRangeInc(0);
                   Number(e.target.value) > 0 ? setAboveOfferRangeInc(Number(e.target.value)) : setAboveOfferRangeInc(0);
                   setActiveGrouping(ActiveGrouping.Percent);
@@ -95,13 +101,17 @@ const Intervention = (props: Props) => {
               <input
                 type="number"
                 onChange={(e) => {
+                  setSelectedPriceRanges([]);
+                  setHighlightedGroups([]);
                   setAboveOfferRangeInc(0);
                   Number(e.target.value) > 0 ? setPriceRangeInc(Number(e.target.value)) : setPriceRangeInc(0);
                   setActiveGrouping(ActiveGrouping.Price);
                 }}
               />
             </div>
-            <button className="supply">Cancel Orders</button>
+            <button className="supply" disabled={selectedPriceRanges.length === 0}>
+              Cancel Orders
+            </button>
           </div>
           <div className="headers">
             <div className="header deviation">% Above Offer</div>
@@ -110,7 +120,29 @@ const Intervention = (props: Props) => {
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
             ? orders.map((o, i) => (
-                <div className={"order " + (orderType ? "bid" : "ask")} key={i}>
+                <div
+                  className={
+                    "order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(i) ? " selected" : "")
+                  }
+                  onClick={() => {
+                    //if $ value price range increment...
+                    if (!highlightedGroups.includes(i)) {
+                      setSelectedPriceRanges([
+                        ...selectedPriceRanges,
+                        {
+                          from: o[0],
+                          to: o[0],
+                        },
+                      ]);
+                      setHighlightedGroups([...highlightedGroups, i]);
+                    } else if (highlightedGroups.includes(i)) {
+                      const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== o[0]);
+                      setSelectedPriceRanges(_priceRangesTargetRemoved);
+                      setHighlightedGroups(highlightedGroups.filter((hg) => hg !== i));
+                    }
+                  }}
+                  key={i}
+                >
                   <div className="deviation">{Math.floor((o[0] / spotPrice) * 100 - 100)}%</div>
                   <div className="price">{o[0]}</div>
                   <div className="supply">{o[1]}</div>
