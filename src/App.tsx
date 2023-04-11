@@ -31,6 +31,7 @@ function App() {
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
   websocket.onmessage = (event) => {
+    console.log(JSON.parse(event.data));
     const message = JSON.parse(event.data);
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
@@ -38,7 +39,7 @@ function App() {
 
   const components = [
     <HomePanel accountUpdate={accountUpdate} />,
-    <AlgoControl />,
+    <AlgoControl websocket={websocket} />,
     accountUpdate.length > 0 ? (
       <Intervention orderBookUpdate={orderBookUpdate} spotPrice={accountUpdate[0].price} websocket={websocket} />
     ) : (
