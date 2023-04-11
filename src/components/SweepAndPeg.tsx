@@ -20,6 +20,8 @@ const SweepAndPeg = (props: Props) => {
 
   const [addFromPrice, setAddFromPrice] = useState<number>();
   const [addToPrice, setAddToPrice] = useState<number>();
+  const [addNumberOrders, setAddNumberOrders] = useState<number>();
+  const [sweepAmount, setSweepAmount] = useState<number>();
 
   const handleSweepAndPeg = () => {
     websocket.send(
@@ -30,6 +32,8 @@ const SweepAndPeg = (props: Props) => {
         add_usd: addUSD,
         add_from_px: addFromPrice,
         add_to_px: addToPrice,
+        add_num_of_orders: addNumberOrders,
+        sweep_amt: sweepAmount,
       })
     );
   };
@@ -87,12 +91,12 @@ const SweepAndPeg = (props: Props) => {
             <input type="number" onChange={(e) => setAddToPrice(Number(e.target.value))} />
           </div>
           <div className="field">
-            <b>Aggressiveness / Timing</b>
-            <select>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
+            <b>Add Number of Orders</b>
+            <input type="number" onChange={(e) => setAddNumberOrders(Number(e.target.value))} />
+          </div>
+          <div className="field">
+            <b>Sweep Amount</b>
+            <input type="number" onChange={(e) => setSweepAmount(Number(e.target.value))} />
           </div>
         </div>
       ) : null}
