@@ -7,7 +7,9 @@ type Props = {
 const AlgoControl = (props: Props) => {
   const { websocket } = props;
 
-  const [config, setConfig] = useState<any>({});
+  const [config, setConfig] = useState<any>({}); //type later
+
+  const [configEdit, setConfigEdit] = useState<any>({});
 
   useEffect(() => {
     console.log("firing get config");
@@ -25,6 +27,21 @@ const AlgoControl = (props: Props) => {
     message.action === "GET_CONFIG" && setConfig(JSON.parse(message.result));
     console.log("CONFIG:");
     console.log(config);
+  };
+
+  const editConfig = () => {
+    websocket.send(
+      JSON.stringify({
+        action: "UPDATE_CONFIG",
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        update_params: {
+          vol_trade_per_hour: 0,
+          min_trade: 0,
+          max_trade: 0,
+          random_walk_degree: "",
+        },
+      })
+    );
   };
 
   return (
