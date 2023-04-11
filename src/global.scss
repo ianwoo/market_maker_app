@@ -60,6 +60,12 @@
       display: flex;
       justify-content: space-between;
 
+      .field {
+        &.highlighted {
+          background: lightblue;
+          color: blue;
+        }
+      }
       .field-group {
         display: flex;
         justify-content: space-around;

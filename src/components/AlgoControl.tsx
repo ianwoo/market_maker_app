@@ -12,7 +12,6 @@ const AlgoControl = (props: Props) => {
   const [configEdit, setConfigEdit] = useState<any>({});
 
   useEffect(() => {
-    console.log("firing get config");
     websocket.send(
       JSON.stringify({
         action: "GET_CONFIG",
@@ -22,11 +21,9 @@ const AlgoControl = (props: Props) => {
   }, [websocket]);
 
   websocket.onmessage = (event) => {
-    console.log(JSON.parse(event.data));
     const message = JSON.parse(event.data);
     message.action === "GET_CONFIG" && setConfig(JSON.parse(message.result));
-    console.log("CONFIG:");
-    console.log(config);
+    message.action === "GET_CONFIG" && setConfigEdit(JSON.parse(message.result));
   };
 
   const editConfig = () => {
@@ -34,12 +31,7 @@ const AlgoControl = (props: Props) => {
       JSON.stringify({
         action: "UPDATE_CONFIG",
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
-        update_params: {
-          vol_trade_per_hour: 0,
-          min_trade: 0,
-          max_trade: 0,
-          random_walk_degree: "",
-        },
+        update_params: configEdit,
       })
     );
   };
@@ -49,26 +41,57 @@ const AlgoControl = (props: Props) => {
       <div className="vol-algo">
         <h1>Volume</h1>
         <h2>ADV: $2.4m</h2>
-        <div className="field">
+        <div className={"field" + (config.vol_trade_per_hour !== configEdit.vol_trade_per_hour ? " highlighted" : "")}>
           <b>USD Vol Trade Per Hour</b>
-          <input value={config.vol_trade_per_hour} />
+          <div className="field col">
+            <b>{config.vol_trade_per_hour}</b>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, vol_trade_per_hour: e.target.value })}
+            />
+          </div>
         </div>
-        <div className="field">
+        <div className={"field" + (config.min_trade !== configEdit.min_trade ? " highlighted" : "")}>
           <b>Trade Slice Out Per Minute (Min)</b>
-          <input value={config.min_trade} />
+          <div className="field col">
+            <b>{config.min_trade}</b>
+            <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, min_trade: e.target.value })} />
+          </div>
         </div>
-        <div className="field">
+        <div className={"field" + (config.max_trade !== configEdit.max_trade ? " highlighted" : "")}>
           <b>Trade Slice Out Per Minute (Max)</b>
-          <input value={config.max_trade} />
+          <div className="field col">
+            <b>{config.max_trade}</b>
+            <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, max_trade: e.target.value })} />
+          </div>
         </div>
-        <div className="field">
+        <div className={"field" + (config.random_walk_degree !== configEdit.random_walk_degree ? " highlighted" : "")}>
           <b>Random Walk Degree</b>
-          <select value={config.random_walk_degree}>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
+          <div className="field col">
+            <b>{config.random_walk_degree}</b>
+            <select
+              onChange={(e) => {
+                setConfigEdit({ ...configEdit, random_walk_degree: e.target.value });
+              }}
+              defaultValue={config.random_walk_degree}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
         </div>
+        <button
+          disabled={
+            config.vol_trade_per_hour === configEdit.vol_trade_per_hour &&
+            config.min_trade === configEdit.min_trade &&
+            config.max_trade === configEdit.max_trade &&
+            config.random_walk_degree === configEdit.random_walk_degree
+          }
+          onClick={editConfig}
+        >
+          EDIT CONFIG
+        </button>
       </div>
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>
