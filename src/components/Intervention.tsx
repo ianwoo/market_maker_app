@@ -29,6 +29,8 @@ enum ActiveGrouping {
 type PriceRange = {
   from: number;
   to: number;
+  supply: number;
+  request_id?: number;
 };
 
 const countDecimals = function (value: number) {
@@ -50,12 +52,21 @@ const Intervention = (props: Props) => {
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<PriceRange[]>([]);
   const [highlightedGroups, setHighlightedGroups] = useState<number[]>([]);
 
+  const [cancellingPriceRanges, setCancellingPriceRanges] = useState<PriceRange[]>([]);
+
+  websocket.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id === message.request_id));
+  };
+
   const cancelOrders = () => {
     selectedPriceRanges.forEach((pr, i) => {
+      const id = Date.now();
+      setCancellingPriceRanges([...cancellingPriceRanges, { ...pr, request_id: id }]);
       websocket.send(
         JSON.stringify({
           action: "CANCEL_ORDERS",
-          request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+          request_id: id, //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
           from_px: pr.from,
           to_px: pr.to,
         })
@@ -126,14 +137,24 @@ const Intervention = (props: Props) => {
                 }}
               />
             </div>
-            <button className="supply" onClick={cancelOrders} disabled={selectedPriceRanges.length === 0}>
-              Cancel Orders
-            </button>
+            <div className="field col">
+              <button className="supply" onClick={cancelOrders} disabled={selectedPriceRanges.length === 0}>
+                Cancel Orders
+              </button>
+              {cancellingPriceRanges.map((cpr) => (
+                <div className="cancel">
+                  Cancelling all orders {cpr.from} to {cpr.to}
+                </div>
+              ))}
+            </div>
           </div>
           <div className="headers">
             <div className="header deviation">% Above Offer</div>
             <div className="header price">Price</div>
-            <div className="header supply">Supply</div>
+            <div className="header supply col">
+              <b>Supply</b>
+              <span>Total Supply: {orders.reduce((acc, next) => acc + next[1], 0)}</span>
+            </div>
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
             ? orders.map((o, i) => (
@@ -149,6 +170,7 @@ const Intervention = (props: Props) => {
                         {
                           from: o[0],
                           to: o[0],
+                          supply: o[1],
                         },
                       ]);
                       setHighlightedGroups([...highlightedGroups, i]);
@@ -230,6 +252,7 @@ const Intervention = (props: Props) => {
                           {
                             from: spotPrice + g.grouping * priceRangeInc,
                             to: spotPrice + (g.grouping + 1) * priceRangeInc,
+                            supply: g.supply,
                           },
                         ]);
                         setHighlightedGroups([...highlightedGroups, g.grouping]);
@@ -240,6 +263,7 @@ const Intervention = (props: Props) => {
                           {
                             from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * spotPrice,
                             to: ((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1,
+                            supply: g.supply,
                           },
                         ]);
                         setHighlightedGroups([...highlightedGroups, g.grouping]);

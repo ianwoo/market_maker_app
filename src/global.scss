@@ -117,6 +117,12 @@
           .headers {
             display: flex;
             justify-content: space-between;
+            .header {
+              &.col {
+                display: flex;
+                flex-direction: column;
+              }
+            }
           }
           .range-controls {
             .field.col {
