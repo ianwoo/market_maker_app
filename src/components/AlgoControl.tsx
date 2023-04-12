@@ -103,7 +103,11 @@ const AlgoControl = (props: Props) => {
         <h1>Order Book Depth</h1>
         <b>Best</b>
         <div className="field-group">
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.best_bid_price_range !== configEdit.best_bid_price_range ? " highlighted" : "")
+            }
+          >
             <span>
               Best Bid: <br />
               <b>{config.best_bid_price_range}</b>
@@ -113,7 +117,11 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.best_bid_random_walk !== configEdit.best_bid_random_walk ? " highlighted" : "")
+            }
+          >
             <span>
               Random Walk (Best Bid): <br />
               <b>{config.best_bid_random_walk}</b>
@@ -124,7 +132,11 @@ const AlgoControl = (props: Props) => {
               <option value="high">High</option>
             </select>
           </div>
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.best_ask_price_range !== configEdit.best_ask_price_range ? " highlighted" : "")
+            }
+          >
             <span>
               Best Ask: <br />
               <b>{config.best_ask_price_range}</b>
@@ -134,7 +146,11 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.best_ask_random_walk !== configEdit.best_ask_random_walk ? " highlighted" : "")
+            }
+          >
             <span>
               Random Walk (Best Ask): <br />
               <b>{config.best_ask_random_walk}</b>
@@ -147,7 +163,11 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.best_bid_order_depth !== configEdit.best_bid_order_depth ? " highlighted" : "")
+            }
+          >
             <span>
               Best Bid Order Depth: <br />
               <b>{config.best_bid_order_depth}</b>
@@ -159,7 +179,11 @@ const AlgoControl = (props: Props) => {
           </div>
           {/* spacer below */}
           <div />
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.best_ask_order_depth !== configEdit.best_ask_order_depth ? " highlighted" : "")
+            }
+          >
             <span>
               Best Ask Order Depth: <br />
               <b>{config.best_ask_order_depth}</b>
@@ -174,7 +198,11 @@ const AlgoControl = (props: Props) => {
         </div>
         <b>Total</b>
         <div className="field-group">
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.total_bid_price_range !== configEdit.total_bid_price_range ? " highlighted" : "")
+            }
+          >
             <span>
               Total Bid: <br />
               <b>{config.total_bid_price_range}</b>
@@ -184,7 +212,11 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.total_bid_random_walk !== configEdit.total_bid_random_walk ? " highlighted" : "")
+            }
+          >
             <span>
               Random Walk (Total Bid): <br />
               <b>{config.total_bid_random_walk}</b>
@@ -195,7 +227,11 @@ const AlgoControl = (props: Props) => {
               <option value="high">High</option>
             </select>
           </div>
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.total_ask_price_range !== configEdit.total_ask_price_range ? " highlighted" : "")
+            }
+          >
             <span>
               Total Ask: <br />
               <b>{config.total_ask_price_range}</b>
@@ -205,7 +241,11 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.total_ask_random_walk !== configEdit.total_ask_random_walk ? " highlighted" : "")
+            }
+          >
             <span>
               Random Walk (Total Ask): <br />
               <b>{config.total_ask_random_walk}</b>
@@ -218,7 +258,11 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.total_bid_order_depth !== configEdit.total_bid_order_depth ? " highlighted" : "")
+            }
+          >
             <span>
               Total Bid Order Depth: <br />
               <b>{config.total_bid_order_depth}</b>
@@ -230,7 +274,11 @@ const AlgoControl = (props: Props) => {
           </div>
           {/* spacer below */}
           <div />
-          <div className="field col">
+          <div
+            className={
+              "field col" + (config.total_ask_order_depth !== configEdit.total_ask_order_depth ? " highlighted" : "")
+            }
+          >
             <span>
               Total Ask Order Depth: <br />
               <b>{config.total_ask_order_depth}</b>
@@ -245,7 +293,7 @@ const AlgoControl = (props: Props) => {
         </div>
         <b>Spread</b>
         <div className="field-group">
-          <div className="field col">
+          <div className={"field col" + (config.spread !== configEdit.spread ? " highlighted" : "")}>
             <span>
               Spread: <br />
               <b>{config.spread}</b>
