@@ -68,8 +68,12 @@
       }
       .field-group {
         display: flex;
-        justify-content: space-around;
+        justify-content: flex-start;
+        gap: 25px;
         margin-bottom: 16px;
+        div {
+          width: 25%;
+        }
       }
       .vol-algo {
         width: 33%;

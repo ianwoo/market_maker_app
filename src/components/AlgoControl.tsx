@@ -104,14 +104,20 @@ const AlgoControl = (props: Props) => {
         <b>Best</b>
         <div className="field-group">
           <div className="field col">
-            <span>Best Bid: {config.best_bid_price_range}</span>
+            <span>
+              Best Bid: <br />
+              <b>{config.best_bid_price_range}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })}
             />
           </div>
           <div className="field col">
-            <span>Random Walk (Best Bid): {config.best_bid_random_walk}</span>
+            <span>
+              Random Walk (Best Bid): <br />
+              <b>{config.best_bid_random_walk}</b>
+            </span>
             <select onChange={(e) => setConfigEdit({ ...configEdit, best_bid_random_walk: e.target.value })}>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -119,14 +125,20 @@ const AlgoControl = (props: Props) => {
             </select>
           </div>
           <div className="field col">
-            <span>Best Ask: {config.best_ask_price_range}</span>
+            <span>
+              Best Ask: <br />
+              <b>{config.best_ask_price_range}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })}
             />
           </div>
           <div className="field col">
-            <span>Random Walk (Best Ask): {config.best_ask_random_walk}</span>
+            <span>
+              Random Walk (Best Ask): <br />
+              <b>{config.best_ask_random_walk}</b>
+            </span>
             <select onChange={(e) => setConfigEdit({ ...configEdit, best_ask_random_walk: e.target.value })}>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -136,7 +148,10 @@ const AlgoControl = (props: Props) => {
         </div>
         <div className="field-group">
           <div className="field col">
-            <span>Best Bid Order Depth: {config.best_bid_order_depth}</span>
+            <span>
+              Best Bid Order Depth: <br />
+              <b>{config.best_bid_order_depth}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })}
@@ -145,7 +160,10 @@ const AlgoControl = (props: Props) => {
           {/* spacer below */}
           <div />
           <div className="field col">
-            <span>Best Ask Order Depth: {config.best_ask_order_depth}</span>
+            <span>
+              Best Ask Order Depth: <br />
+              <b>{config.best_ask_order_depth}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })}
@@ -157,14 +175,20 @@ const AlgoControl = (props: Props) => {
         <b>Total</b>
         <div className="field-group">
           <div className="field col">
-            <span>Total Bid: {config.total_bid_price_range}</span>
+            <span>
+              Total Bid: <br />
+              <b>{config.total_bid_price_range}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })}
             />
           </div>
           <div className="field col">
-            <span>Random Walk (Total Bid): {config.total_bid_random_walk}</span>
+            <span>
+              Random Walk (Total Bid): <br />
+              <b>{config.total_bid_random_walk}</b>
+            </span>
             <select onChange={(e) => setConfigEdit({ ...configEdit, total_bid_random_walk: e.target.value })}>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -172,14 +196,20 @@ const AlgoControl = (props: Props) => {
             </select>
           </div>
           <div className="field col">
-            <span>Total Ask: {config.total_ask_price_range}</span>
+            <span>
+              Total Ask: <br />
+              <b>{config.total_ask_price_range}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })}
             />
           </div>
           <div className="field col">
-            <span>Random Walk (Total Ask): {config.total_ask_random_walk}</span>
+            <span>
+              Random Walk (Total Ask): <br />
+              <b>{config.total_ask_random_walk}</b>
+            </span>
             <select onChange={(e) => setConfigEdit({ ...configEdit, total_ask_random_walk: e.target.value })}>
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -189,7 +219,10 @@ const AlgoControl = (props: Props) => {
         </div>
         <div className="field-group">
           <div className="field col">
-            <span>Total Bid Order Depth: {config.total_bid_order_depth}</span>
+            <span>
+              Total Bid Order Depth: <br />
+              <b>{config.total_bid_order_depth}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })}
@@ -198,7 +231,10 @@ const AlgoControl = (props: Props) => {
           {/* spacer below */}
           <div />
           <div className="field col">
-            <span>Total Ask Order Depth: {config.total_ask_order_depth}</span>
+            <span>
+              Total Ask Order Depth: <br />
+              <b>{config.total_ask_order_depth}</b>
+            </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })}
@@ -210,7 +246,10 @@ const AlgoControl = (props: Props) => {
         <b>Spread</b>
         <div className="field-group">
           <div className="field col">
-            <span>Spread: {config.spread}</span>
+            <span>
+              Spread: <br />
+              <b>{config.spread}</b>
+            </span>
             <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, spread: e.target.value })} />
           </div>
         </div>
