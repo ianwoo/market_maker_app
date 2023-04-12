@@ -4,15 +4,15 @@ type Props = {
   websocket: WebSocket;
 };
 
-enum Tab {
-  Buy = 0,
-  Sell = 1,
-}
+// enum Tab {
+//   Buy = 0,
+//   Sell = 1,
+// }
 
 const SweepAndPeg = (props: Props) => {
   const { websocket } = props;
 
-  const [selected, setSelected] = useState<Tab>(0);
+  // const [selected, setSelected] = useState<Tab>(0);
   const [pegAdditionalOrders, setPegAdditionalOrders] = useState<boolean>(false);
 
   const [targetPrice, setTargetPrice] = useState<number>();
@@ -41,14 +41,14 @@ const SweepAndPeg = (props: Props) => {
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
-      <div className="tabs">
+      {/* <div className="tabs">
         <div className={"tab" + (selected === Tab.Buy ? " selected" : "")} onClick={() => setSelected(Tab.Buy)}>
           Buy
         </div>
         <div className={"tab" + (selected === Tab.Sell ? " selected" : "")} onClick={() => setSelected(Tab.Sell)}>
           Sell
         </div>
-      </div>
+      </div> */}
       <div className="field">
         <b>Limit Price (Target)</b>
         <input type="number" onChange={(e) => setTargetPrice(Number(e.target.value))} />
