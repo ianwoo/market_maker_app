@@ -39,6 +39,26 @@ const AlgoControl = (props: Props) => {
   return (
     <div className="algo-control">
       <div className="vol-algo">
+        <button
+          disabled={
+            config.vol_trade_per_hour === configEdit.vol_trade_per_hour &&
+            config.min_trade === configEdit.min_trade &&
+            config.max_trade === configEdit.max_trade &&
+            config.random_walk_degree === configEdit.random_walk_degree &&
+            config.best_bid_price_range === configEdit.best_bid_price_range &&
+            config.best_bid_random_walk === configEdit.best_bid_random_walk &&
+            config.best_ask_price_range === configEdit.best_ask_price_range &&
+            config.best_ask_random_walk === configEdit.best_ask_random_walk &&
+            config.best_bid_order_depth === configEdit.best_bid_order_depth &&
+            config.best_ask_order_depth === configEdit.best_ask_order_depth &&
+            config.total_bid_price_range === configEdit.total_bid_price_range &&
+            config.total_ask_order_depth === configEdit.total_ask_order_depth &&
+            config.spread === configEdit.spread
+          }
+          onClick={editConfig}
+        >
+          EDIT CONFIG
+        </button>
         <h1>Volume</h1>
         <h2>ADV: $2.4m</h2>
         <div className={"field" + (config.vol_trade_per_hour !== configEdit.vol_trade_per_hour ? " highlighted" : "")}>
@@ -87,17 +107,6 @@ const AlgoControl = (props: Props) => {
             </select>
           </div>
         </div>
-        <button
-          disabled={
-            config.vol_trade_per_hour === configEdit.vol_trade_per_hour &&
-            config.min_trade === configEdit.min_trade &&
-            config.max_trade === configEdit.max_trade &&
-            config.random_walk_degree === configEdit.random_walk_degree
-          }
-          onClick={editConfig}
-        >
-          EDIT CONFIG
-        </button>
       </div>
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>

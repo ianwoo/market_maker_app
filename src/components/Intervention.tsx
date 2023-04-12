@@ -154,6 +154,9 @@ const Intervention = (props: Props) => {
             <div className="header supply col">
               <b>Supply</b>
               <span>Total Supply: {orders.reduce((acc, next) => acc + next[1], 0)}</span>
+              {selectedPriceRanges.length > 0 ? (
+                <span>Selected Supply: {selectedPriceRanges.reduce((acc, next) => acc + next.supply, 0)}</span>
+              ) : null}
             </div>
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
