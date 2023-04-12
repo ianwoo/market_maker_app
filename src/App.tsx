@@ -15,8 +15,9 @@ type AccountUpdate = {
 };
 
 export type OrderBookUpdate = {
-  exchange: string;
+  exchange?: string;
   obtype: string;
+  account?: string;
   bid: [number, number][]; //tuple: [price, supply]
   ask: [number, number][]; //tuple: [price, supply]
 };
@@ -32,6 +33,7 @@ function App() {
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
+    console.log(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
   };

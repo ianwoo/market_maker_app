@@ -42,6 +42,7 @@ const Intervention = (props: Props) => {
   const { orderBookUpdate, spotPrice, websocket } = props;
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
+  const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
   const [orders, setOrders] = useState<[number, number][]>(orderBookUpdate[0].ask);
 
   const [priceRangeInc, setPriceRangeInc] = useState<number>(0);
@@ -87,28 +88,32 @@ const Intervention = (props: Props) => {
             <b>{spotPrice}</b>
           </div>
           <div className="tabs">
-            <div
-              className={"tab" + (orderType === OrderType.Ask ? " selected" : "")}
-              onClick={() => {
-                setSelectedPriceRanges([]);
-                setHighlightedGroups([]);
-                setOrderType(OrderType.Ask);
-                setOrders(orderBookUpdate[0].ask);
-              }}
-            >
-              Asks
-            </div>
-            <div
-              className={"tab" + (orderType === OrderType.Bid ? " selected" : "")}
-              onClick={() => {
-                setSelectedPriceRanges([]);
-                setHighlightedGroups([]);
-                setOrderType(OrderType.Bid);
-                setOrders(orderBookUpdate[0].bid);
-              }}
-            >
-              Bids
-            </div>
+            {orderBookUpdate.map((obu, i) => [
+              <div
+                className={"tab" + (orderType === OrderType.Ask && orderBookIdx === i ? " selected" : "")}
+                onClick={() => {
+                  setSelectedPriceRanges([]);
+                  setHighlightedGroups([]);
+                  setOrderType(OrderType.Ask);
+                  setOrderBookIdx(i);
+                  setOrders(obu.ask);
+                }}
+              >
+                {obu.obtype === "total" ? obu.exchange + " Total" : obu.account} Asks
+              </div>,
+              <div
+                className={"tab" + (orderType === OrderType.Bid && orderBookIdx === i ? " selected" : "")}
+                onClick={() => {
+                  setSelectedPriceRanges([]);
+                  setHighlightedGroups([]);
+                  setOrderType(OrderType.Bid);
+                  setOrderBookIdx(i);
+                  setOrders(obu.bid);
+                }}
+              >
+                {obu.obtype === "total" ? obu.exchange + " Total" : obu.account} Bids
+              </div>,
+            ])}
           </div>
           <div className="range-controls">
             <div className={"field col deviation" + (activeGrouping === ActiveGrouping.Percent ? " active" : "")}>
@@ -138,9 +143,13 @@ const Intervention = (props: Props) => {
               />
             </div>
             <div className="field col">
-              <button className="supply" onClick={cancelOrders} disabled={selectedPriceRanges.length === 0}>
-                Cancel Orders
-              </button>
+              {orderBookIdx !== 0 ? (
+                <button className="supply" onClick={cancelOrders} disabled={selectedPriceRanges.length === 0}>
+                  Cancel Orders
+                </button>
+              ) : (
+                <div className="supply">Cannot Cancel External Orders</div>
+              )}
               {cancellingPriceRanges.map((cpr) => (
                 <div className="cancel">
                   Cancelling all orders {cpr.from} to {cpr.to}
