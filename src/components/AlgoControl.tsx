@@ -13,6 +13,29 @@ const AlgoControl = (props: Props) => {
   const [config, setConfig] = useState<any>({}); //type later
   const [configEdit, setConfigEdit] = useState<any>({});
 
+  const [totalAskPriceInUSD, setTotalAskPriceInUSD] = useState<number>(spotPrice * (1 + config.total_ask_price_range));
+  const [totalBidPriceInUSD, setTotalBidPriceInUSD] = useState<number>(spotPrice * (1 - config.total_bid_price_range));
+  const [bestAskPriceInUSD, setBestAskPriceInUSD] = useState<number>(spotPrice * (1 + config.best_ask_price_range));
+  const [bestBidPriceInUSD, setBestBidPriceInUSD] = useState<number>(spotPrice * (1 - config.best_bid_price_range));
+  const [spreadUpperPrice, setSpreadUpperPrice] = useState<number>(spotPrice * (1 + config.spread / 2));
+  const [spreadLowerPrice, setSpreadLowerPrice] = useState<number>(spotPrice * (1 - config.spread / 2));
+
+  useEffect(() => {
+    configEdit.total_ask_price_range && setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
+    configEdit.total_bid_price_range && setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
+    configEdit.best_ask_price_range && setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
+    configEdit.best_bid_price_range && setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
+    configEdit.spread && setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
+    configEdit.spread && setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
+  }, [
+    spotPrice,
+    configEdit.total_ask_price_range,
+    configEdit.total_bid_price_range,
+    configEdit.best_ask_price_range,
+    configEdit.best_bid_price_range,
+    configEdit.spread,
+  ]);
+
   useEffect(() => {
     websocket.send(
       JSON.stringify({
@@ -37,14 +60,6 @@ const AlgoControl = (props: Props) => {
       })
     );
   };
-
-  const totalAskPriceInUSD = spotPrice * (1 + config.total_ask_price_range);
-  const totalBidPriceInUSD = spotPrice * (1 - config.total_bid_price_range);
-  const bestAskPriceInUSD = spotPrice * (1 + config.best_ask_price_range);
-  const bestBidPriceInUSD = spotPrice * (1 - config.best_bid_price_range);
-
-  const spreadUpperPrice = spotPrice * (1 + config.spread / 2);
-  const spreadLowerPrice = spotPrice * (1 - config.spread / 2);
 
   return (
     <div className="algo-control">
