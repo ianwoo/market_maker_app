@@ -145,10 +145,6 @@ const AlgoControl = (props: Props) => {
             </span>
             <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, spread: e.target.value })} />
           </div>
-          {/* <div className="field col">
-            Est. Total Qty in Between: <br />
-            <b>?</b>
-          </div> */}
         </div>
         <div className="field-group">
           <div
@@ -169,9 +165,17 @@ const AlgoControl = (props: Props) => {
             />
           </div>
           <div className="field col">
-            Upper Total Range Price <br />
-            / Total Ask Price: <br />
+            <span>
+              Upper Total Range Price <br />
+              / Total Ask Price: <br />
+            </span>
             <b>{totalAskPriceInUSD}$</b>
+          </div>
+          <div className="field col">
+            <span>Upper Total Range Quantity</span>
+            <b>
+              {orderBook.ask.filter((ask, i) => ask[0] <= totalAskPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+            </b>
           </div>
           <div
             className={
@@ -228,6 +232,12 @@ const AlgoControl = (props: Props) => {
               <br />
             </span>
             <b>{bestAskPriceInUSD}$</b>
+          </div>
+          <div className="field col">
+            <span>Upper Best Range Quantity</span>
+            <b>
+              {orderBook.ask.filter((ask, i) => ask[0] <= bestAskPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+            </b>
           </div>
           <div
             className={
@@ -301,6 +311,12 @@ const AlgoControl = (props: Props) => {
             </span>
             <b>{bestBidPriceInUSD}$</b>
           </div>
+          <div className="field col">
+            <span>Lower Best Range Quantity</span>
+            <b>
+              {orderBook.bid.filter((bid, i) => bid[0] >= bestBidPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+            </b>
+          </div>
           <div
             className={
               "field col" + (config.best_bid_order_depth !== configEdit.best_bid_order_depth ? " highlighted" : "")
@@ -356,6 +372,12 @@ const AlgoControl = (props: Props) => {
               Total Bid Price:
             </span>
             <b>{totalBidPriceInUSD}$</b>
+          </div>
+          <div className="field col">
+            <span>Lower Total Range Quantity</span>
+            <b>
+              {orderBook.bid.filter((bid, i) => bid[0] >= totalBidPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+            </b>
           </div>
           <div
             className={
