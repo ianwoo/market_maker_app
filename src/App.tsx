@@ -42,12 +42,15 @@ function App() {
     // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
     <AlgoControl
       websocket={websocket}
-      spotPrice={accountUpdate[0].price}
-      upperPrice={[...orderBookUpdate[0].ask].sort((a, b) => a[0] - b[0])[0][0]}
-      lowerPrice={[...orderBookUpdate[0].bid].sort((a, b) => b[0] - a[0])[0][0]}
+      spotPrice={accountUpdate.length > 0 ? accountUpdate[0].price : 0}
+      orderBook={orderBookUpdate[0]}
     />,
     accountUpdate.length > 0 ? (
-      <Intervention orderBookUpdate={orderBookUpdate} spotPrice={accountUpdate[0].price} websocket={websocket} />
+      <Intervention
+        orderBookUpdate={orderBookUpdate}
+        spotPrice={accountUpdate.length > 0 ? accountUpdate[0].price : 0}
+        websocket={websocket}
+      />
     ) : (
       <div>Loading...</div>
     ),
@@ -60,7 +63,8 @@ function App() {
           <div
             key={i}
             className={"tab" + (selectedTabIdx === i ? " selected" : "")}
-            onClick={() => setSelectedTabIdx(i)}
+            // conditions are to ensure websocket packages are received before switching component
+            onClick={() => accountUpdate.length > 0 && orderBookUpdate.length > 0 && setSelectedTabIdx(i)}
           >
             <span>{tab}</span>
           </div>

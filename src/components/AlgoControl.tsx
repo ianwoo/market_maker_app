@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
+import { OrderBookUpdate } from "../App";
 
 type Props = {
   websocket: WebSocket;
   spotPrice: number;
-  upperPrice: number;
-  lowerPrice: number;
+  orderBook: OrderBookUpdate;
 };
 
 const AlgoControl = (props: Props) => {
-  const { websocket, spotPrice, upperPrice, lowerPrice } = props;
+  const { websocket, spotPrice, orderBook } = props;
 
   const [config, setConfig] = useState<any>({}); //type later
-
   const [configEdit, setConfigEdit] = useState<any>({});
+
+  const [upperPrice, setUpperPrice] = useState<number>(0);
+  const [lowerPrice, setLowerPrice] = useState<number>(0);
+
+  useEffect(() => {
+    setUpperPrice([...orderBook.ask].sort((a, b) => a[0] - b[0])[0][0]);
+    setLowerPrice([...orderBook.bid].sort((a, b) => b[0] - a[0])[0][0]);
+  }, [orderBook]);
 
   useEffect(() => {
     websocket.send(
