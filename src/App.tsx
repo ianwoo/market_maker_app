@@ -33,14 +33,19 @@ function App() {
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    console.log(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
   };
 
   const components = [
     <HomePanel accountUpdate={accountUpdate} />,
-    <AlgoControl websocket={websocket} />,
+    // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
+    <AlgoControl
+      websocket={websocket}
+      spotPrice={accountUpdate[0].price}
+      upperPrice={[...orderBookUpdate[0].ask].sort((a, b) => a[0] - b[0])[0][0]}
+      lowerPrice={[...orderBookUpdate[0].bid].sort((a, b) => b[0] - a[0])[0][0]}
+    />,
     accountUpdate.length > 0 ? (
       <Intervention orderBookUpdate={orderBookUpdate} spotPrice={accountUpdate[0].price} websocket={websocket} />
     ) : (

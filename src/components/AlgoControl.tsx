@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 
 type Props = {
   websocket: WebSocket;
+  spotPrice: number;
+  upperPrice: number;
+  lowerPrice: number;
 };
 
 const AlgoControl = (props: Props) => {
-  const { websocket } = props;
+  const { websocket, spotPrice, upperPrice, lowerPrice } = props;
 
   const [config, setConfig] = useState<any>({}); //type later
 
@@ -35,6 +38,11 @@ const AlgoControl = (props: Props) => {
       })
     );
   };
+
+  const totalAskPriceInUSD = spotPrice * (1 + config.total_ask_price_range);
+  const totalBidPriceInUSD = spotPrice * (1 - config.total_bid_price_range);
+  const bestAskPriceInUSD = spotPrice * (1 + config.best_ask_price_range);
+  const bestBidPriceInUSD = spotPrice * (1 - config.best_bid_price_range);
 
   return (
     <div className="algo-control">
@@ -110,144 +118,66 @@ const AlgoControl = (props: Props) => {
       </div>
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>
-        <b>Best</b>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.best_bid_price_range !== configEdit.best_bid_price_range ? " highlighted" : "")
-            }
-          >
-            <span>
-              Best Bid: <br />
-              <b>{config.best_bid_price_range}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })}
-            />
-          </div>
-          <div
-            className={
-              "field col" + (config.best_bid_random_walk !== configEdit.best_bid_random_walk ? " highlighted" : "")
-            }
-          >
-            <span>
-              Random Walk (Best Bid): <br />
-              <b>{config.best_bid_random_walk}</b>
-            </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, best_bid_random_walk: e.target.value })}>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-          <div
-            className={
-              "field col" + (config.best_ask_price_range !== configEdit.best_ask_price_range ? " highlighted" : "")
-            }
-          >
-            <span>
-              Best Ask: <br />
-              <b>{config.best_ask_price_range}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })}
-            />
-          </div>
-          <div
-            className={
-              "field col" + (config.best_ask_random_walk !== configEdit.best_ask_random_walk ? " highlighted" : "")
-            }
-          >
-            <span>
-              Random Walk (Best Ask): <br />
-              <b>{config.best_ask_random_walk}</b>
-            </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, best_ask_random_walk: e.target.value })}>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+          <div className="field col">
+            <span>Total Range in $:</span>
+            <span>{totalAskPriceInUSD - totalBidPriceInUSD}</span>
           </div>
         </div>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.best_bid_order_depth !== configEdit.best_bid_order_depth ? " highlighted" : "")
-            }
-          >
-            <span>
-              Best Bid Order Depth: <br />
-              <b>{config.best_bid_order_depth}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })}
-            />
+          <div className="field col">
+            <span>Best Range in $:</span>
+            <span>{bestAskPriceInUSD - bestBidPriceInUSD}</span>
           </div>
-          {/* spacer below */}
-          <div />
-          <div
-            className={
-              "field col" + (config.best_ask_order_depth !== configEdit.best_ask_order_depth ? " highlighted" : "")
-            }
-          >
-            <span>
-              Best Ask Order Depth: <br />
-              <b>{config.best_ask_order_depth}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })}
-            />
-          </div>
-          {/* spacer below */}
-          <div />
         </div>
-        <b>Total</b>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.total_bid_price_range !== configEdit.total_bid_price_range ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (config.spread !== configEdit.spread ? " highlighted" : "")}>
             <span>
-              Total Bid: <br />
-              <b>{config.total_bid_price_range}</b>
+              Price Gap Allowance / Spread: <br />
+              <b>{config.spread}</b>
             </span>
-            <input
-              type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })}
-            />
+            <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, spread: e.target.value })} />
           </div>
-          <div
-            className={
-              "field col" + (config.total_bid_random_walk !== configEdit.total_bid_random_walk ? " highlighted" : "")
-            }
-          >
-            <span>
-              Random Walk (Total Bid): <br />
-              <b>{config.total_bid_random_walk}</b>
-            </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, total_bid_random_walk: e.target.value })}>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+          {/* <div className="field col">
+            Est. Total Qty in Between: <br />
+            <b>?</b>
+          </div> */}
+        </div>
+        <div className="field-group">
           <div
             className={
               "field col" + (config.total_ask_price_range !== configEdit.total_ask_price_range ? " highlighted" : "")
             }
           >
             <span>
-              Total Ask: <br />
-              <b>{config.total_ask_price_range}</b>
+              Upper Total Range
+              <br />/ Total Ask: <br />
+              <b>
+                {config.total_ask_price_range} / {config.total_ask_price_range * 100}%
+              </b>
             </span>
             <input
               type="number"
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })}
+            />
+          </div>
+          <div className="field col">
+            Upper Total Range Price <br />
+            / Total Ask Price: <br />
+            <b>{totalAskPriceInUSD}$</b>
+          </div>
+          <div
+            className={
+              "field col" + (config.total_ask_order_depth !== configEdit.total_ask_order_depth ? " highlighted" : "")
+            }
+          >
+            <span>
+              Total Ask Order Depth: <br />
+              <b>{config.total_ask_order_depth}</b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })}
             />
           </div>
           <div
@@ -269,6 +199,159 @@ const AlgoControl = (props: Props) => {
         <div className="field-group">
           <div
             className={
+              "field col" + (config.best_ask_price_range !== configEdit.best_ask_price_range ? " highlighted" : "")
+            }
+          >
+            <span>
+              Upper Best Range /<br />
+              Best Ask: <br />
+              <b>
+                {config.best_ask_price_range} / {config.best_ask_price_range * 100}%
+              </b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })}
+            />
+          </div>
+          <div className="field col">
+            <span>
+              Upper Best Range Price / <br />
+              Best Ask Price:
+              <br />
+            </span>
+            <b>{bestAskPriceInUSD}$</b>
+          </div>
+          <div
+            className={
+              "field col" + (config.best_ask_order_depth !== configEdit.best_ask_order_depth ? " highlighted" : "")
+            }
+          >
+            <span>
+              Best Ask Order Depth: <br />
+              <b>{config.best_ask_order_depth}</b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })}
+            />
+          </div>
+          <div
+            className={
+              "field col" + (config.best_ask_random_walk !== configEdit.best_ask_random_walk ? " highlighted" : "")
+            }
+          >
+            <span>
+              Random Walk (Best Ask): <br />
+              <b>{config.best_ask_random_walk}</b>
+            </span>
+            <select onChange={(e) => setConfigEdit({ ...configEdit, best_ask_random_walk: e.target.value })}>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+        <div className="field-group">
+          <div className="field col">
+            <span>Upper Price</span>
+            <b>{upperPrice}$</b>
+          </div>
+        </div>
+        <div className="field-group">
+          <div className="field col">
+            <span>Spot Price</span>
+            <b>{spotPrice}$</b>
+          </div>
+        </div>
+        <div className="field-group">
+          <div className="field col">
+            <span>Lower Price</span>
+            <b>{lowerPrice}$</b>
+          </div>
+        </div>
+        <div className="field-group">
+          <div
+            className={
+              "field col" + (config.best_bid_price_range !== configEdit.best_bid_price_range ? " highlighted" : "")
+            }
+          >
+            <span>
+              Lower Best Range /<br />
+              Best Bid: <br />
+              <b>
+                {config.best_bid_price_range} / {config.best_bid_price_range * 100}%
+              </b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })}
+            />
+          </div>
+          <div className="field col">
+            <span>
+              Lower Best Range Price /<br /> Best Bid Price
+            </span>
+            <b>{bestBidPriceInUSD}$</b>
+          </div>
+          <div
+            className={
+              "field col" + (config.best_bid_order_depth !== configEdit.best_bid_order_depth ? " highlighted" : "")
+            }
+          >
+            <span>
+              Best Bid Order Depth: <br />
+              <b>{config.best_bid_order_depth}</b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })}
+            />
+          </div>
+          <div
+            className={
+              "field col" + (config.best_bid_random_walk !== configEdit.best_bid_random_walk ? " highlighted" : "")
+            }
+          >
+            <span>
+              Random Walk (Best Bid): <br />
+              <b>{config.best_bid_random_walk}</b>
+            </span>
+            <select onChange={(e) => setConfigEdit({ ...configEdit, best_bid_random_walk: e.target.value })}>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+        <div className="field-group">
+          <div
+            className={
+              "field col" + (config.total_bid_price_range !== configEdit.total_bid_price_range ? " highlighted" : "")
+            }
+          >
+            <span>
+              Lower Total Range
+              <br />
+              Total Bid: <br />
+              <b>
+                {config.total_bid_price_range} / {config.total_bid_price_range * 100}%
+              </b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) => setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })}
+            />
+          </div>
+          <div className="field col">
+            <span>
+              Lower Total Range Price /<br />
+              Total Bid Price:
+            </span>
+            <b>{totalBidPriceInUSD}$</b>
+          </div>
+          <div
+            className={
               "field col" + (config.total_bid_order_depth !== configEdit.total_bid_order_depth ? " highlighted" : "")
             }
           >
@@ -281,33 +364,20 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })}
             />
           </div>
-          {/* spacer below */}
-          <div />
           <div
             className={
-              "field col" + (config.total_ask_order_depth !== configEdit.total_ask_order_depth ? " highlighted" : "")
+              "field col" + (config.total_bid_random_walk !== configEdit.total_bid_random_walk ? " highlighted" : "")
             }
           >
             <span>
-              Total Ask Order Depth: <br />
-              <b>{config.total_ask_order_depth}</b>
+              Random Walk (Total Bid): <br />
+              <b>{config.total_bid_random_walk}</b>
             </span>
-            <input
-              type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })}
-            />
-          </div>
-          {/* spacer below */}
-          <div />
-        </div>
-        <b>Spread</b>
-        <div className="field-group">
-          <div className={"field col" + (config.spread !== configEdit.spread ? " highlighted" : "")}>
-            <span>
-              Spread: <br />
-              <b>{config.spread}</b>
-            </span>
-            <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, spread: e.target.value })} />
+            <select onChange={(e) => setConfigEdit({ ...configEdit, total_bid_random_walk: e.target.value })}>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
           </div>
         </div>
         {/* <b>Density</b>
