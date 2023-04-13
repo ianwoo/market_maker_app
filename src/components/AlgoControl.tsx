@@ -13,14 +13,6 @@ const AlgoControl = (props: Props) => {
   const [config, setConfig] = useState<any>({}); //type later
   const [configEdit, setConfigEdit] = useState<any>({});
 
-  const [upperPrice, setUpperPrice] = useState<number>(0);
-  const [lowerPrice, setLowerPrice] = useState<number>(0);
-
-  useEffect(() => {
-    setUpperPrice([...orderBook.ask].sort((a, b) => a[0] - b[0])[0][0]);
-    setLowerPrice([...orderBook.bid].sort((a, b) => b[0] - a[0])[0][0]);
-  }, [orderBook]);
-
   useEffect(() => {
     websocket.send(
       JSON.stringify({
@@ -50,6 +42,9 @@ const AlgoControl = (props: Props) => {
   const totalBidPriceInUSD = spotPrice * (1 - config.total_bid_price_range);
   const bestAskPriceInUSD = spotPrice * (1 + config.best_ask_price_range);
   const bestBidPriceInUSD = spotPrice * (1 - config.best_bid_price_range);
+
+  const spreadUpperPrice = spotPrice * (1 + config.spread / 2);
+  const spreadLowerPrice = spotPrice * (1 - config.spread / 2);
 
   return (
     <div className="algo-control">
@@ -272,7 +267,7 @@ const AlgoControl = (props: Props) => {
         <div className="field-group">
           <div className="field col">
             <span>Upper Price</span>
-            <b>{upperPrice}$</b>
+            <b>{spreadUpperPrice}$</b>
           </div>
         </div>
         <div className="field-group">
@@ -284,7 +279,7 @@ const AlgoControl = (props: Props) => {
         <div className="field-group">
           <div className="field col">
             <span>Lower Price</span>
-            <b>{lowerPrice}$</b>
+            <b>{spreadLowerPrice}$</b>
           </div>
         </div>
         <div className="field-group">
