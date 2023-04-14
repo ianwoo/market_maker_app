@@ -21,20 +21,19 @@ const AlgoControl = (props: Props) => {
   const [spreadLowerPrice, setSpreadLowerPrice] = useState<number>(spotPrice * (1 - config.spread / 2));
 
   useEffect(() => {
-    configEdit.total_ask_price_range && setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
-    configEdit.total_bid_price_range && setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
-    configEdit.best_ask_price_range && setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
-    configEdit.best_bid_price_range && setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
-    configEdit.spread && setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
-    configEdit.spread && setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
-  }, [
-    spotPrice,
-    configEdit.total_ask_price_range,
-    configEdit.total_bid_price_range,
-    configEdit.best_ask_price_range,
-    configEdit.best_bid_price_range,
-    configEdit.spread,
-  ]);
+    configEdit.total_ask_price_range !== config.total_ask_price_range &&
+      setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
+    configEdit.total_bid_price_range !== config.total_bid_price_range &&
+      setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
+    configEdit.best_ask_price_range !== config.best_ask_price_range &&
+      setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
+    configEdit.best_bid_price_range !== config.best_bid_price_range &&
+      setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
+    if (configEdit.spread !== config.spread) {
+      setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
+      setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
+    }
+  }, [spotPrice, config, configEdit]);
 
   useEffect(() => {
     websocket.send(
@@ -61,24 +60,29 @@ const AlgoControl = (props: Props) => {
     );
   };
 
+  let compare: any = {}; //type later;
+  for (const prop in config) {
+    compare[prop] = config[prop] !== configEdit[prop] ? false : true;
+  }
+
   return (
     <div className="algo-control">
       <div className="vol-algo">
         <button
           disabled={
-            config.vol_trade_per_hour === configEdit.vol_trade_per_hour &&
-            config.min_trade === configEdit.min_trade &&
-            config.max_trade === configEdit.max_trade &&
-            config.random_walk_degree === configEdit.random_walk_degree &&
-            config.best_bid_price_range === configEdit.best_bid_price_range &&
-            config.best_bid_random_walk === configEdit.best_bid_random_walk &&
-            config.best_ask_price_range === configEdit.best_ask_price_range &&
-            config.best_ask_random_walk === configEdit.best_ask_random_walk &&
-            config.best_bid_order_depth === configEdit.best_bid_order_depth &&
-            config.best_ask_order_depth === configEdit.best_ask_order_depth &&
-            config.total_bid_price_range === configEdit.total_bid_price_range &&
-            config.total_ask_order_depth === configEdit.total_ask_order_depth &&
-            config.spread === configEdit.spread
+            compare.vol_trade_per_hour &&
+            compare.min_trade &&
+            compare.max_trade &&
+            compare.random_walk_degree &&
+            compare.best_bid_price_range &&
+            compare.best_bid_random_walk &&
+            compare.best_ask_price_range &&
+            compare.best_ask_random_walk &&
+            compare.best_bid_order_depth &&
+            compare.best_ask_order_depth &&
+            compare.total_bid_price_range &&
+            compare.total_ask_order_depth &&
+            compare.spread
           }
           onClick={editConfig}
         >
@@ -86,7 +90,7 @@ const AlgoControl = (props: Props) => {
         </button>
         <h1>Volume</h1>
         <h2>ADV: $2.4m</h2>
-        <div className={"field" + (config.vol_trade_per_hour !== configEdit.vol_trade_per_hour ? " highlighted" : "")}>
+        <div className={"field" + (!compare.vol_trade_per_hour ? " highlighted" : "")}>
           <b>USD Vol Trade Per Hour</b>
           <div className="field col">
             <b>{config.vol_trade_per_hour}</b>
@@ -96,7 +100,7 @@ const AlgoControl = (props: Props) => {
             />
           </div>
         </div>
-        <div className={"field" + (config.min_trade !== configEdit.min_trade ? " highlighted" : "")}>
+        <div className={"field" + (!compare.min_trade ? " highlighted" : "")}>
           <b>Trade Slice Out Per Minute (Min)</b>
           <div className="field col">
             <b>{config.min_trade}</b>
@@ -106,7 +110,7 @@ const AlgoControl = (props: Props) => {
             />
           </div>
         </div>
-        <div className={"field" + (config.max_trade !== configEdit.max_trade ? " highlighted" : "")}>
+        <div className={"field" + (!compare.max_trade ? " highlighted" : "")}>
           <b>Trade Slice Out Per Minute (Max)</b>
           <div className="field col">
             <b>{config.max_trade}</b>
@@ -116,7 +120,7 @@ const AlgoControl = (props: Props) => {
             />
           </div>
         </div>
-        <div className={"field" + (config.random_walk_degree !== configEdit.random_walk_degree ? " highlighted" : "")}>
+        <div className={"field" + (!compare.random_walk_degree ? " highlighted" : "")}>
           <b>Random Walk Degree</b>
           <div className="field col">
             <b>{config.random_walk_degree}</b>
@@ -136,19 +140,27 @@ const AlgoControl = (props: Props) => {
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>
         <div className="field-group">
-          <div className="field col">
+          <div
+            className={
+              "field col" + !compare.total_ask_price_range || !compare.total_bid_price_range ? " highlighted" : ""
+            }
+          >
             <span>Total Range in $:</span>
             <span>{totalAskPriceInUSD - totalBidPriceInUSD}</span>
           </div>
         </div>
         <div className="field-group">
-          <div className="field col">
+          <div
+            className={
+              "field col" + !compare.best_ask_price_range || !compare.best_bid_price_range ? " highlighted" : ""
+            }
+          >
             <span>Best Range in $:</span>
             <span>{bestAskPriceInUSD - bestBidPriceInUSD}</span>
           </div>
         </div>
         <div className="field-group">
-          <div className={"field col" + (config.spread !== configEdit.spread ? " highlighted" : "")}>
+          <div className={"field col" + (!compare.spread ? " highlighted" : "")}>
             <span>
               Price Gap Allowance / Spread: <br />
               <b>{config.spread}</b>
@@ -157,11 +169,7 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.total_ask_price_range !== configEdit.total_ask_price_range ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
             <span>
               Upper Total Range
               <br />/ Total Ask: <br />
@@ -174,24 +182,20 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div className={"field col" + !compare.total_ask_price_range ? " highlighted" : ""}>
             <span>
               Upper Total Range Price <br />
               / Total Ask Price: <br />
             </span>
             <b>{totalAskPriceInUSD}$</b>
           </div>
-          <div className="field col">
+          <div className={"field col" + !compare.total_ask_price_range ? " highlighted" : ""}>
             <span>Upper Total Range Quantity</span>
             <b>
               {orderBook.ask.filter((ask, i) => ask[0] <= totalAskPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
-          <div
-            className={
-              "field col" + (config.total_ask_order_depth !== configEdit.total_ask_order_depth ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.total_ask_order_depth ? " highlighted" : "")}>
             <span>
               Total Ask Order Depth: <br />
               <b>{config.total_ask_order_depth}</b>
@@ -201,11 +205,7 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })}
             />
           </div>
-          <div
-            className={
-              "field col" + (config.total_ask_random_walk !== configEdit.total_ask_random_walk ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.total_ask_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Total Ask): <br />
               <b>{config.total_ask_random_walk}</b>
@@ -218,11 +218,7 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.best_ask_price_range !== configEdit.best_ask_price_range ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
             <span>
               Upper Best Range /<br />
               Best Ask: <br />
@@ -249,11 +245,7 @@ const AlgoControl = (props: Props) => {
               {orderBook.ask.filter((ask, i) => ask[0] <= bestAskPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
-          <div
-            className={
-              "field col" + (config.best_ask_order_depth !== configEdit.best_ask_order_depth ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.best_ask_order_depth ? " highlighted" : "")}>
             <span>
               Best Ask Order Depth: <br />
               <b>{config.best_ask_order_depth}</b>
@@ -263,11 +255,7 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })}
             />
           </div>
-          <div
-            className={
-              "field col" + (config.best_ask_random_walk !== configEdit.best_ask_random_walk ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.best_ask_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Best Ask): <br />
               <b>{config.best_ask_random_walk}</b>
@@ -298,11 +286,7 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.best_bid_price_range !== configEdit.best_bid_price_range ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
             <span>
               Lower Best Range /<br />
               Best Bid: <br />
@@ -327,11 +311,7 @@ const AlgoControl = (props: Props) => {
               {orderBook.bid.filter((bid, i) => bid[0] >= bestBidPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
-          <div
-            className={
-              "field col" + (config.best_bid_order_depth !== configEdit.best_bid_order_depth ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.best_bid_order_depth ? " highlighted" : "")}>
             <span>
               Best Bid Order Depth: <br />
               <b>{config.best_bid_order_depth}</b>
@@ -341,11 +321,7 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })}
             />
           </div>
-          <div
-            className={
-              "field col" + (config.best_bid_random_walk !== configEdit.best_bid_random_walk ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.best_bid_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Best Bid): <br />
               <b>{config.best_bid_random_walk}</b>
@@ -358,11 +334,7 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div
-            className={
-              "field col" + (config.total_bid_price_range !== configEdit.total_bid_price_range ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
             <span>
               Lower Total Range
               <br />
@@ -389,11 +361,7 @@ const AlgoControl = (props: Props) => {
               {orderBook.bid.filter((bid, i) => bid[0] >= totalBidPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
-          <div
-            className={
-              "field col" + (config.total_bid_order_depth !== configEdit.total_bid_order_depth ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.total_bid_order_depth ? " highlighted" : "")}>
             <span>
               Total Bid Order Depth: <br />
               <b>{config.total_bid_order_depth}</b>
@@ -403,11 +371,7 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })}
             />
           </div>
-          <div
-            className={
-              "field col" + (config.total_bid_random_walk !== configEdit.total_bid_random_walk ? " highlighted" : "")
-            }
-          >
+          <div className={"field col" + (!compare.total_bid_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Total Bid): <br />
               <b>{config.total_bid_random_walk}</b>
