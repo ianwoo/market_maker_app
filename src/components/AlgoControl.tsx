@@ -12,7 +12,8 @@ const AlgoControl = (props: Props) => {
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
   const [config, setConfig] = useState<any>({}); //type later
-  const [configEdit, setConfigEdit] = useState<any>({});
+  const [configEdit, setConfigEdit] = useState<any>({}); //type later
+  const [compare, setCompare] = useState<any>({}); //type later
 
   const [totalAskPriceInUSD, setTotalAskPriceInUSD] = useState<number>();
   const [totalBidPriceInUSD, setTotalBidPriceInUSD] = useState<number>();
@@ -24,9 +25,7 @@ const AlgoControl = (props: Props) => {
   useEffect(() => {
     //set initial variable and react to spot price change / actual config changes
     if (configsLoaded) {
-      setConfigEdit(config); //update config edit
-
-      //update variables
+      //update variables if spot price or config (but not config edit) changes
       setTotalAskPriceInUSD(spotPrice * (1 + config.total_ask_price_range));
       setTotalBidPriceInUSD(spotPrice * (1 - config.total_bid_price_range));
       setBestAskPriceInUSD(spotPrice * (1 + config.best_ask_price_range));
@@ -63,12 +62,25 @@ const AlgoControl = (props: Props) => {
     );
   }, [websocket]);
 
+  useEffect(() => {
+    let comparison: any = {}; //type later;
+    for (const prop in config) {
+      comparison[prop] = config[prop] !== configEdit[prop] ? false : true;
+    }
+    setCompare(comparison);
+  }, [config, configEdit]);
+
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
     if (message.action === "GET_CONFIG") {
       setConfig(JSON.parse(message.result));
       setConfigEdit(JSON.parse(message.result));
       setConfigsLoaded(true);
+    }
+    if (message.action === "UPDATE_CONFIG") {
+      if (JSON.parse(message.result)) {
+        setConfig(configEdit);
+      }
     }
   };
 
@@ -82,32 +94,23 @@ const AlgoControl = (props: Props) => {
     );
   };
 
-  let compare: any = {}; //type later;
-  for (const prop in config) {
-    compare[prop] = config[prop] !== configEdit[prop] ? false : true;
-  }
+  const checkCompare = () => {
+    let retbool: boolean = true;
+    for (const prop in compare) {
+      if (!compare[prop]) {
+        retbool = false;
+      }
+    }
+    return retbool;
+  };
+
+  console.log("pre render");
+  console.log(compare);
 
   return (
     <div className="algo-control">
       <div className="vol-algo">
-        <button
-          disabled={
-            compare.vol_trade_per_hour &&
-            compare.min_trade &&
-            compare.max_trade &&
-            compare.random_walk_degree &&
-            compare.best_bid_price_range &&
-            compare.best_bid_random_walk &&
-            compare.best_ask_price_range &&
-            compare.best_ask_random_walk &&
-            compare.best_bid_order_depth &&
-            compare.best_ask_order_depth &&
-            compare.total_bid_price_range &&
-            compare.total_ask_order_depth &&
-            compare.spread
-          }
-          onClick={editConfig}
-        >
+        <button disabled={checkCompare()} onClick={editConfig}>
           EDIT CONFIG
         </button>
         <h1>Volume</h1>
