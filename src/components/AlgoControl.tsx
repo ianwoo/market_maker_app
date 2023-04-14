@@ -10,30 +10,49 @@ type Props = {
 const AlgoControl = (props: Props) => {
   const { websocket, spotPrice, orderBook } = props;
 
+  const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
   const [config, setConfig] = useState<any>({}); //type later
   const [configEdit, setConfigEdit] = useState<any>({});
 
-  const [totalAskPriceInUSD, setTotalAskPriceInUSD] = useState<number>(spotPrice * (1 + config.total_ask_price_range));
-  const [totalBidPriceInUSD, setTotalBidPriceInUSD] = useState<number>(spotPrice * (1 - config.total_bid_price_range));
-  const [bestAskPriceInUSD, setBestAskPriceInUSD] = useState<number>(spotPrice * (1 + config.best_ask_price_range));
-  const [bestBidPriceInUSD, setBestBidPriceInUSD] = useState<number>(spotPrice * (1 - config.best_bid_price_range));
-  const [spreadUpperPrice, setSpreadUpperPrice] = useState<number>(spotPrice * (1 + config.spread / 2));
-  const [spreadLowerPrice, setSpreadLowerPrice] = useState<number>(spotPrice * (1 - config.spread / 2));
+  const [totalAskPriceInUSD, setTotalAskPriceInUSD] = useState<number>();
+  const [totalBidPriceInUSD, setTotalBidPriceInUSD] = useState<number>();
+  const [bestAskPriceInUSD, setBestAskPriceInUSD] = useState<number>();
+  const [bestBidPriceInUSD, setBestBidPriceInUSD] = useState<number>();
+  const [spreadUpperPrice, setSpreadUpperPrice] = useState<number>();
+  const [spreadLowerPrice, setSpreadLowerPrice] = useState<number>();
 
   useEffect(() => {
-    configEdit.total_ask_price_range !== config.total_ask_price_range &&
-      setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
-    configEdit.total_bid_price_range !== config.total_bid_price_range &&
-      setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
-    configEdit.best_ask_price_range !== config.best_ask_price_range &&
-      setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
-    configEdit.best_bid_price_range !== config.best_bid_price_range &&
-      setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
-    if (configEdit.spread !== config.spread) {
-      setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
-      setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
+    //set initial variable and react to spot price change / actual config changes
+    if (configsLoaded) {
+      setConfigEdit(config); //update config edit
+
+      //update variables
+      setTotalAskPriceInUSD(spotPrice * (1 + config.total_ask_price_range));
+      setTotalBidPriceInUSD(spotPrice * (1 - config.total_bid_price_range));
+      setBestAskPriceInUSD(spotPrice * (1 + config.best_ask_price_range));
+      setBestBidPriceInUSD(spotPrice * (1 - config.best_bid_price_range));
+      setSpreadUpperPrice(spotPrice * (1 + config.spread / 2));
+      setSpreadLowerPrice(spotPrice * (1 - config.spread / 2));
     }
-  }, [spotPrice, config, configEdit]);
+  }, [spotPrice, configsLoaded, config]);
+
+  useEffect(() => {
+    if (configsLoaded) {
+      //reactive variables on edit
+      configEdit.total_ask_price_range !== config.total_ask_price_range &&
+        setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
+      configEdit.total_bid_price_range !== config.total_bid_price_range &&
+        setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
+      configEdit.best_ask_price_range !== config.best_ask_price_range &&
+        setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
+      configEdit.best_bid_price_range !== config.best_bid_price_range &&
+        setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
+      if (configEdit.spread !== config.spread) {
+        setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
+        setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
+      }
+    }
+  }, [spotPrice, configsLoaded, config, configEdit]);
 
   useEffect(() => {
     websocket.send(
@@ -46,8 +65,11 @@ const AlgoControl = (props: Props) => {
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    message.action === "GET_CONFIG" && setConfig(JSON.parse(message.result));
-    message.action === "GET_CONFIG" && setConfigEdit(JSON.parse(message.result));
+    if (message.action === "GET_CONFIG") {
+      setConfig(JSON.parse(message.result));
+      setConfigEdit(JSON.parse(message.result));
+      setConfigsLoaded(true);
+    }
   };
 
   const editConfig = () => {
@@ -146,7 +168,7 @@ const AlgoControl = (props: Props) => {
             }
           >
             <span>Total Range in $:</span>
-            <span>{totalAskPriceInUSD - totalBidPriceInUSD}</span>
+            <span>{totalAskPriceInUSD && totalBidPriceInUSD ? totalAskPriceInUSD - totalBidPriceInUSD : null}</span>
           </div>
         </div>
         <div className="field-group">
@@ -156,7 +178,7 @@ const AlgoControl = (props: Props) => {
             }
           >
             <span>Best Range in $:</span>
-            <span>{bestAskPriceInUSD - bestBidPriceInUSD}</span>
+            <span>{bestAskPriceInUSD && bestBidPriceInUSD ? bestAskPriceInUSD - bestBidPriceInUSD : null}</span>
           </div>
         </div>
         <div className="field-group">
@@ -182,17 +204,19 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className={"field col" + !compare.total_ask_price_range ? " highlighted" : ""}>
+          <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
             <span>
               Upper Total Range Price <br />
               / Total Ask Price: <br />
             </span>
-            <b>{totalAskPriceInUSD}$</b>
+            <b>{totalAskPriceInUSD && totalAskPriceInUSD}$</b>
           </div>
-          <div className={"field col" + !compare.total_ask_price_range ? " highlighted" : ""}>
+          <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
             <span>Upper Total Range Quantity</span>
             <b>
-              {orderBook.ask.filter((ask, i) => ask[0] <= totalAskPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+              {orderBook.ask
+                .filter((ask, i) => ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice))
+                .reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
           <div className={"field col" + (!compare.total_ask_order_depth ? " highlighted" : "")}>
@@ -231,7 +255,7 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
             <span>
               Upper Best Range Price / <br />
               Best Ask Price:
@@ -239,10 +263,12 @@ const AlgoControl = (props: Props) => {
             </span>
             <b>{bestAskPriceInUSD}$</b>
           </div>
-          <div className="field col">
+          <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
             <span>Upper Best Range Quantity</span>
             <b>
-              {orderBook.ask.filter((ask, i) => ask[0] <= bestAskPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+              {orderBook.ask
+                .filter((ask, i) => ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice))
+                .reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
           <div className={"field col" + (!compare.best_ask_order_depth ? " highlighted" : "")}>
@@ -268,9 +294,9 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div className="field col">
+          <div className={"field col" + (!compare.spread ? " highlighted" : "")}>
             <span>Upper Price</span>
-            <b>{spreadUpperPrice}$</b>
+            <b>{spreadUpperPrice && spreadUpperPrice}$</b>
           </div>
         </div>
         <div className="field-group">
@@ -280,9 +306,9 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
-          <div className="field col">
+          <div className={"field col" + (!compare.spread ? " highlighted" : "")}>
             <span>Lower Price</span>
-            <b>{spreadLowerPrice}$</b>
+            <b>{spreadLowerPrice && spreadLowerPrice}$</b>
           </div>
         </div>
         <div className="field-group">
@@ -299,16 +325,18 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
             <span>
               Lower Best Range Price /<br /> Best Bid Price
             </span>
             <b>{bestBidPriceInUSD}$</b>
           </div>
-          <div className="field col">
+          <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
             <span>Lower Best Range Quantity</span>
             <b>
-              {orderBook.bid.filter((bid, i) => bid[0] >= bestBidPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+              {orderBook.bid
+                .filter((bid, i) => bid[0] >= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
+                .reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
           <div className={"field col" + (!compare.best_bid_order_depth ? " highlighted" : "")}>
@@ -348,17 +376,19 @@ const AlgoControl = (props: Props) => {
               onChange={(e) => setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })}
             />
           </div>
-          <div className="field col">
+          <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
             <span>
               Lower Total Range Price /<br />
               Total Bid Price:
             </span>
             <b>{totalBidPriceInUSD}$</b>
           </div>
-          <div className="field col">
+          <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
             <span>Lower Total Range Quantity</span>
             <b>
-              {orderBook.bid.filter((bid, i) => bid[0] >= totalBidPriceInUSD).reduce((acc, next) => acc + next[1], 0)}
+              {orderBook.bid
+                .filter((bid, i) => bid[0] >= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice))
+                .reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
           <div className={"field col" + (!compare.total_bid_order_depth ? " highlighted" : "")}>
