@@ -82,6 +82,9 @@ const AlgoControl = (props: Props) => {
         setConfig(configEdit);
       }
     }
+    if (message.action === "START_STOP") {
+      setConfig({ ...config, status: message.result });
+    }
   };
 
   const editConfig = () => {
@@ -139,6 +142,9 @@ const AlgoControl = (props: Props) => {
             START ALGO
           </button>
         )}
+      </div>
+      <div className="algo-status">
+        <h1>Algo Status: Algo is {config.status ? "running" : "stopped"}</h1>
       </div>
       <div className="vol-algo">
         <h1>Volume</h1>
