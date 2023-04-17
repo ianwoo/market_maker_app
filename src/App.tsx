@@ -32,7 +32,6 @@ function App() {
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
   websocket.onmessage = (event) => {
-    console.log(event.data);
     const message = JSON.parse(event.data);
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));

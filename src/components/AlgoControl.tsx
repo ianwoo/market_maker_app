@@ -105,13 +105,23 @@ const AlgoControl = (props: Props) => {
   };
 
   const startAlgo = () => {
-    setConfigEdit({ ...config, status: true });
-    editConfig();
+    websocket.send(
+      JSON.stringify({
+        action: "START_STOP",
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        status: true,
+      })
+    );
   };
 
   const stopAlgo = () => {
-    setConfigEdit({ ...config, status: true });
-    editConfig();
+    websocket.send(
+      JSON.stringify({
+        action: "START_STOP",
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        status: false,
+      })
+    );
   };
 
   return (
