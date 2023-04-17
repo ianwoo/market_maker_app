@@ -82,7 +82,6 @@ const Intervention = (props: Props) => {
       <h1>Intervention</h1>
       <div className="flex">
         <div className="order-book">
-          <button className="stop-algo">Stop Volume Algo</button>
           <div className="spot-price field col">
             <b>Spot Price</b>
             <b>{spotPrice}</b>

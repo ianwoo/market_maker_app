@@ -61,6 +61,15 @@
       flex-direction: column;
       justify-content: space-between;
 
+      .fixed-buttons {
+        display: flex;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 69px;
+        margin: 8px;
+      }
+
       .field {
         &.highlighted {
           background: lightblue;

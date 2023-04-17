@@ -104,15 +104,33 @@ const AlgoControl = (props: Props) => {
     return retbool;
   };
 
-  console.log("pre render");
-  console.log(compare);
+  const startAlgo = () => {
+    setConfigEdit({ ...config, status: true });
+    editConfig();
+  };
+
+  const stopAlgo = () => {
+    setConfigEdit({ ...config, status: true });
+    editConfig();
+  };
 
   return (
     <div className="algo-control">
-      <div className="vol-algo">
-        <button disabled={checkCompare()} onClick={editConfig}>
+      <div className="fixed-buttons">
+        <button className="edit-config" disabled={checkCompare()} onClick={editConfig}>
           EDIT CONFIG
         </button>
+        {config.status ? (
+          <button className="stop-algo" onClick={() => stopAlgo()}>
+            STOP ALGO
+          </button>
+        ) : (
+          <button className="start-algo" onClick={() => startAlgo()}>
+            START ALGO
+          </button>
+        )}
+      </div>
+      <div className="vol-algo">
         <h1>Volume</h1>
         <h2>ADV: $2.4m</h2>
         <div className={"field" + (!compare.vol_trade_per_hour ? " highlighted" : "")}>
