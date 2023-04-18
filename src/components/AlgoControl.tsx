@@ -38,18 +38,12 @@ const AlgoControl = (props: Props) => {
   useEffect(() => {
     if (configsLoaded) {
       //reactive variables on edit
-      configEdit.total_ask_price_range !== config.total_ask_price_range &&
-        setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
-      configEdit.total_bid_price_range !== config.total_bid_price_range &&
-        setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
-      configEdit.best_ask_price_range !== config.best_ask_price_range &&
-        setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
-      configEdit.best_bid_price_range !== config.best_bid_price_range &&
-        setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
-      if (configEdit.spread !== config.spread) {
-        setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
-        setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
-      }
+      setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
+      setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
+      setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
+      setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
+      setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
+      setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
     }
   }, [spotPrice, configsLoaded, config, configEdit]);
 
@@ -148,14 +142,17 @@ const AlgoControl = (props: Props) => {
       </div>
       <div className="vol-algo">
         <h1>Volume</h1>
-        <h2>ADV: $2.4m</h2>
         <div className={"field" + (!compare.vol_trade_per_hour ? " highlighted" : "")}>
           <b>USD Vol Trade Per Hour</b>
           <div className="field col">
             <b>{config.vol_trade_per_hour}</b>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, vol_trade_per_hour: Number(e.target.value) })}
+              onChange={(e) => {
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, vol_trade_per_hour: config.vol_trade_per_hour })
+                  : setConfigEdit({ ...configEdit, vol_trade_per_hour: Number(e.target.value) });
+              }}
             />
           </div>
         </div>
@@ -165,7 +162,11 @@ const AlgoControl = (props: Props) => {
             <b>{config.min_trade}</b>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, min_trade: Number(e.target.value) })}
+              onChange={(e) => {
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, min_trade: config.min_trade })
+                  : setConfigEdit({ ...configEdit, min_trade: Number(e.target.value) });
+              }}
             />
           </div>
         </div>
@@ -175,7 +176,11 @@ const AlgoControl = (props: Props) => {
             <b>{config.max_trade}</b>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, max_trade: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, max_trade: config.max_trade })
+                  : setConfigEdit({ ...configEdit, max_trade: Number(e.target.value) })
+              }
             />
           </div>
         </div>
@@ -185,10 +190,13 @@ const AlgoControl = (props: Props) => {
             <b>{config.random_walk_degree}</b>
             <select
               onChange={(e) => {
-                setConfigEdit({ ...configEdit, random_walk_degree: e.target.value });
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, random_walk_degree: config.random_walk_degree })
+                  : setConfigEdit({ ...configEdit, random_walk_degree: e.target.value });
               }}
               defaultValue={config.random_walk_degree}
             >
+              {!compare.random_walk_degree && <option value="">Reset</option>}
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -224,7 +232,14 @@ const AlgoControl = (props: Props) => {
               Price Gap Allowance / Spread: <br />
               <b>{config.spread}</b>
             </span>
-            <input type="number" onChange={(e) => setConfigEdit({ ...configEdit, spread: e.target.value })} />
+            <input
+              type="number"
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, spread: config.spread })
+                  : setConfigEdit({ ...configEdit, spread: e.target.value })
+              }
+            />
           </div>
         </div>
         <div className="field-group">
@@ -238,7 +253,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === "" || Number(e.target.value) === config.total_ask_price_range
+                  ? setConfigEdit({ ...configEdit, total_ask_price_range: config.total_ask_price_range })
+                  : setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
@@ -252,7 +271,10 @@ const AlgoControl = (props: Props) => {
             <span>Upper Total Range Quantity</span>
             <b>
               {orderBook.ask
-                .filter((ask, i) => ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice))
+                .filter(
+                  (ask, i) =>
+                    ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice * (1 + config.total_ask_price_range))
+                )
                 .reduce((acc, next) => acc + next[1], 0)}
             </b>
           </div>
@@ -263,7 +285,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, total_ask_order_depth: config.total_ask_order_depth })
+                  : setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })
+              }
             />
           </div>
           <div className={"field col" + (!compare.total_ask_random_walk ? " highlighted" : "")}>
@@ -271,7 +297,14 @@ const AlgoControl = (props: Props) => {
               Random Walk (Total Ask): <br />
               <b>{config.total_ask_random_walk}</b>
             </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, total_ask_random_walk: e.target.value })}>
+            <select
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, total_ask_random_walk: config.total_ask_random_walk })
+                  : setConfigEdit({ ...configEdit, total_ask_random_walk: e.target.value })
+              }
+            >
+              {!compare.total_ask_random_walk && <option value="">Reset</option>}
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -289,7 +322,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, best_ask_price_range: config.best_ask_price_range })
+                  : setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
@@ -315,7 +352,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, best_ask_order_depth: config.best_ask_order_depth })
+                  : setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.best_ask_random_walk ? " highlighted" : "")}>
@@ -323,7 +364,14 @@ const AlgoControl = (props: Props) => {
               Random Walk (Best Ask): <br />
               <b>{config.best_ask_random_walk}</b>
             </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, best_ask_random_walk: e.target.value })}>
+            <select
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, best_ask_random_walk: config.best_ask_random_walk })
+                  : setConfigEdit({ ...configEdit, best_ask_random_walk: e.target.value })
+              }
+            >
+              {!compare.best_ask_random_walk && <option value="">Reset</option>}
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -359,7 +407,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, best_bid_price_range: config.best_bid_price_range })
+                  : setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
@@ -383,7 +435,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, best_bid_order_depth: config.best_bid_order_depth })
+                  : setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.best_bid_random_walk ? " highlighted" : "")}>
@@ -391,7 +447,14 @@ const AlgoControl = (props: Props) => {
               Random Walk (Best Bid): <br />
               <b>{config.best_bid_random_walk}</b>
             </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, best_bid_random_walk: e.target.value })}>
+            <select
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, best_bid_random_walk: config.best_bid_random_walk })
+                  : setConfigEdit({ ...configEdit, best_bid_random_walk: e.target.value })
+              }
+            >
+              {!compare.best_bid_random_walk && <option value="">Reset</option>}
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
@@ -410,7 +473,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, total_bid_price_range: config.total_bid_price_range })
+                  : setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
@@ -435,7 +502,11 @@ const AlgoControl = (props: Props) => {
             </span>
             <input
               type="number"
-              onChange={(e) => setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })}
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, total_bid_order_depth: config.total_bid_order_depth })
+                  : setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })
+              }
             />
           </div>
           <div className={"field col" + (!compare.total_bid_random_walk ? " highlighted" : "")}>
@@ -443,40 +514,20 @@ const AlgoControl = (props: Props) => {
               Random Walk (Total Bid): <br />
               <b>{config.total_bid_random_walk}</b>
             </span>
-            <select onChange={(e) => setConfigEdit({ ...configEdit, total_bid_random_walk: e.target.value })}>
+            <select
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, total_bid_random_walk: config.total_bid_random_walk })
+                  : setConfigEdit({ ...configEdit, total_bid_random_walk: e.target.value })
+              }
+            >
+              {!compare.total_bid_random_walk && <option value="">Reset</option>}
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
           </div>
         </div>
-        {/* <b>Density</b>
-        <div className="field-group">
-          <div className="field col">
-            <span>Bid</span>
-            <input />
-          </div>
-          <div className="field col">
-            <span>Random Walk (Bid)</span>
-            <select>
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </select>
-          </div>
-          <div className="field col">
-            <span>Offer</span>
-            <input />
-          </div>
-          <div className="field col">
-            <span>Random Walk (Offer)</span>
-            <select>
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </select>
-          </div>
-        </div> */}
       </div>
     </div>
   );
