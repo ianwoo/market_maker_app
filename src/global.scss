@@ -55,6 +55,9 @@
       &.col {
         flex-direction: column;
       }
+      .validation {
+        color: red;
+      }
     }
     .algo-control {
       display: flex;
