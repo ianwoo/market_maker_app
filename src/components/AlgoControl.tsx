@@ -269,6 +269,7 @@ const AlgoControl = (props: Props) => {
           </div>
           <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
             <span>Upper Total Range Quantity</span>
+            <br />
             <b>
               {orderBook.ask
                 .filter(
@@ -281,7 +282,8 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.total_ask_order_depth ? " highlighted" : "")}>
             <span>
               Total Ask Order Depth: <br />
-              <b>{config.total_ask_order_depth}</b>
+              <br />
+              <b>${config.total_ask_order_depth}</b>
             </span>
             <input
               type="number"
@@ -295,6 +297,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.total_ask_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Total Ask): <br />
+              <br />
               <b>{config.total_ask_random_walk}</b>
             </span>
             <select
@@ -339,6 +342,7 @@ const AlgoControl = (props: Props) => {
           </div>
           <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
             <span>Upper Best Range Quantity</span>
+            <br />
             <b>
               {orderBook.ask
                 .filter((ask, i) => ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice))
@@ -348,6 +352,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.best_ask_order_depth ? " highlighted" : "")}>
             <span>
               Best Ask Order Depth: <br />
+              <br />
               <b>{config.best_ask_order_depth}</b>
             </span>
             <input
@@ -362,6 +367,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.best_ask_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Best Ask): <br />
+              <br />
               <b>{config.best_ask_random_walk}</b>
             </span>
             <select
@@ -422,6 +428,7 @@ const AlgoControl = (props: Props) => {
           </div>
           <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
             <span>Lower Best Range Quantity</span>
+            <br />
             <b>
               {orderBook.bid
                 .filter((bid, i) => bid[0] >= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
@@ -431,6 +438,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.best_bid_order_depth ? " highlighted" : "")}>
             <span>
               Best Bid Order Depth: <br />
+              <br />
               <b>{config.best_bid_order_depth}</b>
             </span>
             <input
@@ -445,6 +453,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.best_bid_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Best Bid): <br />
+              <br />
               <b>{config.best_bid_random_walk}</b>
             </span>
             <select
@@ -489,6 +498,7 @@ const AlgoControl = (props: Props) => {
           </div>
           <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
             <span>Lower Total Range Quantity</span>
+            <br />
             <b>
               {orderBook.bid
                 .filter((bid, i) => bid[0] >= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice))
@@ -498,6 +508,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.total_bid_order_depth ? " highlighted" : "")}>
             <span>
               Total Bid Order Depth: <br />
+              <br />
               <b>{config.total_bid_order_depth}</b>
             </span>
             <input
@@ -512,6 +523,7 @@ const AlgoControl = (props: Props) => {
           <div className={"field col" + (!compare.total_bid_random_walk ? " highlighted" : "")}>
             <span>
               Random Walk (Total Bid): <br />
+              <br />
               <b>{config.total_bid_random_walk}</b>
             </span>
             <select
