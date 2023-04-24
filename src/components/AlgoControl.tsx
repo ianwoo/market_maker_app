@@ -477,6 +477,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, tilt_bids: Number(e.target.value) })
               }
             />
+            {!validations.tilt_bids && <span className="validation">Must enter a value from 1 to 10!</span>}
           </div>
         </div>
         <div className="field-group">
