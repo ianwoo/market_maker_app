@@ -25,10 +25,10 @@ const HomePanel = (props: Props) => {
                 <span>{acc.exchange}</span>
                 <span>{acc.account}</span>
                 <span>{acc.coin}</span>
-                <span>{acc.free}</span>
-                <span>{acc.locked}</span>
-                <span>{acc.total}</span>
-                <span>${acc.price}</span>
+                <span>{Number(acc.free).toFixed(4)}</span>
+                <span>{Number(acc.locked).toFixed(4)}</span>
+                <span>{Number(acc.total).toFixed(4)}</span>
+                <span>${Number(acc.price).toFixed(4)}</span>
               </div>
             ))}
         </div>
