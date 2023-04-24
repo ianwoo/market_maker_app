@@ -70,14 +70,16 @@ const AlgoControl = (props: Props) => {
     for (const prop in configEdit) {
       switch (prop) {
         case "total_ask_price_range":
-          validations[prop] = !(configEdit[prop] < 0);
-          break;
         case "best_ask_price_range":
+        case "total_bid_price_range":
+        case "best_bid_price_range":
+        case "total_ask_order_depth":
+        case "best_ask_order_depth":
+        case "total_bid_order_depth":
+        case "best_bid_order_depth":
           validations[prop] = !(configEdit[prop] < 0);
           break;
         case "tilt_asks":
-          validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 0);
-          break;
         case "tilt_bids":
           validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 0);
           break;
@@ -340,6 +342,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })
               }
             />
+            {!validations.total_ask_order_depth && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.total_ask_random_walk ? " highlighted" : "")}>
             <span>
@@ -411,6 +414,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })
               }
             />
+            {!validations.best_ask_order_depth && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.best_ask_random_walk ? " highlighted" : "")}>
             <span>
@@ -535,6 +539,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })
               }
             />
+            {!validations.best_bid_order_depth && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.best_bid_random_walk ? " highlighted" : "")}>
             <span>
@@ -572,6 +577,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) / 100 })
               }
             />
+            {!validations.total_bid_price_range && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
             <span>
@@ -605,6 +611,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })
               }
             />
+            {!validations.total_bid_order_depth && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.total_bid_random_walk ? " highlighted" : "")}>
             <span>

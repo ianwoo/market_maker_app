@@ -38,15 +38,17 @@ function App() {
   };
 
   const components = [
-    <HomePanel accountUpdate={accountUpdate} />,
+    <HomePanel key="home" accountUpdate={accountUpdate} />,
     // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
     <AlgoControl
+      key="control"
       websocket={websocket}
       spotPrice={accountUpdate.length > 0 ? accountUpdate[0].price : 0}
       orderBook={orderBookUpdate[0]}
     />,
     accountUpdate.length > 0 ? (
       <Intervention
+        key="intervention"
         orderBookUpdate={orderBookUpdate}
         spotPrice={accountUpdate.length > 0 ? accountUpdate[0].price : 0}
         websocket={websocket}
