@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   websocket: WebSocket;
@@ -23,6 +23,19 @@ const SweepAndPeg = (props: Props) => {
   const [addNumberOrders, setAddNumberOrders] = useState<number>();
   const [sweepAmount, setSweepAmount] = useState<number>();
 
+  const [validations, setValidations] = useState<any>({});
+
+  useEffect(() => {
+    let validations: any = {};
+    validations.targetPrice = !(targetPrice !== undefined && targetPrice <= 0);
+    validations.addUSD = !(addUSD !== undefined && addUSD <= 0);
+    validations.addFromPrice = !(addFromPrice !== undefined && addFromPrice <= 0);
+    validations.addToPrice = !(addToPrice !== undefined && addToPrice <= 0);
+    validations.addNumberOrders = !(addNumberOrders !== undefined && addNumberOrders <= 0);
+    validations.sweepAmount = !(sweepAmount !== undefined && sweepAmount <= 0);
+    setValidations(validations);
+  }, [targetPrice, addUSD, addFromPrice, addToPrice, addNumberOrders, sweepAmount]);
+
   const handleSweepAndPeg = () => {
     websocket.send(
       JSON.stringify({
@@ -38,6 +51,16 @@ const SweepAndPeg = (props: Props) => {
     );
   };
 
+  const checkValidations = () => {
+    let retbool: boolean = true;
+    for (const prop in validations) {
+      if (!validations[prop]) {
+        retbool = false;
+      }
+    }
+    return retbool;
+  };
+
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
@@ -49,14 +72,16 @@ const SweepAndPeg = (props: Props) => {
           Sell
         </div>
       </div> */}
-      <div className="field">
+      <div className="field col">
         <b>Limit Price (Target)</b>
         <input type="number" onChange={(e) => setTargetPrice(Number(e.target.value))} />
+        {!validations.targetPrice && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
       <div className="field">
         <b>Amount</b>
         <div className="field col">
           <input type="number" onChange={(e) => setAddUSD(Number(e.target.value))} />
+          {!validations.addUSD && <span className="validation">Must enter positive or non-zero value!</span>}
           {/* TODO: change control from Add USD and Add Quantity once we figure out what field for Add Quantity
           
           <select>
@@ -65,14 +90,14 @@ const SweepAndPeg = (props: Props) => {
           </select> */}
         </div>
       </div>
-      <div className="field">
+      {/* <div className="field">
         <b>Aggressiveness / Timing</b>
         <select>
           <option>High</option>
           <option>Medium</option>
           <option>Low</option>
         </select>
-      </div>
+      </div> */}
       <div className="field">
         <b>Peg Additional Orders</b>
         <input
@@ -80,27 +105,34 @@ const SweepAndPeg = (props: Props) => {
           checked={pegAdditionalOrders}
           onChange={() => setPegAdditionalOrders(!pegAdditionalOrders)}
         />
+        {}
       </div>
       {pegAdditionalOrders ? (
         <div className="peg-fields">
           <b>Price Range</b>
-          <div className="field">
+          <div className="field col">
             <span>From</span>
             <input type="number" onChange={(e) => setAddFromPrice(Number(e.target.value))} />
+            {!validations.addFromPrice && <span className="validation">Must enter positive or non-zero value!</span>}
             <span>To</span>
             <input type="number" onChange={(e) => setAddToPrice(Number(e.target.value))} />
+            {!validations.addToPrice && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
-          <div className="field">
+          <div className="field col">
             <b>Add Number of Orders</b>
             <input type="number" onChange={(e) => setAddNumberOrders(Number(e.target.value))} />
+            {!validations.addNumberOrders && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
-          <div className="field">
+          <div className="field col">
             <b>Sweep Amount</b>
             <input type="number" onChange={(e) => setSweepAmount(Number(e.target.value))} />
+            {!validations.sweepAmount && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
         </div>
       ) : null}
-      <button onClick={handleSweepAndPeg}>Execute</button>
+      <button disabled={!checkValidations()} onClick={handleSweepAndPeg}>
+        Execute
+      </button>
     </div>
   );
 };
