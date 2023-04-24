@@ -142,8 +142,8 @@ const AlgoControl = (props: Props) => {
       </div>
       <div className="vol-algo">
         <h1>Volume</h1>
-        <div className={"field" + (!compare.vol_trade_per_hour ? " highlighted" : "")}>
-          <b>USD Vol Trade Per Hour</b>
+        <div className={"field col" + (!compare.vol_trade_per_hour ? " highlighted" : "")}>
+          <span>USD Vol Trade Per Hour</span>
           <div className="field col">
             <b>{config.vol_trade_per_hour}</b>
             <input
@@ -156,8 +156,8 @@ const AlgoControl = (props: Props) => {
             />
           </div>
         </div>
-        <div className={"field" + (!compare.min_trade ? " highlighted" : "")}>
-          <b>Trade Slice Out Per Minute (Min)</b>
+        <div className={"field col" + (!compare.min_trade ? " highlighted" : "")}>
+          <span>Trade Slice Out Per Minute (Min)</span>
           <div className="field col">
             <b>{config.min_trade}</b>
             <input
@@ -170,8 +170,8 @@ const AlgoControl = (props: Props) => {
             />
           </div>
         </div>
-        <div className={"field" + (!compare.max_trade ? " highlighted" : "")}>
-          <b>Trade Slice Out Per Minute (Max)</b>
+        <div className={"field col" + (!compare.max_trade ? " highlighted" : "")}>
+          <span>Trade Slice Out Per Minute (Max)</span>
           <div className="field col">
             <b>{config.max_trade}</b>
             <input
@@ -184,8 +184,8 @@ const AlgoControl = (props: Props) => {
             />
           </div>
         </div>
-        <div className={"field" + (!compare.random_walk_degree ? " highlighted" : "")}>
-          <b>Random Walk Degree</b>
+        <div className={"field col" + (!compare.random_walk_degree ? " highlighted" : "")}>
+          <span>Random Walk Degree</span>
           <div className="field col">
             <b>{config.random_walk_degree}</b>
             <select
@@ -213,7 +213,13 @@ const AlgoControl = (props: Props) => {
             }
           >
             <span>Total Range in $:</span>
-            <span>{totalAskPriceInUSD && totalBidPriceInUSD ? totalAskPriceInUSD - totalBidPriceInUSD : null}</span>
+            <br />
+            <b>
+              $
+              {totalAskPriceInUSD !== undefined && totalBidPriceInUSD !== undefined
+                ? totalAskPriceInUSD - totalBidPriceInUSD
+                : null}
+            </b>
           </div>
         </div>
         <div className="field-group">
@@ -223,7 +229,12 @@ const AlgoControl = (props: Props) => {
             }
           >
             <span>Best Range in $:</span>
-            <span>{bestAskPriceInUSD && bestBidPriceInUSD ? bestAskPriceInUSD - bestBidPriceInUSD : null}</span>
+            <br />
+            <b>
+              {bestAskPriceInUSD !== undefined && bestBidPriceInUSD !== undefined
+                ? bestAskPriceInUSD - bestBidPriceInUSD
+                : null}
+            </b>
           </div>
         </div>
         <div className="field-group">
@@ -315,6 +326,24 @@ const AlgoControl = (props: Props) => {
           </div>
         </div>
         <div className="field-group">
+          <div className={"field col" + (!compare.tilt_asks ? " highlighted" : "")}>
+            <span>
+              Order Tilt
+              <br />
+              (Asks) <br />
+              <b>{config.tilt_asks}</b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, tilt_asks: config.tilt_asks })
+                  : setConfigEdit({ ...configEdit, tilt_asks: Number(e.target.value) })
+              }
+            />
+          </div>
+        </div>
+        <div className="field-group">
           <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
             <span>
               Upper Best Range /<br />
@@ -353,7 +382,7 @@ const AlgoControl = (props: Props) => {
             <span>
               Best Ask Order Depth: <br />
               <br />
-              <b>{config.best_ask_order_depth}</b>
+              <b>${config.best_ask_order_depth}</b>
             </span>
             <input
               type="number"
@@ -382,6 +411,24 @@ const AlgoControl = (props: Props) => {
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
+          </div>
+        </div>
+        <div className="field-group">
+          <div className={"field col" + (!compare.tilt_bids ? " highlighted" : "")}>
+            <span>
+              Order Tilt
+              <br />
+              (Bids) <br />
+              <b>{config.tilt_asks}</b>
+            </span>
+            <input
+              type="number"
+              onChange={(e) =>
+                e.target.value === ""
+                  ? setConfigEdit({ ...configEdit, tilt_bids: config.tilt_bids })
+                  : setConfigEdit({ ...configEdit, tilt_bids: Number(e.target.value) })
+              }
+            />
           </div>
         </div>
         <div className="field-group">
@@ -439,7 +486,7 @@ const AlgoControl = (props: Props) => {
             <span>
               Best Bid Order Depth: <br />
               <br />
-              <b>{config.best_bid_order_depth}</b>
+              <b>${config.best_bid_order_depth}</b>
             </span>
             <input
               type="number"
@@ -509,7 +556,7 @@ const AlgoControl = (props: Props) => {
             <span>
               Total Bid Order Depth: <br />
               <br />
-              <b>{config.total_bid_order_depth}</b>
+              <b>${config.total_bid_order_depth}</b>
             </span>
             <input
               type="number"
