@@ -479,7 +479,7 @@ const AlgoControl = (props: Props) => {
               Order Tilt
               <br />
               (Bids) <br />
-              <b>{config.tilt_asks}</b>
+              <b>{config.tilt_bids}</b>
             </span>
             <input
               type="number"
