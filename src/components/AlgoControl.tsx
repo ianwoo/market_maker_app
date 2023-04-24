@@ -69,11 +69,17 @@ const AlgoControl = (props: Props) => {
     let validations: any = {};
     for (const prop in configEdit) {
       switch (prop) {
+        case "total_ask_price_range":
+          validations[prop] = !(configEdit[prop] < 0);
+          break;
+        case "best_ask_price_range":
+          validations[prop] = !(configEdit[prop] < 0);
+          break;
         case "tilt_asks":
-          validations[prop] = configEdit[prop] > 10 || configEdit[prop] < 0 ? false : true;
+          validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 0);
           break;
         case "tilt_bids":
-          validations[prop] = configEdit[prop] > 10 || configEdit[prop] < 0 ? false : true;
+          validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 0);
           break;
         default:
           break;
@@ -152,7 +158,7 @@ const AlgoControl = (props: Props) => {
   return (
     <div className="algo-control">
       <div className="fixed-buttons">
-        <button className="edit-config" disabled={checkCompare() && checkValidations()} onClick={editConfig}>
+        <button className="edit-config" disabled={!checkCompare() && !checkValidations()} onClick={editConfig}>
           EDIT CONFIG
         </button>
         {config.status ? (
@@ -297,6 +303,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) / 100 })
               }
             />
+            {!validations.total_ask_price_range && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
             <span>
@@ -369,6 +376,7 @@ const AlgoControl = (props: Props) => {
                   : setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) / 100 })
               }
             />
+            {!validations.best_ask_price_range && <span className="validation">Must enter a positive value!</span>}
           </div>
           <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
             <span>
