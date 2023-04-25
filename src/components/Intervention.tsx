@@ -61,6 +61,7 @@ const Intervention = (props: Props) => {
   };
 
   const cancelOrders = () => {
+    console.log(selectedPriceRanges);
     selectedPriceRanges.forEach((pr, i) => {
       const id = Date.now();
       setCancellingPriceRanges([...cancellingPriceRanges, { ...pr, request_id: id }]);
@@ -89,6 +90,7 @@ const Intervention = (props: Props) => {
           <div className="tabs">
             {orderBookUpdate.map((obu, i) => [
               <div
+                key={"obu" + i + 0}
                 className={"tab" + (orderType === OrderType.Ask && orderBookIdx === i ? " selected" : "")}
                 onClick={() => {
                   setSelectedPriceRanges([]);
@@ -101,6 +103,7 @@ const Intervention = (props: Props) => {
                 {obu.obtype === "total" ? obu.exchange + " Total" : obu.account} Asks
               </div>,
               <div
+                key={"obu" + i + 1}
                 className={"tab" + (orderType === OrderType.Bid && orderBookIdx === i ? " selected" : "")}
                 onClick={() => {
                   setSelectedPriceRanges([]);
@@ -149,8 +152,8 @@ const Intervention = (props: Props) => {
               ) : (
                 <div className="supply">Cannot Cancel External Orders</div>
               )}
-              {cancellingPriceRanges.map((cpr) => (
-                <div className="cancel">
+              {cancellingPriceRanges.map((cpr, i) => (
+                <div key={"cpr" + i} className="cancel">
                   Cancelling all orders {cpr.from} to {cpr.to}
                 </div>
               ))}
@@ -170,6 +173,7 @@ const Intervention = (props: Props) => {
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
             ? orders.map((o, i) => (
                 <div
+                  key={"o" + i}
                   className={
                     "order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(i) ? " selected" : "")
                   }
@@ -191,7 +195,6 @@ const Intervention = (props: Props) => {
                       setHighlightedGroups(highlightedGroups.filter((hg) => hg !== i));
                     }
                   }}
-                  key={i}
                 >
                   <div className="deviation">{Math.floor((o[0] / spotPrice) * 100 - 100)}%</div>
                   <div className="price">{o[0]}</div>
@@ -273,7 +276,7 @@ const Intervention = (props: Props) => {
                           ...selectedPriceRanges,
                           {
                             from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * spotPrice,
-                            to: ((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1,
+                            to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * spotPrice,
                             supply: g.supply,
                           },
                         ]);
