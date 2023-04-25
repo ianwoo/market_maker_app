@@ -405,7 +405,7 @@ const AlgoControl = (props: Props) => {
       }
     }
     if (message.action === "START_STOP") {
-      setConfig({ ...config, status: !config.status });
+      setConfig({ ...config, [message.type + "_status"]: !config[message.type + "_status"] });
     }
   };
 
