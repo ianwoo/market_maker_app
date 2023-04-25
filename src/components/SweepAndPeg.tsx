@@ -39,7 +39,7 @@ const SweepAndPeg = (props: Props) => {
   const handleSweepAndPeg = () => {
     websocket.send(
       JSON.stringify({
-        action: "CANCEL_ORDERS",
+        action: "SWEEP_AND_PEG",
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
         target_px: targetPrice,
         add_usd: addUSD,
