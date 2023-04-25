@@ -518,7 +518,7 @@ const AlgoControl = (props: Props) => {
   return (
     <div className="algo-control">
       <div className="fixed-buttons">
-        <button className="edit-config" disabled={!checkCompare() && !checkValidations()} onClick={editConfig}>
+        <button className="edit-config" disabled={checkCompare() || !checkValidations()} onClick={editConfig}>
           EDIT CONFIG
         </button>
         {config.mm_engine_status ? (
