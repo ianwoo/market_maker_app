@@ -10,35 +10,41 @@ type Props = {
 enum FieldType {
   Input = 0,
   Select = 1,
+  Output = 2,
 }
 
 type Field = {
-  fieldName: string;
+  fieldNames: string[];
   fieldTitle: string;
   fieldType: FieldType;
   prefix?: string;
   suffix?: string;
+  output?: number;
+  validation?: string;
 };
 
 const volAlgoFields: Field[] = [
   {
-    fieldName: "vol_trade_per_hour",
+    fieldNames: ["vol_trade_per_hour"],
     fieldTitle: "USD Vol Trade Per Hour",
     fieldType: FieldType.Input,
     prefix: "$",
+    validation: "Must enter a positive value!",
   },
   {
-    fieldName: "min_trade",
+    fieldNames: ["min_trade"],
     fieldTitle: "Minimum Trade Slice Out Per Minute",
     fieldType: FieldType.Input,
+    validation: "Must enter a positive value!",
   },
   {
-    fieldName: "max_trade",
+    fieldNames: ["max_trade"],
     fieldTitle: "Maximum Trade Slice Out Per Minute",
     fieldType: FieldType.Input,
+    validation: "Must enter a positive value!",
   },
   {
-    fieldName: "random_walk_degree",
+    fieldNames: ["random_walk_degree"],
     fieldTitle: "Random Walk Degree",
     fieldType: FieldType.Select,
   },
@@ -59,6 +65,238 @@ const AlgoControl = (props: Props) => {
   const [bestBidPriceInUSD, setBestBidPriceInUSD] = useState<number>();
   const [spreadUpperPrice, setSpreadUpperPrice] = useState<number>();
   const [spreadLowerPrice, setSpreadLowerPrice] = useState<number>();
+
+  const orderBookAlgoFieldGroups: Field[][] = [
+    [
+      {
+        fieldNames: ["total_ask_price_range", "total_bid_price_range"],
+        fieldTitle: "Total Range in $",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output:
+          totalAskPriceInUSD !== undefined && totalBidPriceInUSD !== undefined
+            ? totalAskPriceInUSD - totalBidPriceInUSD
+            : undefined,
+      },
+    ],
+    [
+      {
+        fieldNames: ["best_ask_price_range", "best_bid_price_range"],
+        fieldTitle: "Best Range in $",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output:
+          bestAskPriceInUSD !== undefined && bestBidPriceInUSD !== undefined
+            ? bestAskPriceInUSD - bestBidPriceInUSD
+            : undefined,
+      },
+    ],
+    [
+      {
+        fieldNames: ["spread"],
+        fieldTitle: "Price Gap Allowance / Spread",
+        fieldType: FieldType.Input,
+        suffix: "%",
+      },
+    ],
+    [
+      {
+        fieldNames: ["total_ask_price_range"],
+        fieldTitle: "Upper Total Range / Total Ask",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["total_ask_price_range"],
+        fieldTitle: "Upper Total Range Price / Total Ask Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: totalAskPriceInUSD,
+      },
+      {
+        fieldNames: ["total_ask_price_range"],
+        fieldTitle: "Upper Total Range Quantity",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: orderBook.ask
+          .filter(
+            (ask, i) =>
+              ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice * (1 + config.total_ask_price_range))
+          )
+          .reduce((acc, next) => acc + next[1], 0),
+      },
+      {
+        fieldNames: ["total_ask_order_depth"],
+        fieldTitle: "Total Ask Order Depth",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["total_ask_random_walk"],
+        fieldTitle: "Random Walk (Total Ask)",
+        fieldType: FieldType.Select,
+      },
+    ],
+    [
+      {
+        fieldNames: ["best_ask_price_range"],
+        fieldTitle: "Upper Best Range / Best Ask",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["best_ask_price_range"],
+        fieldTitle: "Upper Best Range Price / Best Ask Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: bestAskPriceInUSD,
+      },
+      {
+        fieldNames: ["best_ask_price_range"],
+        fieldTitle: "Upper Best Range Quantity",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: orderBook.ask
+          .filter((ask, i) => ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice))
+          .reduce((acc, next) => acc + next[1], 0),
+      },
+      {
+        fieldNames: ["best_ask_order_depth"],
+        fieldTitle: "Best Ask Order Depth",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["best_ask_random_walk"],
+        fieldTitle: "Random Walk (Best Ask)",
+        fieldType: FieldType.Select,
+      },
+    ],
+    [
+      {
+        fieldNames: ["tilt_asks"],
+        fieldTitle: "Order Tilt (Asks)",
+        fieldType: FieldType.Input,
+        validation: "Must enter a value from 0 to 10!",
+      },
+    ],
+    [
+      {
+        fieldNames: ["spread"],
+        fieldTitle: "Upper Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: spreadUpperPrice,
+      },
+    ],
+    [
+      {
+        fieldNames: ["spread"],
+        fieldTitle: "Spot Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: spotPrice,
+      },
+    ],
+    [
+      {
+        fieldNames: ["spread"],
+        fieldTitle: "Lower Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: spreadLowerPrice,
+      },
+    ],
+    [
+      {
+        fieldNames: ["tilt_bids"],
+        fieldTitle: "Order Tilt (Bids)",
+        fieldType: FieldType.Input,
+        validation: "Must enter a value from 0 to 10!",
+      },
+    ],
+    [
+      {
+        fieldNames: ["best_bid_price_range"],
+        fieldTitle: "Lower Best Range / Best Bid",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["best_bid_price_range"],
+        fieldTitle: "Lower Best Range Price / Best Bid Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: bestBidPriceInUSD,
+      },
+      {
+        fieldNames: ["best_bid_price_range"],
+        fieldTitle: "Lower Best Range Quantity",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: orderBook.bid
+          .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
+          .reduce((acc, next) => acc + next[1], 0),
+      },
+      {
+        fieldNames: ["best_bid_order_depth"],
+        fieldTitle: "Best Bid Order Depth",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["best_bid_random_walk"],
+        fieldTitle: "Random Walk (Best Bid)",
+        fieldType: FieldType.Select,
+      },
+    ],
+    [
+      {
+        fieldNames: ["total_bid_price_range"],
+        fieldTitle: "Lower Total Range / Total Bid",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["total_bid_price_range"],
+        fieldTitle: "Lower Total Range Price / Total Bid Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: totalBidPriceInUSD,
+      },
+      {
+        fieldNames: ["total_bid_price_range"],
+        fieldTitle: "Lower Total Range Quantity",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: orderBook.bid
+          .filter(
+            (bid, i) =>
+              bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice * (1 + config.total_bid_price_range))
+          )
+          .reduce((acc, next) => acc + next[1], 0),
+      },
+      {
+        fieldNames: ["total_bid_order_depth"],
+        fieldTitle: "Total Bid Order Depth",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Must enter a positive value!",
+      },
+      {
+        fieldNames: ["total_bid_random_walk"],
+        fieldTitle: "Random Walk (Total Bid)",
+        fieldType: FieldType.Select,
+      },
+    ],
+  ];
 
   useEffect(() => {
     //set initial variable and react to spot price change / actual config changes
@@ -106,6 +344,9 @@ const AlgoControl = (props: Props) => {
     let validations: any = {};
     for (const prop in configEdit) {
       switch (prop) {
+        case "vol_trade_per_hour":
+        case "min_trade":
+        case "max_trade":
         case "total_ask_price_range":
         case "best_ask_price_range":
         case "total_bid_price_range":
@@ -194,6 +435,60 @@ const AlgoControl = (props: Props) => {
     );
   };
 
+  const renderField = (f: Field, i: number) => (
+    <div key={i} className={"field col" + (f.fieldNames.some((fn) => !compare[fn]) ? " highlighted" : "")}>
+      <span>{f.fieldTitle}</span>
+      {f.fieldType !== FieldType.Output && (
+        <b>
+          {f.prefix}
+          {f.suffix !== "%" ? config[f.fieldNames[0]] : config[f.fieldNames[0]] * 100}
+          {f.suffix}
+        </b>
+      )}
+      {f.fieldType === FieldType.Input && (
+        <input
+          type="number"
+          onChange={(e) => {
+            e.target.value === ""
+              ? setConfigEdit({ ...configEdit, [f.fieldNames[0]]: config[f.fieldNames[0]] })
+              : setConfigEdit({
+                  ...configEdit,
+                  [f.fieldNames[0]]:
+                    f.suffix !== "%"
+                      ? f.fieldNames[0] === "tilt_asks" || f.fieldNames[0] === "tilt_bids"
+                        ? Number(e.target.value).toFixed(0)
+                        : Number(e.target.value)
+                      : Number(e.target.value) / 100,
+                });
+          }}
+        />
+      )}
+      {f.fieldType === FieldType.Select && (
+        <select
+          onChange={(e) => {
+            e.target.value === ""
+              ? setConfigEdit({ ...configEdit, [f.fieldNames[0]]: config[f.fieldNames[0]] })
+              : setConfigEdit({ ...configEdit, [f.fieldNames[0]]: e.target.value });
+          }}
+          defaultValue={config[f.fieldNames[0]]}
+        >
+          {!compare[f.fieldNames[0]] && <option value="">Reset</option>}
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      )}
+      {f.fieldType === FieldType.Output && (
+        <b>
+          {f.prefix}
+          {f.output && f.output.toFixed(4)}
+          {f.suffix}
+        </b>
+      )}
+      {f.validation && !validations[f.fieldNames[0]] && <span className="validation">{f.validation}</span>}
+    </div>
+  );
+
   return (
     <div className="algo-control">
       <div className="fixed-buttons">
@@ -215,437 +510,15 @@ const AlgoControl = (props: Props) => {
       </div>
       <div className="vol-algo">
         <h1>Volume</h1>
-        <div className="field-group">
-          {volAlgoFields.map((f, i) => (
-            <div className={"field col" + (!compare[f.fieldName] ? " highlighted" : "")}>
-              <span>{f.fieldTitle}</span>
-              <b>
-                {f.prefix}
-                {config[f.fieldName]}
-                {f.suffix}
-              </b>
-              {f.fieldType === FieldType.Input && (
-                <input
-                  type="number"
-                  onChange={(e) => {
-                    e.target.value === ""
-                      ? setConfigEdit({ ...configEdit, [f.fieldName]: config[f.fieldName] })
-                      : setConfigEdit({ ...configEdit, [f.fieldName]: Number(e.target.value) });
-                  }}
-                />
-              )}
-              {f.fieldType === FieldType.Select && (
-                <select
-                  onChange={(e) => {
-                    e.target.value === ""
-                      ? setConfigEdit({ ...configEdit, [f.fieldName]: config[f.fieldName] })
-                      : setConfigEdit({ ...configEdit, [f.fieldName]: e.target.value });
-                  }}
-                  defaultValue={config[f.fieldName]}
-                >
-                  {!compare[f.fieldName] && <option value="">Reset</option>}
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              )}
-            </div>
-          ))}
-        </div>
+        <div className="field-group">{volAlgoFields.map((f, i) => renderField(f, i))}</div>
       </div>
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>
-        <div className="field-group">
-          <div
-            className={
-              "field col" + !compare.total_ask_price_range || !compare.total_bid_price_range ? " highlighted" : ""
-            }
-          >
-            <span>Total Range in $:</span>
-            <br />
-            <b>
-              $
-              {totalAskPriceInUSD !== undefined && totalBidPriceInUSD !== undefined
-                ? (totalAskPriceInUSD - totalBidPriceInUSD).toFixed(4)
-                : null}
-            </b>
+        {orderBookAlgoFieldGroups.map((fg, i) => (
+          <div className="field-group" key={"fg" + i}>
+            {fg.map((f, j) => renderField(f, 3 + j))}
           </div>
-        </div>
-        <div className="field-group">
-          <div
-            className={
-              "field col" + !compare.best_ask_price_range || !compare.best_bid_price_range ? " highlighted" : ""
-            }
-          >
-            <span>Best Range in $:</span>
-            <br />
-            <b>
-              $
-              {bestAskPriceInUSD !== undefined && bestBidPriceInUSD !== undefined
-                ? (bestAskPriceInUSD - bestBidPriceInUSD).toFixed(4)
-                : null}
-            </b>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.spread ? " highlighted" : "")}>
-            <span>
-              Price Gap Allowance / Spread: <br />
-              <b>{config.spread * 100}%</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, spread: config.spread })
-                  : setConfigEdit({ ...configEdit, spread: Number(e.target.value) / 100 })
-              }
-            />
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
-            <span>
-              Upper Total Range
-              <br />/ Total Ask: <br />
-              <b>{config.total_ask_price_range * 100}%</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === "" || Number(e.target.value) === config.total_ask_price_range
-                  ? setConfigEdit({ ...configEdit, total_ask_price_range: config.total_ask_price_range })
-                  : setConfigEdit({ ...configEdit, total_ask_price_range: Number(e.target.value) / 100 })
-              }
-            />
-            {!validations.total_ask_price_range && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
-            <span>
-              Upper Total Range Price <br />
-              / Total Ask Price: <br />
-            </span>
-            <b>${totalAskPriceInUSD && totalAskPriceInUSD}</b>
-          </div>
-          <div className={"field col" + (!compare.total_ask_price_range ? " highlighted" : "")}>
-            <span>Upper Total Range Quantity</span>
-            <br />
-            <b>
-              $
-              {orderBook.ask
-                .filter(
-                  (ask, i) =>
-                    ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice * (1 + config.total_ask_price_range))
-                )
-                .reduce((acc, next) => acc + next[1], 0)
-                .toFixed(4)}
-            </b>
-          </div>
-          <div className={"field col" + (!compare.total_ask_order_depth ? " highlighted" : "")}>
-            <span>
-              Total Ask Order Depth: <br />
-              <br />
-              <b>${config.total_ask_order_depth}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, total_ask_order_depth: config.total_ask_order_depth })
-                  : setConfigEdit({ ...configEdit, total_ask_order_depth: e.target.value })
-              }
-            />
-            {!validations.total_ask_order_depth && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.total_ask_random_walk ? " highlighted" : "")}>
-            <span>
-              Random Walk (Total Ask): <br />
-              <br />
-              <b>{config.total_ask_random_walk}</b>
-            </span>
-            <select
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, total_ask_random_walk: config.total_ask_random_walk })
-                  : setConfigEdit({ ...configEdit, total_ask_random_walk: e.target.value })
-              }
-            >
-              {!compare.total_ask_random_walk && <option value="">Reset</option>}
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
-            <span>
-              Upper Best Range /<br />
-              Best Ask: <br />
-              <b>{config.best_ask_price_range * 100}%</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, best_ask_price_range: config.best_ask_price_range })
-                  : setConfigEdit({ ...configEdit, best_ask_price_range: Number(e.target.value) / 100 })
-              }
-            />
-            {!validations.best_ask_price_range && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
-            <span>
-              Upper Best Range Price / <br />
-              Best Ask Price:
-              <br />
-            </span>
-            <b>${bestAskPriceInUSD?.toFixed(4)}</b>
-          </div>
-          <div className={"field col" + (!compare.best_ask_price_range ? " highlighted" : "")}>
-            <span>Upper Best Range Quantity</span>
-            <br />
-            <b>
-              $
-              {orderBook.ask
-                .filter((ask, i) => ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice))
-                .reduce((acc, next) => acc + next[1], 0)
-                .toFixed(4)}
-            </b>
-          </div>
-          <div className={"field col" + (!compare.best_ask_order_depth ? " highlighted" : "")}>
-            <span>
-              Best Ask Order Depth: <br />
-              <br />
-              <b>${config.best_ask_order_depth}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, best_ask_order_depth: config.best_ask_order_depth })
-                  : setConfigEdit({ ...configEdit, best_ask_order_depth: Number(e.target.value) })
-              }
-            />
-            {!validations.best_ask_order_depth && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.best_ask_random_walk ? " highlighted" : "")}>
-            <span>
-              Random Walk (Best Ask): <br />
-              <br />
-              <b>{config.best_ask_random_walk}</b>
-            </span>
-            <select
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, best_ask_random_walk: config.best_ask_random_walk })
-                  : setConfigEdit({ ...configEdit, best_ask_random_walk: e.target.value })
-              }
-            >
-              {!compare.best_ask_random_walk && <option value="">Reset</option>}
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.tilt_asks ? " highlighted" : "")}>
-            <span>
-              Order Tilt
-              <br />
-              (Asks) <br />
-              <b>{config.tilt_asks}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, tilt_asks: config.tilt_asks })
-                  : setConfigEdit({ ...configEdit, tilt_asks: Number(e.target.value).toFixed(0) })
-              }
-            />
-            {!validations.tilt_asks && <span className="validation">Must enter a value from 1 to 10!</span>}
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.spread ? " highlighted" : "")}>
-            <span>Upper Price</span>
-            <b>{spreadUpperPrice && spreadUpperPrice.toFixed(4)}$</b>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className="field col">
-            <span>Spot Price</span>
-            <b>{spotPrice.toFixed(4)}$</b>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.spread ? " highlighted" : "")}>
-            <span>Lower Price</span>
-            <b>{spreadLowerPrice && spreadLowerPrice.toFixed(4)}$</b>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.tilt_bids ? " highlighted" : "")}>
-            <span>
-              Order Tilt
-              <br />
-              (Bids) <br />
-              <b>{config.tilt_bids}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, tilt_bids: config.tilt_bids })
-                  : setConfigEdit({ ...configEdit, tilt_bids: Number(e.target.value) })
-              }
-            />
-            {!validations.tilt_bids && <span className="validation">Must enter a value from 1 to 10!</span>}
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
-            <span>
-              Lower Best Range /<br />
-              Best Bid: <br />
-              <b>{config.best_bid_price_range * 100}%</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, best_bid_price_range: config.best_bid_price_range })
-                  : setConfigEdit({ ...configEdit, best_bid_price_range: Number(e.target.value) / 100 })
-              }
-            />
-          </div>
-          <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
-            <span>
-              Lower Best Range Price /<br /> Best Bid Price
-            </span>
-            <b>${bestBidPriceInUSD?.toFixed(4)}</b>
-          </div>
-          <div className={"field col" + (!compare.best_bid_price_range ? " highlighted" : "")}>
-            <span>Lower Best Range Quantity</span>
-            <br />
-            <b>
-              $
-              {orderBook.bid
-                .filter((bid, i) => bid[0] >= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
-                .reduce((acc, next) => acc + next[1], 0)
-                .toFixed(4)}
-            </b>
-          </div>
-          <div className={"field col" + (!compare.best_bid_order_depth ? " highlighted" : "")}>
-            <span>
-              Best Bid Order Depth: <br />
-              <br />
-              <b>${config.best_bid_order_depth}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, best_bid_order_depth: config.best_bid_order_depth })
-                  : setConfigEdit({ ...configEdit, best_bid_order_depth: Number(e.target.value) })
-              }
-            />
-            {!validations.best_bid_order_depth && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.best_bid_random_walk ? " highlighted" : "")}>
-            <span>
-              Random Walk (Best Bid): <br />
-              <br />
-              <b>{config.best_bid_random_walk}</b>
-            </span>
-            <select
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, best_bid_random_walk: config.best_bid_random_walk })
-                  : setConfigEdit({ ...configEdit, best_bid_random_walk: e.target.value })
-              }
-            >
-              {!compare.best_bid_random_walk && <option value="">Reset</option>}
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        </div>
-        <div className="field-group">
-          <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
-            <span>
-              Lower Total Range
-              <br />
-              Total Bid: <br />
-              <b>{config.total_bid_price_range * 100}%</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, total_bid_price_range: config.total_bid_price_range })
-                  : setConfigEdit({ ...configEdit, total_bid_price_range: Number(e.target.value) / 100 })
-              }
-            />
-            {!validations.total_bid_price_range && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
-            <span>
-              Lower Total Range Price /<br />
-              Total Bid Price:
-            </span>
-            <b>${totalBidPriceInUSD?.toFixed(4)}</b>
-          </div>
-          <div className={"field col" + (!compare.total_bid_price_range ? " highlighted" : "")}>
-            <span>Lower Total Range Quantity</span>
-            <br />
-            <b>
-              $
-              {orderBook.bid
-                .filter((bid, i) => bid[0] >= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice))
-                .reduce((acc, next) => acc + next[1], 0)
-                .toFixed(4)}
-            </b>
-          </div>
-          <div className={"field col" + (!compare.total_bid_order_depth ? " highlighted" : "")}>
-            <span>
-              Total Bid Order Depth: <br />
-              <br />
-              <b>${config.total_bid_order_depth}</b>
-            </span>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, total_bid_order_depth: config.total_bid_order_depth })
-                  : setConfigEdit({ ...configEdit, total_bid_order_depth: Number(e.target.value) })
-              }
-            />
-            {!validations.total_bid_order_depth && <span className="validation">Must enter a positive value!</span>}
-          </div>
-          <div className={"field col" + (!compare.total_bid_random_walk ? " highlighted" : "")}>
-            <span>
-              Random Walk (Total Bid): <br />
-              <br />
-              <b>{config.total_bid_random_walk}</b>
-            </span>
-            <select
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, total_bid_random_walk: config.total_bid_random_walk })
-                  : setConfigEdit({ ...configEdit, total_bid_random_walk: e.target.value })
-              }
-            >
-              {!compare.total_bid_random_walk && <option value="">Reset</option>}
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
