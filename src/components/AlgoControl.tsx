@@ -7,6 +7,28 @@ type Props = {
   orderBook: OrderBookUpdate;
 };
 
+// type Config = {
+//   vol_trade_per_hour: number;
+//   min_trade: number;
+//   max_trade: number;
+//   random_walk_degree: string;
+//   spread: number;
+//   total_ask_price_range: number;
+//   total_ask_order_depth: number;
+//   total_ask_random_walk: string;
+//   best_ask_price_range: number;
+//   best_ask_order_depth: number;
+//   best_ask_random_walk: string;
+//   tilt_asks: number;
+//   tilt_bids: number;
+//   best_bid_price_range: number;
+//   best_bid_order_depth: number;
+//   best_bid_random_walk: string;
+//   total_bid_price_range: number;
+//   total_bid_order_depth: number;
+//   total_bid_random_walk: string;
+// };
+
 enum FieldType {
   Input = 0,
   Select = 1,
@@ -54,9 +76,9 @@ const AlgoControl = (props: Props) => {
   const { websocket, spotPrice, orderBook } = props;
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
-  const [config, setConfig] = useState<any>({}); //type later
-  const [configEdit, setConfigEdit] = useState<any>({}); //type later
-  const [compare, setCompare] = useState<any>({}); //type later
+  const [config, setConfig] = useState<any>({});
+  const [configEdit, setConfigEdit] = useState<any>({});
+  const [compare, setCompare] = useState<any>({});
   const [validations, setValidations] = useState<any>({});
 
   const [totalAskPriceInUSD, setTotalAskPriceInUSD] = useState<number>();
@@ -381,7 +403,7 @@ const AlgoControl = (props: Props) => {
       }
     }
     if (message.action === "START_STOP") {
-      setConfig({ ...config, status: message.result });
+      setConfig({ ...config, status: !config.status });
     }
   };
 
