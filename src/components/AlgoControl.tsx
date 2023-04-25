@@ -7,6 +7,43 @@ type Props = {
   orderBook: OrderBookUpdate;
 };
 
+enum FieldType {
+  Input = 0,
+  Select = 1,
+}
+
+type Field = {
+  fieldName: string;
+  fieldTitle: string;
+  fieldType: FieldType;
+  prefix?: string;
+  suffix?: string;
+};
+
+const volAlgoFields: Field[] = [
+  {
+    fieldName: "vol_trade_per_hour",
+    fieldTitle: "USD Vol Trade Per Hour",
+    fieldType: FieldType.Input,
+    prefix: "$",
+  },
+  {
+    fieldName: "min_trade",
+    fieldTitle: "Minimum Trade Slice Out Per Minute",
+    fieldType: FieldType.Input,
+  },
+  {
+    fieldName: "max_trade",
+    fieldTitle: "Maximum Trade Slice Out Per Minute",
+    fieldType: FieldType.Input,
+  },
+  {
+    fieldName: "random_walk_degree",
+    fieldTitle: "Random Walk Degree",
+    fieldType: FieldType.Select,
+  },
+];
+
 const AlgoControl = (props: Props) => {
   const { websocket, spotPrice, orderBook } = props;
 
@@ -178,66 +215,42 @@ const AlgoControl = (props: Props) => {
       </div>
       <div className="vol-algo">
         <h1>Volume</h1>
-        <div className={"field col" + (!compare.vol_trade_per_hour ? " highlighted" : "")}>
-          <span>USD Vol Trade Per Hour</span>
-          <div className="field col">
-            <b>${config.vol_trade_per_hour}</b>
-            <input
-              type="number"
-              onChange={(e) => {
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, vol_trade_per_hour: config.vol_trade_per_hour })
-                  : setConfigEdit({ ...configEdit, vol_trade_per_hour: Number(e.target.value) });
-              }}
-            />
-          </div>
-        </div>
-        <div className={"field col" + (!compare.min_trade ? " highlighted" : "")}>
-          <span>Trade Slice Out Per Minute (Min)</span>
-          <div className="field col">
-            <b>{config.min_trade}</b>
-            <input
-              type="number"
-              onChange={(e) => {
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, min_trade: config.min_trade })
-                  : setConfigEdit({ ...configEdit, min_trade: Number(e.target.value) });
-              }}
-            />
-          </div>
-        </div>
-        <div className={"field col" + (!compare.max_trade ? " highlighted" : "")}>
-          <span>Trade Slice Out Per Minute (Max)</span>
-          <div className="field col">
-            <b>{config.max_trade}</b>
-            <input
-              type="number"
-              onChange={(e) =>
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, max_trade: config.max_trade })
-                  : setConfigEdit({ ...configEdit, max_trade: Number(e.target.value) })
-              }
-            />
-          </div>
-        </div>
-        <div className={"field col" + (!compare.random_walk_degree ? " highlighted" : "")}>
-          <span>Random Walk Degree</span>
-          <div className="field col">
-            <b>{config.random_walk_degree}</b>
-            <select
-              onChange={(e) => {
-                e.target.value === ""
-                  ? setConfigEdit({ ...configEdit, random_walk_degree: config.random_walk_degree })
-                  : setConfigEdit({ ...configEdit, random_walk_degree: e.target.value });
-              }}
-              defaultValue={config.random_walk_degree}
-            >
-              {!compare.random_walk_degree && <option value="">Reset</option>}
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+        <div className="field-group">
+          {volAlgoFields.map((f, i) => (
+            <div className={"field col" + (!compare[f.fieldName] ? " highlighted" : "")}>
+              <span>{f.fieldTitle}</span>
+              <b>
+                {f.prefix}
+                {config[f.fieldName]}
+                {f.suffix}
+              </b>
+              {f.fieldType === FieldType.Input && (
+                <input
+                  type="number"
+                  onChange={(e) => {
+                    e.target.value === ""
+                      ? setConfigEdit({ ...configEdit, [f.fieldName]: config[f.fieldName] })
+                      : setConfigEdit({ ...configEdit, [f.fieldName]: Number(e.target.value) });
+                  }}
+                />
+              )}
+              {f.fieldType === FieldType.Select && (
+                <select
+                  onChange={(e) => {
+                    e.target.value === ""
+                      ? setConfigEdit({ ...configEdit, [f.fieldName]: config[f.fieldName] })
+                      : setConfigEdit({ ...configEdit, [f.fieldName]: e.target.value });
+                  }}
+                  defaultValue={config[f.fieldName]}
+                >
+                  {!compare[f.fieldName] && <option value="">Reset</option>}
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              )}
+            </div>
+          ))}
         </div>
       </div>
       <div className="order-book-depth">
