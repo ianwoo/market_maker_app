@@ -8,6 +8,8 @@ type Props = {
 };
 
 // type Config = {
+//   mm_engine_status: boolean;
+//   self_trade_status: boolean;
 //   vol_trade_per_hour: number;
 //   min_trade: number;
 //   max_trade: number;
@@ -437,21 +439,23 @@ const AlgoControl = (props: Props) => {
     return retbool;
   };
 
-  const startAlgo = () => {
+  const startAlgo = (type: string) => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP",
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        type: type,
         status: true,
       })
     );
   };
 
-  const stopAlgo = () => {
+  const stopAlgo = (type: string) => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP",
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        type: type,
         status: false,
       })
     );
@@ -517,13 +521,22 @@ const AlgoControl = (props: Props) => {
         <button className="edit-config" disabled={!checkCompare() && !checkValidations()} onClick={editConfig}>
           EDIT CONFIG
         </button>
-        {config.status ? (
-          <button className="stop-algo" onClick={() => stopAlgo()}>
-            STOP ALGO
+        {config.mm_engine_status ? (
+          <button className="stop-algo" onClick={() => stopAlgo("mm_engine")}>
+            STOP MM ENGINE
           </button>
         ) : (
-          <button className="start-algo" onClick={() => startAlgo()}>
-            START ALGO
+          <button className="start-algo" onClick={() => startAlgo("mm_engine")}>
+            START MM ENGINE
+          </button>
+        )}
+        {config.self_trade_status ? (
+          <button className="stop-algo" onClick={() => stopAlgo("self_trade")}>
+            STOP SELF TRADE
+          </button>
+        ) : (
+          <button className="start-algo" onClick={() => startAlgo("self_trade")}>
+            START SELF TRADE
           </button>
         )}
       </div>
