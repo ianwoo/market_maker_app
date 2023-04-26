@@ -537,7 +537,9 @@ const AlgoControl = (props: Props) => {
         )}
       </div>
       <div className="algo-status">
-        <h1>Algo Status: Algo is {config.status ? "running" : "stopped"}</h1>
+        <h1>Algo Status:</h1>
+        <h2>MM Engine is {config.mm_engine_status ? "running" : "stopped"}</h2>
+        <h2>Self Trading is {config.self_trade_status ? "running" : "stopped"}</h2>
       </div>
       <div className="vol-algo">
         <h1>Volume</h1>
