@@ -136,11 +136,18 @@
           }
           .price {
             width: 242px;
-            text-align: center;
           }
           .supply {
             width: 142px;
             text-align: right;
+            .subheader {
+              margin-bottom: 16px;
+            }
+            &.cancel-btn {
+              height: 69px;
+              font-size: 16px;
+              font-weight: 600;
+            }
           }
           .headers {
             display: flex;
@@ -149,6 +156,7 @@
               &.col {
                 display: flex;
                 flex-direction: column;
+                justify-content: flex-end;
               }
             }
           }

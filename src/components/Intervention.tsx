@@ -146,7 +146,11 @@ const Intervention = (props: Props) => {
             </div>
             <div className="field col">
               {orderBookIdx !== 0 ? (
-                <button className="supply" onClick={cancelOrders} disabled={selectedPriceRanges.length === 0}>
+                <button
+                  className="supply cancel-btn"
+                  onClick={cancelOrders}
+                  disabled={selectedPriceRanges.length === 0}
+                >
                   Cancel Orders
                 </button>
               ) : (
@@ -160,14 +164,22 @@ const Intervention = (props: Props) => {
             </div>
           </div>
           <div className="headers">
-            <div className="header deviation">% Above Offer</div>
-            <div className="header price">Price</div>
+            <div className="header deviation col">
+              <b>% Above Offer</b>
+            </div>
+            <div className="header price col">
+              <b>Price</b>
+            </div>
             <div className="header supply col">
-              <b>Supply</b>
-              <span>Total Supply: {orders.reduce((acc, next) => acc + next[1], 0)}</span>
+              <span className="subheader">
+                Total Supply: {orders.reduce((acc, next) => acc + next[1], 0).toFixed(4)}
+              </span>
               {selectedPriceRanges.length > 0 ? (
-                <span>Selected Supply: {selectedPriceRanges.reduce((acc, next) => acc + next.supply, 0)}</span>
+                <b className="subheader">
+                  Selected Supply: {selectedPriceRanges.reduce((acc, next) => acc + next.supply, 0).toFixed(4)}
+                </b>
               ) : null}
+              <b>Supply</b>
             </div>
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
