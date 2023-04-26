@@ -142,7 +142,6 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["total_ask_price_range"],
         fieldTitle: "Upper Total Range Quantity",
         fieldType: FieldType.Output,
-        prefix: "$",
         output: orderBook.ask
           .filter(
             (ask, i) =>
@@ -182,7 +181,6 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["best_ask_price_range"],
         fieldTitle: "Upper Best Range Quantity",
         fieldType: FieldType.Output,
-        prefix: "$",
         output: orderBook.ask
           .filter((ask, i) => ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice))
           .reduce((acc, next) => acc + next[1], 0),
@@ -262,7 +260,6 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["best_bid_price_range"],
         fieldTitle: "Lower Best Range Quantity",
         fieldType: FieldType.Output,
-        prefix: "$",
         output: orderBook.bid
           .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
           .reduce((acc, next) => acc + next[1], 0),
@@ -299,7 +296,6 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["total_bid_price_range"],
         fieldTitle: "Lower Total Range Quantity",
         fieldType: FieldType.Output,
-        prefix: "$",
         output: orderBook.bid
           .filter(
             (bid, i) =>
