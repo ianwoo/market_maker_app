@@ -31,20 +31,22 @@ function App() {
   const [accountUpdate, setAccountUpdate] = useState<AccountUpdate[]>([]);
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
-  useEffect(() => {
-    if (websocket.readyState === 1) {
-      websocket.send(
-        JSON.stringify({
-          action: "ORDER_BOOK_UPDATE_REQ",
-        })
-      );
-      websocket.send(
-        JSON.stringify({
-          action: "ACCOUNT_UPDATE_REQ",
-        })
-      );
-    }
-  }, []);
+  // Wait until the socket is open
+  websocket.addEventListener('open', () => {
+    websocket.send(
+      JSON.stringify({
+        action: "ORDER_BOOK_UPDATE_REQ",
+      })
+    );
+    websocket.send(
+      JSON.stringify({
+        action: "ACCOUNT_UPDATE_REQ",
+      })
+    );
+
+    // The socket is now ready to use
+    console.log('WebSocket is ready!');
+  });
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
