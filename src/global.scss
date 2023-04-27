@@ -1,7 +1,10 @@
 .App {
+  background: black;
+  color: white;
   .tabs {
     display: flex;
-    width: 100%;
+    background: darkgrey;
+    color: black;
     gap: 8px;
     padding: 8px;
     .tab {
@@ -23,24 +26,32 @@
   .component {
     padding-left: 8px;
     .home {
+      height: 100vh;
       .currentCapitalBalance {
         .accounts {
           text-align: center;
           display: flex;
+          .loading {
+            width: 100%;
+            text-align: center;
+          }
           .labels {
             display: flex;
             flex-direction: column;
-            span {
+            b {
               width: 200px;
               text-align: right;
-              padding-right: 8px;
+              padding: 4px;
             }
           }
           .account {
-            border: 1px solid black;
+            border: 1px solid white;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            span {
+              padding: 4px;
+            }
           }
           .total {
             display: flex;
@@ -57,6 +68,13 @@
 
         span {
           height: 42px;
+        }
+      }
+      &.gap {
+        gap: 8px;
+
+        .grow {
+          flex-grow: 1;
         }
       }
       .validation {
@@ -94,7 +112,9 @@
         display: flex;
         justify-content: flex-start;
         gap: 25px;
-        margin-bottom: 69px;
+        margin-bottom: 8px;
+        padding: 8px;
+        border: 1px solid white;
         div {
           width: 20%;
         }
@@ -116,6 +136,9 @@
         .range-controls {
           display: flex;
           justify-content: space-between;
+          .field.col {
+            padding: 8px;
+          }
         }
         .order-book {
           display: flex;
@@ -177,13 +200,13 @@
             border-radius: 8px;
             padding: 0 8px;
             &.ask {
-              background: pink;
+              background: darkred;
             }
             &.bid {
-              background: lightblue;
+              background: darkblue;
             }
             &.selected {
-              border: 3px solid black;
+              border: 3px solid lightblue;
             }
           }
         }

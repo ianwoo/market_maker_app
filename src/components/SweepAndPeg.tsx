@@ -77,18 +77,10 @@ const SweepAndPeg = (props: Props) => {
         <input type="number" onChange={(e) => setTargetPrice(Number(e.target.value))} />
         {!validations.targetPrice && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
-      <div className="field">
+      <div className="field col">
         <b>Amount</b>
-        <div className="field col">
-          <input type="number" onChange={(e) => setAddUSD(Number(e.target.value))} />
-          {!validations.addUSD && <span className="validation">Must enter positive or non-zero value!</span>}
-          {/* TODO: change control from Add USD and Add Quantity once we figure out what field for Add Quantity
-          
-          <select>
-            <option>USD</option>
-            <option>QTY</option>
-          </select> */}
-        </div>
+        <input type="number" onChange={(e) => setAddUSD(Number(e.target.value))} />
+        {!validations.addUSD && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
       {/* <div className="field">
         <b>Aggressiveness / Timing</b>
@@ -98,24 +90,23 @@ const SweepAndPeg = (props: Props) => {
           <option>Low</option>
         </select>
       </div> */}
-      <div className="field">
+      <div className="field gap">
         <b>Peg Additional Orders</b>
         <input
           type="checkbox"
           checked={pegAdditionalOrders}
           onChange={() => setPegAdditionalOrders(!pegAdditionalOrders)}
         />
-        {}
       </div>
       {pegAdditionalOrders ? (
         <div className="peg-fields">
           <b>Price Range</b>
-          <div className="field col">
+          <div className="field gap">
             <span>From</span>
-            <input type="number" onChange={(e) => setAddFromPrice(Number(e.target.value))} />
+            <input className="grow" type="number" onChange={(e) => setAddFromPrice(Number(e.target.value))} />
             {!validations.addFromPrice && <span className="validation">Must enter positive or non-zero value!</span>}
             <span>To</span>
-            <input type="number" onChange={(e) => setAddToPrice(Number(e.target.value))} />
+            <input className="grow" type="number" onChange={(e) => setAddToPrice(Number(e.target.value))} />
             {!validations.addToPrice && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
           <div className="field col">

@@ -209,7 +209,7 @@ const Intervention = (props: Props) => {
                   }}
                 >
                   <div className="deviation">{Math.floor((o[0] / spotPrice) * 100 - 100)}%</div>
-                  <div className="price">{o[0]}</div>
+                  <div className="price">${o[0]}</div>
                   <div className="supply">{o[1]}</div>
                 </div>
               ))
@@ -229,13 +229,15 @@ const Intervention = (props: Props) => {
                       : acc.find((group) => group.grouping === _percentGrouping);
 
                   const _groupingPrice =
+                    "$" +
                     (spotPrice + _grouping * priceRangeInc).toFixed(_decimals).toString() +
-                    " - " +
+                    " - $" +
                     (spotPrice + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
 
                   const _percentGroupingPrice =
+                    "$" +
                     (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * spotPrice).toFixed(_decimals).toString() +
-                    " - " +
+                    " - $" +
                     ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * spotPrice)
                       .toFixed(_decimals)
                       .toString();
