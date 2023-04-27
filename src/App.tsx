@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
@@ -31,8 +31,25 @@ function App() {
   const [accountUpdate, setAccountUpdate] = useState<AccountUpdate[]>([]);
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
+  useEffect(() => {
+    if (websocket.readyState === 1) {
+      websocket.send(
+        JSON.stringify({
+          action: "ORDER_BOOK_UPDATE_REQ",
+        })
+      );
+      websocket.send(
+        JSON.stringify({
+          action: "ACCOUNT_UPDATE_REQ",
+        })
+      );
+    }
+  }, []);
+
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
+    message.type === "ACCOUNT_UPDATE_REQ" && setAccountUpdate(JSON.parse(message.content));
+    message.type === "ORDER_BOOK_UPDATE_REQ" && setOrderBookUpdate(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
   };
