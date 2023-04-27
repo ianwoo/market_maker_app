@@ -4,7 +4,7 @@ import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
 import "./global.scss";
 
-type AccountUpdate = {
+export type AccountUpdate = {
   account: string;
   coin: string;
   exchange: string;
@@ -67,7 +67,7 @@ function App() {
       <Intervention
         key="intervention"
         orderBookUpdate={orderBookUpdate}
-        spotPrice={accountUpdate.length > 0 ? accountUpdate[0].price : 0}
+        accountUpdate={accountUpdate}
         websocket={websocket}
       />
     ) : (

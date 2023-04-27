@@ -213,6 +213,29 @@
         .sweep-and-peg {
           width: 33%;
           padding: 16px;
+
+          .info {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+
+            .inforow {
+              display: flex;
+              justify-content: space-between;
+
+              span {
+                width: 20%;
+
+                &.account {
+                  width: 27%;
+                }
+                &.coin {
+                  width: 13%;
+                }
+              }
+            }
+          }
+
           .field {
             margin-bottom: 16px;
           }

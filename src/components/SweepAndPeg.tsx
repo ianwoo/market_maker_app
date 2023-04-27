@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { AccountUpdate } from "../App";
 
 type Props = {
   websocket: WebSocket;
+  accountUpdate: AccountUpdate[];
 };
 
 // enum Tab {
@@ -10,7 +12,7 @@ type Props = {
 // }
 
 const SweepAndPeg = (props: Props) => {
-  const { websocket } = props;
+  const { websocket, accountUpdate } = props;
 
   // const [selected, setSelected] = useState<Tab>(0);
   const [pegAdditionalOrders, setPegAdditionalOrders] = useState<boolean>(false);
@@ -64,14 +66,24 @@ const SweepAndPeg = (props: Props) => {
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
-      {/* <div className="tabs">
-        <div className={"tab" + (selected === Tab.Buy ? " selected" : "")} onClick={() => setSelected(Tab.Buy)}>
-          Buy
+      <div className="info">
+        <div className="inforow">
+          <span className="account">Account</span>
+          <span className="coin">Coin</span>
+          <span>Free</span>
+          <span>Locked</span>
+          <span>Total</span>
         </div>
-        <div className={"tab" + (selected === Tab.Sell ? " selected" : "")} onClick={() => setSelected(Tab.Sell)}>
-          Sell
-        </div>
-      </div> */}
+        {accountUpdate.map((a, i) => (
+          <div className="inforow">
+            <span className="account">{a.account}</span>
+            <span className="coin">{a.coin}</span>
+            <span>{Number(a.free).toFixed(4)}</span>
+            <span>{Number(a.locked).toFixed(4)}</span>
+            <span>{Number(a.total).toFixed(4)}</span>
+          </div>
+        ))}
+      </div>
       <div className="field col">
         <b>Limit Price (Target)</b>
         <input type="number" onChange={(e) => setTargetPrice(Number(e.target.value))} />

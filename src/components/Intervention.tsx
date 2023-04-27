@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { OrderBookUpdate } from "../App";
+import { AccountUpdate, OrderBookUpdate } from "../App";
 import SweepAndPeg from "./SweepAndPeg";
 
 type Props = {
   orderBookUpdate: OrderBookUpdate[];
-  spotPrice: number;
+  accountUpdate: AccountUpdate[];
   websocket: WebSocket;
 };
 
@@ -39,7 +39,7 @@ const countDecimals = function (value: number) {
 };
 
 const Intervention = (props: Props) => {
-  const { orderBookUpdate, spotPrice, websocket } = props;
+  const { orderBookUpdate, accountUpdate, websocket } = props;
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
@@ -85,7 +85,7 @@ const Intervention = (props: Props) => {
         <div className="order-book">
           <div className="spot-price field col">
             <b>Spot Price</b>
-            <b>{spotPrice}</b>
+            <b>{accountUpdate[0].price}</b>
           </div>
           <div className="tabs">
             {orderBookUpdate.map((obu, i) => [
@@ -208,7 +208,7 @@ const Intervention = (props: Props) => {
                     }
                   }}
                 >
-                  <div className="deviation">{Math.floor((o[0] / spotPrice) * 100 - 100)}%</div>
+                  <div className="deviation">{Math.floor((o[0] / accountUpdate[0].price) * 100 - 100)}%</div>
                   <div className="price">${o[0]}</div>
                   <div className="supply">{o[1]}</div>
                 </div>
@@ -216,11 +216,11 @@ const Intervention = (props: Props) => {
             : orders
                 .reduce((acc: Group[], next: [number, number]) => {
                   //                   tuple: [price, supply]
-                  const _decimals = countDecimals(spotPrice);
+                  const _decimals = countDecimals(accountUpdate[0].price);
 
-                  const _grouping = Math.floor((next[0] - spotPrice) / priceRangeInc);
+                  const _grouping = Math.floor((next[0] - accountUpdate[0].price) / priceRangeInc);
                   const _percentGrouping = Math.floor(
-                    Math.floor((next[0] / spotPrice) * 100 - 100) / aboveOfferRangeInc
+                    Math.floor((next[0] / accountUpdate[0].price) * 100 - 100) / aboveOfferRangeInc
                   );
 
                   const _existingGroup =
@@ -230,22 +230,24 @@ const Intervention = (props: Props) => {
 
                   const _groupingPrice =
                     "$" +
-                    (spotPrice + _grouping * priceRangeInc).toFixed(_decimals).toString() +
+                    (accountUpdate[0].price + _grouping * priceRangeInc).toFixed(_decimals).toString() +
                     " - $" +
-                    (spotPrice + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
+                    (accountUpdate[0].price + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
 
                   const _percentGroupingPrice =
                     "$" +
-                    (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * spotPrice).toFixed(_decimals).toString() +
+                    (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
+                      .toFixed(_decimals)
+                      .toString() +
                     " - $" +
-                    ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * spotPrice)
+                    ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
                       .toFixed(_decimals)
                       .toString();
 
                   const _deviation =
-                    Math.floor(((next[0] - priceRangeInc) / spotPrice) * 100 - 100).toString() +
+                    Math.floor(((next[0] - priceRangeInc) / accountUpdate[0].price) * 100 - 100).toString() +
                     "% - " +
-                    Math.floor((next[0] / spotPrice) * 100 - 100).toString() +
+                    Math.floor((next[0] / accountUpdate[0].price) * 100 - 100).toString() +
                     "%";
 
                   const _percentDeviation =
@@ -278,8 +280,8 @@ const Intervention = (props: Props) => {
                         setSelectedPriceRanges([
                           ...selectedPriceRanges,
                           {
-                            from: spotPrice + g.grouping * priceRangeInc,
-                            to: spotPrice + (g.grouping + 1) * priceRangeInc,
+                            from: accountUpdate[0].price + g.grouping * priceRangeInc,
+                            to: accountUpdate[0].price + (g.grouping + 1) * priceRangeInc,
                             supply: g.supply,
                           },
                         ]);
@@ -289,21 +291,21 @@ const Intervention = (props: Props) => {
                         setSelectedPriceRanges([
                           ...selectedPriceRanges,
                           {
-                            from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * spotPrice,
-                            to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * spotPrice,
+                            from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
+                            to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
                             supply: g.supply,
                           },
                         ]);
                         setHighlightedGroups([...highlightedGroups, g.grouping]);
                       } else if (aboveOfferRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
-                        const _targetFromPrice = spotPrice + g.grouping * priceRangeInc;
+                        const _targetFromPrice = accountUpdate[0].price + g.grouping * priceRangeInc;
                         const _priceRangesTargetRemoved = selectedPriceRanges.filter(
                           (r) => r.from !== _targetFromPrice
                         );
                         setSelectedPriceRanges(_priceRangesTargetRemoved);
                         setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
                       } else if (priceRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
-                        const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * spotPrice;
+                        const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price;
                         const _priceRangesTargetRemoved = selectedPriceRanges.filter(
                           (r) => r.from !== _targetFromPrice
                         );
@@ -318,7 +320,7 @@ const Intervention = (props: Props) => {
                   </div>
                 ))}
         </div>
-        <SweepAndPeg websocket={websocket} />
+        <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} />
       </div>
     </div>
   );
