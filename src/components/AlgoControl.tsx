@@ -157,7 +157,10 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Total Ask Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Cannot be higher than amount of capital available, and must be positive!",
+        validation:
+          "Cannot be higher than amount of capital available ($" +
+          capitalMaximum.toFixed(4) +
+          "), and must be positive!",
       },
       {
         fieldNames: ["total_ask_random_walk"],
@@ -193,7 +196,10 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Best Ask Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Cannot be higher than amount of capital available, and must be positive!",
+        validation:
+          "Cannot be higher than amount of capital available ($" +
+          capitalMaximum.toFixed(4) +
+          "), and must be positive!",
       },
       {
         fieldNames: ["best_ask_random_walk"],
@@ -232,7 +238,7 @@ const AlgoControl = (props: Props) => {
       {
         fieldNames: ["spread"],
         fieldTitle:
-          "Lower Price" + ((configEdit.spread ? configEdit.spread : config.spread) / 2) * 100 + "% below Spot)",
+          "Lower Price (" + ((configEdit.spread ? configEdit.spread : config.spread) / 2) * 100 + "% below Spot)",
         fieldType: FieldType.Output,
         prefix: "$",
         output: spreadLowerPrice,
@@ -274,7 +280,10 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Best Bid Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Cannot be higher than amount of capital available, and must be positive!",
+        validation:
+          "Cannot be higher than amount of capital available ($" +
+          capitalMaximum.toFixed(4) +
+          "), and must be positive!",
       },
       {
         fieldNames: ["best_bid_random_walk"],
@@ -313,7 +322,10 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Total Bid Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Cannot be higher than amount of capital available, and must be positive!",
+        validation:
+          "Cannot be higher than amount of capital available ($" +
+          capitalMaximum.toFixed(4) +
+          "), and must be positive!",
       },
       {
         fieldNames: ["total_bid_random_walk"],
@@ -528,7 +540,8 @@ const AlgoControl = (props: Props) => {
         configEdit[f.fieldNames[0]] > capitalMaximum / 2 &&
         validations[f.fieldNames[0]] && (
           <span className="warning">
-            This will commit more than half of available capital to this order depth! Are you sure?
+            This will commit more than half of available capital ({capitalMaximum.toFixed(4)}) to this order depth! Are
+            you sure?
           </span>
         )}
     </div>
