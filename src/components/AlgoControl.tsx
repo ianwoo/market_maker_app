@@ -521,6 +521,16 @@ const AlgoControl = (props: Props) => {
         </b>
       )}
       {f.validation && !validations[f.fieldNames[0]] && <span className="validation">{f.validation}</span>}
+      {(f.fieldTitle === "Total Ask Order Depth" ||
+        f.fieldTitle === "Best Ask Order Depth" ||
+        f.fieldTitle === "Total Bid Order Depth" ||
+        f.fieldTitle === "Best Bid Order Depth") &&
+        configEdit[f.fieldNames[0]] > capitalMaximum / 2 &&
+        validations[f.fieldNames[0]] && (
+          <span className="warning">
+            This will commit more than half of available capital to this order depth! Are you sure?
+          </span>
+        )}
     </div>
   );
 
