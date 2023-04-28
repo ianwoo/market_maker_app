@@ -80,7 +80,6 @@
       .validation {
         background: black;
         color: red;
-        padding-bottom: 20px;
       }
       .warning {
         background: black;
@@ -113,6 +112,10 @@
         &.highlighted {
           background: lightblue;
           color: blue;
+        }
+
+        .validation {
+          padding-bottom: 20px;
         }
       }
       .field-group {
@@ -245,6 +248,13 @@
 
           .field {
             margin-bottom: 16px;
+          }
+
+          .peg-fields {
+            .validation {
+              background: black;
+              color: red;
+            }
           }
         }
       }

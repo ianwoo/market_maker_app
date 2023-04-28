@@ -31,8 +31,14 @@ const SweepAndPeg = (props: Props) => {
     let validations: any = {};
     validations.targetPrice = !(targetPrice !== undefined && targetPrice <= 0);
     validations.addUSD = !(addUSD !== undefined && addUSD <= 0);
-    validations.addFromPrice = !(addFromPrice !== undefined && addFromPrice <= 0);
-    validations.addToPrice = !(addToPrice !== undefined && addToPrice <= 0);
+    validations.addFromPrice = !(
+      (addFromPrice !== undefined && addFromPrice <= 0) ||
+      (addFromPrice !== undefined && addToPrice !== undefined && addFromPrice > addToPrice)
+    );
+    validations.addToPrice = !(
+      (addToPrice !== undefined && addToPrice <= 0) ||
+      (addFromPrice !== undefined && addToPrice !== undefined && addFromPrice > addToPrice)
+    );
     validations.addNumberOrders = !(addNumberOrders !== undefined && addNumberOrders <= 0);
     validations.pegAmount = !(pegAmount !== undefined && pegAmount <= 0);
     setValidations(validations);
@@ -116,11 +122,15 @@ const SweepAndPeg = (props: Props) => {
           <div className="field gap">
             <span>From</span>
             <input className="grow" type="number" onChange={(e) => setAddFromPrice(Number(e.target.value))} />
-            {!validations.addFromPrice && <span className="validation">Must enter positive or non-zero value!</span>}
+
             <span>To</span>
             <input className="grow" type="number" onChange={(e) => setAddToPrice(Number(e.target.value))} />
-            {!validations.addToPrice && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
+          {(!validations.addFromPrice || !validations.addToPrice) && (
+            <span className="validation">
+              From price must be lower than To price, and both must be positive and non-zero!
+            </span>
+          )}
           <div className="field col">
             <b>Add Number of Orders</b>
             <input type="number" onChange={(e) => setAddNumberOrders(Number(e.target.value))} />
