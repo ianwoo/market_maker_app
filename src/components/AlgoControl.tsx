@@ -209,7 +209,8 @@ const AlgoControl = (props: Props) => {
     [
       {
         fieldNames: ["spread"],
-        fieldTitle: "Upper Price",
+        fieldTitle:
+          "Upper Price (" + ((configEdit.spread ? configEdit.spread : config.spread) / 2) * 100 + "% above Spot)",
         fieldType: FieldType.Output,
         prefix: "$",
         output: spreadUpperPrice,
@@ -227,7 +228,8 @@ const AlgoControl = (props: Props) => {
     [
       {
         fieldNames: ["spread"],
-        fieldTitle: "Lower Price",
+        fieldTitle:
+          "Lower Price" + ((configEdit.spread ? configEdit.spread : config.spread) / 2) * 100 + "% below Spot)",
         fieldType: FieldType.Output,
         prefix: "$",
         output: spreadLowerPrice,
@@ -379,7 +381,7 @@ const AlgoControl = (props: Props) => {
           break;
         case "tilt_asks":
         case "tilt_bids":
-          validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 0);
+          validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 1);
           break;
         default:
           break;
