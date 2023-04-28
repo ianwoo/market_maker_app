@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { OrderBookUpdate } from "../App";
+import { AccountUpdate, OrderBookUpdate } from "../App";
 
 type Props = {
   websocket: WebSocket;
-  spotPrice: number;
   orderBook: OrderBookUpdate;
+  accountUpdate: AccountUpdate[];
 };
 
 // type Config = {
@@ -75,7 +75,10 @@ const volAlgoFields: Field[] = [
 ];
 
 const AlgoControl = (props: Props) => {
-  const { websocket, spotPrice, orderBook } = props;
+  const { websocket, orderBook, accountUpdate } = props;
+
+  const spotPrice = accountUpdate[0].price;
+  const capitalMaximum = Number(accountUpdate[0].total) * spotPrice + Number(accountUpdate[1].total);
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
   const [config, setConfig] = useState<any>({});
@@ -129,7 +132,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Upper Total Range / Total Ask",
         fieldType: FieldType.Input,
         suffix: "%",
-        validation: "Must enter a positive value!",
+        validation: "Must be higher than Upper Best Range / Best Ask, and must be positive!",
       },
       {
         fieldNames: ["total_ask_price_range"],
@@ -154,7 +157,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Total Ask Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Must enter a positive value!",
+        validation: "Cannot be higher than amount of capital available, and must be positive!",
       },
       {
         fieldNames: ["total_ask_random_walk"],
@@ -168,7 +171,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Upper Best Range / Best Ask",
         fieldType: FieldType.Input,
         suffix: "%",
-        validation: "Must enter a positive value!",
+        validation: "Must be higher than half the spread, and must be positive!",
       },
       {
         fieldNames: ["best_ask_price_range"],
@@ -190,7 +193,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Best Ask Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Must enter a positive value!",
+        validation: "Cannot be higher than amount of capital available, and must be positive!",
       },
       {
         fieldNames: ["best_ask_random_walk"],
@@ -249,7 +252,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Lower Best Range / Best Bid",
         fieldType: FieldType.Input,
         suffix: "%",
-        validation: "Must enter a positive value!",
+        validation: "Must be higher than half the spread, and must be positive!",
       },
       {
         fieldNames: ["best_bid_price_range"],
@@ -271,7 +274,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Best Bid Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Must enter a positive value!",
+        validation: "Cannot be higher than amount of capital available, and must be positive!",
       },
       {
         fieldNames: ["best_bid_random_walk"],
@@ -285,7 +288,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Lower Total Range / Total Bid",
         fieldType: FieldType.Input,
         suffix: "%",
-        validation: "Must enter a positive value!",
+        validation: "Must be higher than Lower Best Range / Best Bid, and must be positive!",
       },
       {
         fieldNames: ["total_bid_price_range"],
@@ -310,7 +313,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Total Bid Order Depth",
         fieldType: FieldType.Input,
         prefix: "$",
-        validation: "Must enter a positive value!",
+        validation: "Cannot be higher than amount of capital available, and must be positive!",
       },
       {
         fieldNames: ["total_bid_random_walk"],
@@ -366,17 +369,25 @@ const AlgoControl = (props: Props) => {
     let validations: any = {};
     for (const prop in configEdit) {
       switch (prop) {
-        case "vol_trade_per_hour":
-        case "min_trade":
-        case "max_trade":
         case "total_ask_price_range":
-        case "best_ask_price_range":
+          validations[prop] = !(configEdit[prop] < configEdit.best_ask_price_range || configEdit[prop] < 0);
+          break;
         case "total_bid_price_range":
+          validations[prop] = !(configEdit[prop] < configEdit.best_bid_price_range || configEdit[prop] < 0);
+          break;
+        case "best_ask_price_range":
         case "best_bid_price_range":
+          validations[prop] = !(configEdit[prop] < configEdit.spread / 2 || configEdit[prop] < 0);
+          break;
         case "total_ask_order_depth":
         case "best_ask_order_depth":
         case "total_bid_order_depth":
         case "best_bid_order_depth":
+          validations[prop] = !(configEdit[prop] > capitalMaximum || configEdit[prop] < 0);
+          break;
+        case "vol_trade_per_hour":
+        case "min_trade":
+        case "max_trade":
           validations[prop] = !(configEdit[prop] < 0);
           break;
         case "tilt_asks":
@@ -388,7 +399,7 @@ const AlgoControl = (props: Props) => {
       }
     }
     setValidations(validations);
-  }, [configEdit]);
+  }, [capitalMaximum, configEdit]);
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);

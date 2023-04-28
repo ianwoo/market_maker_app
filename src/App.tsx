@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
@@ -32,7 +32,7 @@ function App() {
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
   // Wait until the socket is open
-  websocket.addEventListener('open', () => {
+  websocket.addEventListener("open", () => {
     websocket.send(
       JSON.stringify({
         action: "ORDER_BOOK_UPDATE_REQ",
@@ -45,7 +45,7 @@ function App() {
     );
 
     // The socket is now ready to use
-    console.log('WebSocket is ready!');
+    console.log("WebSocket is ready!");
   });
 
   websocket.onmessage = (event) => {
@@ -62,8 +62,8 @@ function App() {
     <AlgoControl
       key="control"
       websocket={websocket}
-      spotPrice={accountUpdate.length > 0 ? accountUpdate[0].price : 0}
-      orderBook={orderBookUpdate[0]}
+      orderBook={orderBookUpdate[0]} //this needs to change once we activate more than just one mm account
+      accountUpdate={accountUpdate}
     />,
     accountUpdate.length > 0 ? (
       <Intervention

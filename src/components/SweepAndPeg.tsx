@@ -129,7 +129,7 @@ const SweepAndPeg = (props: Props) => {
           <div className="field col">
             <b>Peg Amount</b>
             <input type="number" onChange={(e) => setPegAmount(Number(e.target.value))} />
-            {!validations.sweepAmount && <span className="validation">Must enter positive or non-zero value!</span>}
+            {!validations.pegAmount && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
         </div>
       ) : null}
