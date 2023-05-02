@@ -99,7 +99,7 @@ const SweepAndPeg = (props: Props) => {
         {!validations.targetPrice && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
       <div className="field col">
-        <b>Amount in USD</b>
+        <b>Sweep Amount in USD</b>
         <input type="number" onChange={(e) => setAddUSD(Number(e.target.value))} />
         {!validations.addUSD && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
@@ -121,7 +121,7 @@ const SweepAndPeg = (props: Props) => {
       </div>
       {pegAdditionalOrders ? (
         <div className="peg-fields">
-          <b>Price Range</b>
+          <b>Peg Price Range</b>
           <div className="field gap">
             <span>From</span>
             <input className="grow" type="number" onChange={(e) => setAddFromPrice(Number(e.target.value))} />
@@ -135,12 +135,12 @@ const SweepAndPeg = (props: Props) => {
             </span>
           )}
           <div className="field col">
-            <b>Add Number of Orders</b>
+            <b>Add Additional Peg Orders</b>
             <input type="number" onChange={(e) => setAddNumberOrders(Number(e.target.value))} />
             {!validations.addNumberOrders && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
           <div className="field col">
-            <b>Peg Amount</b>
+            <b>Peg Amount in USD</b>
             <input type="number" onChange={(e) => setPegAmount(Number(e.target.value))} />
             {!validations.pegAmount && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
