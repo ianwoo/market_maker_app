@@ -122,7 +122,9 @@ const Intervention = (props: Props) => {
                   setHighlightedGroups([]);
                   setOrderType(OrderType.Ask);
                   setOrderBookIdx(i);
-                  setOrders(obu.ask);
+                  externalsOnly && orderBookUpdate[0].external_ask && orderBookIdx === 0
+                    ? setOrders(orderBookUpdate[0].external_ask)
+                    : setOrders(obu.ask);
                 }}
               >
                 {obu.obtype === "total" ? obu.exchange + " Total" : obu.account} Asks
@@ -135,7 +137,9 @@ const Intervention = (props: Props) => {
                   setHighlightedGroups([]);
                   setOrderType(OrderType.Bid);
                   setOrderBookIdx(i);
-                  setOrders(obu.bid);
+                  externalsOnly && orderBookUpdate[0].external_bid && orderBookIdx === 0
+                    ? setOrders(orderBookUpdate[0].external_bid)
+                    : setOrders(obu.bid);
                 }}
               >
                 {obu.obtype === "total" ? obu.exchange + " Total" : obu.account} Bids
