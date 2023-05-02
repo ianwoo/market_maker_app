@@ -212,7 +212,7 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["tilt_asks"],
         fieldTitle: "Order Tilt (Asks)",
         fieldType: FieldType.Input,
-        validation: "Must enter a value from 0 to 10!",
+        validation: "Must enter a value from -5 to 5!",
       },
     ],
     [
@@ -249,7 +249,7 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["tilt_bids"],
         fieldTitle: "Order Tilt (Bids)",
         fieldType: FieldType.Input,
-        validation: "Must enter a value from 0 to 10!",
+        validation: "Must enter a value from -5 to 5!",
       },
     ],
     [
@@ -404,7 +404,7 @@ const AlgoControl = (props: Props) => {
           break;
         case "tilt_asks":
         case "tilt_bids":
-          validations[prop] = !(configEdit[prop] > 10 || configEdit[prop] < 1);
+          validations[prop] = !(configEdit[prop] > 5 || configEdit[prop] < -5);
           break;
         default:
           break;
