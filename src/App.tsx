@@ -20,6 +20,8 @@ export type OrderBookUpdate = {
   account?: string;
   bid: [number, number][]; //tuple: [price, supply]
   ask: [number, number][]; //tuple: [price, supply]
+  external_bid?: [number, number][]; //tuple: [price, supply]
+  external_ask?: [number, number][]; //tuple: [price, supply]
 };
 
 const tabs = ["Home Panel", "Algos Control", "Intervention Control"];

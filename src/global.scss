@@ -156,6 +156,15 @@
           padding: 16px;
           width: 66%;
           gap: 8px;
+
+          .toggle-external-only {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            input {
+              margin-right: 16px;
+            }
+          }
           .stop-algo {
             margin-bottom: 16px;
           }

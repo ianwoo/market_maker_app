@@ -44,6 +44,7 @@ const Intervention = (props: Props) => {
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
   const [orders, setOrders] = useState<[number, number][]>(orderBookUpdate[0].ask);
+  const [externalsOnly, setExternalsOnly] = useState<boolean>(false);
 
   const [priceRangeInc, setPriceRangeInc] = useState<number>(0);
   const [aboveOfferRangeInc, setAboveOfferRangeInc] = useState<number>(0);
@@ -83,6 +84,30 @@ const Intervention = (props: Props) => {
       <h1>Intervention</h1>
       <div className="flex">
         <div className="order-book">
+          {orderBookIdx === 0 && (
+            <div className="toggle-external-only">
+              <input
+                type="checkbox"
+                checked={externalsOnly}
+                onChange={() => {
+                  if (!externalsOnly) {
+                    orderType === OrderType.Ask &&
+                      orderBookUpdate[0].external_ask &&
+                      setOrders(orderBookUpdate[0].external_ask);
+                    orderType === OrderType.Bid &&
+                      orderBookUpdate[0].external_bid &&
+                      setOrders(orderBookUpdate[0].external_bid);
+                  } else {
+                    orderType === OrderType.Ask && setOrders(orderBookUpdate[0].ask);
+                    orderType === OrderType.Bid && setOrders(orderBookUpdate[0].bid);
+                  }
+
+                  setExternalsOnly(!externalsOnly);
+                }}
+              />
+              <span>See only external asks and bids</span>
+            </div>
+          )}
           <div className="spot-price field col">
             <b>Spot Price</b>
             <b>{accountUpdate[0].price}</b>

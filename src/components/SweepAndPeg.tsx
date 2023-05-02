@@ -81,7 +81,7 @@ const SweepAndPeg = (props: Props) => {
           <span>Total</span>
         </div>
         {accountUpdate.map((a, i) => (
-          <div className="inforow">
+          <div className="inforow" key={i}>
             <span className="account">{a.account}</span>
             <span className="coin">{a.coin}</span>
             <span>{Number(a.free).toFixed(4)}</span>
