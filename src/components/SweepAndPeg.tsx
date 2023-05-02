@@ -72,6 +72,9 @@ const SweepAndPeg = (props: Props) => {
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
+      <p>
+        Currently using <b>bybit_dev_mm1</b>
+      </p>
       <div className="info">
         <div className="inforow">
           <span className="account">Account</span>
