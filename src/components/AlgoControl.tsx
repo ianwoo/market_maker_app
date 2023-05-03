@@ -214,18 +214,16 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Input,
         validation: "Must enter a value from -5 to 5!",
       },
-    ],
-    [
       {
         fieldNames: ["min_ask_order_usd_value"],
-        fieldTitle: "Minimum Ask Order (USD)",
+        fieldTitle: "Minimum Ask Order Size (USD)",
         fieldType: FieldType.Input,
         prefix: "$",
         validation: "Cannot be higher than Maximum Ask Order!",
       },
       {
         fieldNames: ["max_ask_order_usd_value"],
-        fieldTitle: "Maximum Ask Order (USD)",
+        fieldTitle: "Maximum Ask Order Size (USD)",
         fieldType: FieldType.Input,
         prefix: "$",
         validation: "Cannot be lower than Minimum Ask Order!",
@@ -266,6 +264,20 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Order Tilt (Bids)",
         fieldType: FieldType.Input,
         validation: "Must enter a value from -5 to 5!",
+      },
+      {
+        fieldNames: ["min_bid_order_usd_value"],
+        fieldTitle: "Minimum Bid Order Size (USD)",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Cannot be higher than Maximum Bid Order!",
+      },
+      {
+        fieldNames: ["max_bid_order_usd_value"],
+        fieldTitle: "Maximum Bid Order Size (USD)",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Cannot be lower than Minimum Bid Order!",
       },
     ],
     [
@@ -347,22 +359,6 @@ const AlgoControl = (props: Props) => {
         fieldNames: ["total_bid_random_walk"],
         fieldTitle: "Random Walk (Total Bid)",
         fieldType: FieldType.Select,
-      },
-    ],
-    [
-      {
-        fieldNames: ["min_bid_order_usd_value"],
-        fieldTitle: "Minimum Bid Order (USD)",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation: "Cannot be higher than Maximum Bid Order!",
-      },
-      {
-        fieldNames: ["max_bid_order_usd_value"],
-        fieldTitle: "Maximum Bid Order (USD)",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation: "Cannot be lower than Minimum Bid Order!",
       },
     ],
   ];
