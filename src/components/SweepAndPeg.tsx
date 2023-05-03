@@ -6,10 +6,22 @@ type Props = {
   accountUpdate: AccountUpdate[];
 };
 
-// enum Tab {
-//   Buy = 0,
-//   Sell = 1,
-// }
+enum Side {
+  Buy = "BUY",
+  Sell = "SELL",
+}
+
+type SweepAndPegCall = {
+  action: string;
+  request_id: number;
+  side: Side; //BUY or SELL
+  add_from_px: number;
+  add_to_px: number;
+  add_num_of_orders: number;
+  peg_amt: number;
+  target_px?: number;
+  add_usd?: number;
+};
 
 const SweepAndPeg = (props: Props) => {
   const { websocket, accountUpdate } = props;
@@ -32,10 +44,12 @@ const SweepAndPeg = (props: Props) => {
     validations.targetPrice = !(targetPrice !== undefined && targetPrice <= 0);
     validations.addUSD = !(addUSD !== undefined && addUSD <= 0);
     validations.addFromPrice = !(
+      addFromPrice === undefined ||
       (addFromPrice !== undefined && addFromPrice <= 0) ||
       (addFromPrice !== undefined && addToPrice !== undefined && addFromPrice > addToPrice)
     );
     validations.addToPrice = !(
+      addToPrice === undefined ||
       (addToPrice !== undefined && addToPrice <= 0) ||
       (addFromPrice !== undefined && addToPrice !== undefined && addFromPrice > addToPrice)
     );
@@ -44,7 +58,23 @@ const SweepAndPeg = (props: Props) => {
     setValidations(validations);
   }, [targetPrice, addUSD, addFromPrice, addToPrice, addNumberOrders, pegAmount]);
 
-  const handleSweepAndPeg = () => {
+  const handleSweepAndPeg = (side: Side) => {
+    if (!addFromPrice || !addToPrice || !addNumberOrders || !pegAmount) return;
+    let payload: SweepAndPegCall = {
+      action: "SWEEP_AND_PEG",
+      side: side,
+      request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+      add_from_px: addFromPrice,
+      add_to_px: addToPrice,
+      add_num_of_orders: addNumberOrders,
+      peg_amt: pegAmount,
+    };
+    if (targetPrice) {
+      payload.target_px = targetPrice;
+    }
+    if (addUSD) {
+      payload.add_usd = addUSD;
+    }
     websocket.send(
       JSON.stringify({
         action: "SWEEP_AND_PEG",
@@ -94,12 +124,12 @@ const SweepAndPeg = (props: Props) => {
         ))}
       </div>
       <div className="field col">
-        <b>Limit Price (Target)</b>
+        <b>Target Limit Price (Optional)</b>
         <input type="number" onChange={(e) => setTargetPrice(Number(e.target.value))} />
         {!validations.targetPrice && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
       <div className="field col">
-        <b>Sweep Amount in USD</b>
+        <b>Sweep Amount in USD (Optional)</b>
         <input type="number" onChange={(e) => setAddUSD(Number(e.target.value))} />
         {!validations.addUSD && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
@@ -135,7 +165,7 @@ const SweepAndPeg = (props: Props) => {
             </span>
           )}
           <div className="field col">
-            <b>Add Additional Peg Orders</b>
+            <b>Number Of Peg Orders</b>
             <input type="number" onChange={(e) => setAddNumberOrders(Number(e.target.value))} />
             {!validations.addNumberOrders && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
@@ -146,8 +176,11 @@ const SweepAndPeg = (props: Props) => {
           </div>
         </div>
       ) : null}
-      <button disabled={!checkValidations()} onClick={handleSweepAndPeg}>
-        Execute
+      <button className="buy" disabled={!checkValidations()} onClick={() => handleSweepAndPeg(Side.Buy)}>
+        BUY
+      </button>
+      <button className="sell" disabled={!checkValidations()} onClick={() => handleSweepAndPeg(Side.Sell)}>
+        SELL
       </button>
     </div>
   );

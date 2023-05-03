@@ -62,7 +62,6 @@ const Intervention = (props: Props) => {
   };
 
   const cancelOrders = () => {
-    console.log(selectedPriceRanges);
     selectedPriceRanges.forEach((pr, i) => {
       const id = Date.now();
       setCancellingPriceRanges([...cancellingPriceRanges, { ...pr, request_id: id }]);
@@ -75,8 +74,11 @@ const Intervention = (props: Props) => {
         })
       );
     });
-    //to do: create state for handling confirmation of order cancellation
-    //basically just match request_id and then show feedback of order cancellations still processing
+    websocket.send(
+      JSON.stringify({
+        action: "ORDER_BOOK_UPDATE_REQ",
+      })
+    );
   };
 
   return (
