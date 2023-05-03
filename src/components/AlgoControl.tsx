@@ -217,6 +217,22 @@ const AlgoControl = (props: Props) => {
     ],
     [
       {
+        fieldNames: ["min_ask_order_usd_value"],
+        fieldTitle: "Minimum Ask Order (USD)",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Cannot be higher than Maximum Ask Order!",
+      },
+      {
+        fieldNames: ["max_ask_order_usd_value"],
+        fieldTitle: "Maximum Ask Order (USD)",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Cannot be lower than Minimum Ask Order!",
+      },
+    ],
+    [
+      {
         fieldNames: ["spread"],
         fieldTitle:
           "Upper Price (" + ((configEdit.spread ? configEdit.spread : config.spread) / 2) * 100 + "% above Spot)",
@@ -342,25 +358,11 @@ const AlgoControl = (props: Props) => {
         validation: "Cannot be higher than Maximum Bid Order!",
       },
       {
-        fieldNames: ["min_ask_order_usd_value"],
-        fieldTitle: "Minimum Ask Order (USD)",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation: "Cannot be higher than Maximum Ask Order!",
-      },
-      {
         fieldNames: ["max_bid_order_usd_value"],
         fieldTitle: "Maximum Bid Order (USD)",
         fieldType: FieldType.Input,
         prefix: "$",
         validation: "Cannot be lower than Minimum Bid Order!",
-      },
-      {
-        fieldNames: ["max_ask_order_usd_value"],
-        fieldTitle: "Maximum Ask Order (USD)",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation: "Cannot be lower than Minimum Ask Order!",
       },
     ],
   ];
@@ -428,16 +430,16 @@ const AlgoControl = (props: Props) => {
           validations[prop] = !(configEdit[prop] > capitalMaximum || configEdit[prop] < 0);
           break;
         case "min_bid_order_usd_value":
-          validations[prop] = !(configEdit[prop] < configEdit.max_bid_order_usd_value || configEdit[prop] <= 0);
+          validations[prop] = !(configEdit[prop] > configEdit.max_bid_order_usd_value || configEdit[prop] <= 0);
           break;
         case "max_bid_order_usd_value":
-          validations[prop] = !(configEdit[prop] > configEdit.min_bid_order_usd_value || configEdit[prop] <= 0);
+          validations[prop] = !(configEdit[prop] < configEdit.min_bid_order_usd_value || configEdit[prop] <= 0);
           break;
         case "min_ask_order_usd_value":
-          validations[prop] = !(configEdit[prop] < configEdit.max_bid_order_usd_value || configEdit[prop] <= 0);
+          validations[prop] = !(configEdit[prop] > configEdit.max_bid_order_usd_value || configEdit[prop] <= 0);
           break;
         case "max_ask_order_usd_value":
-          validations[prop] = !(configEdit[prop] > configEdit.min_bid_order_usd_value || configEdit[prop] <= 0);
+          validations[prop] = !(configEdit[prop] < configEdit.min_bid_order_usd_value || configEdit[prop] <= 0);
           break;
         case "vol_trade_per_hour":
         case "min_trade":
