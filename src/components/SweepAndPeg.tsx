@@ -41,8 +41,8 @@ const SweepAndPeg = (props: Props) => {
 
   useEffect(() => {
     let validations: any = {};
-    validations.targetPrice = !(targetPrice !== undefined && targetPrice <= 0);
-    validations.addUSD = !(addUSD !== undefined && addUSD <= 0);
+    validations.targetPrice = !(targetPrice !== undefined ? targetPrice <= 0 : false);
+    validations.addUSD = !(addUSD !== undefined ? addUSD <= 0 : false);
     validations.addFromPrice = !(
       addFromPrice === undefined ||
       (addFromPrice !== undefined && addFromPrice <= 0) ||
