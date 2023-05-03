@@ -41,22 +41,18 @@ const SweepAndPeg = (props: Props) => {
 
   useEffect(() => {
     let validations: any = {};
-    validations.targetPrice = !(targetPrice !== undefined ? targetPrice <= 0 : false);
-    validations.addUSD = !(addUSD !== undefined ? addUSD <= 0 : false);
-    validations.addFromPrice = !(
-      addFromPrice === undefined ||
-      (addFromPrice !== undefined && addFromPrice <= 0) ||
-      (addFromPrice !== undefined && addToPrice !== undefined && addFromPrice > addToPrice)
-    );
-    validations.addToPrice = !(
-      addToPrice === undefined ||
-      (addToPrice !== undefined && addToPrice <= 0) ||
-      (addFromPrice !== undefined && addToPrice !== undefined && addFromPrice > addToPrice)
-    );
-    validations.addNumberOrders = !(addNumberOrders !== undefined && addNumberOrders <= 0);
+    validations.targetPrice = !(targetPrice !== undefined ? targetPrice <= 0 : pegAdditionalOrders ? false : true);
+    validations.addUSD = !(addUSD !== undefined ? addUSD <= 0 : pegAdditionalOrders ? false : true);
+    validations.addFromPrice = !(pegAdditionalOrders
+      ? false
+      : addFromPrice === undefined || (addFromPrice !== undefined && addFromPrice <= 0));
+    validations.addToPrice = !(addToPrice === undefined || (addToPrice !== undefined && addToPrice <= 0));
+    validations.addNumberOrders = !(pegAdditionalOrders
+      ? false
+      : addNumberOrders !== undefined && addNumberOrders <= 0);
     validations.pegAmount = !(pegAmount !== undefined && pegAmount <= 0);
     setValidations(validations);
-  }, [targetPrice, addUSD, addFromPrice, addToPrice, addNumberOrders, pegAmount]);
+  }, [targetPrice, addUSD, addFromPrice, addToPrice, addNumberOrders, pegAmount, pegAdditionalOrders]);
 
   const handleSweepAndPeg = (side: Side) => {
     if (!addFromPrice || !addToPrice || !addNumberOrders || !pegAmount) return;
@@ -113,12 +109,12 @@ const SweepAndPeg = (props: Props) => {
         ))}
       </div>
       <div className="field col">
-        <b>Target Limit Price (Optional)</b>
+        <b>Target Limit Price {pegAdditionalOrders && "(Optional)"}</b>
         <input type="number" onChange={(e) => setTargetPrice(Number(e.target.value))} />
         {!validations.targetPrice && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
       <div className="field col">
-        <b>Sweep Amount in USD (Optional)</b>
+        <b>Sweep Amount in USD {pegAdditionalOrders && "(Optional)"}</b>
         <input type="number" onChange={(e) => setAddUSD(Number(e.target.value))} />
         {!validations.addUSD && <span className="validation">Must enter positive or non-zero value!</span>}
       </div>
@@ -159,7 +155,7 @@ const SweepAndPeg = (props: Props) => {
             {!validations.addNumberOrders && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
           <div className="field col">
-            <b>Peg Amount in USD</b>
+            <b>Total Peg Amount in USD</b>
             <input type="number" onChange={(e) => setPegAmount(Number(e.target.value))} />
             {!validations.pegAmount && <span className="validation">Must enter positive or non-zero value!</span>}
           </div>
