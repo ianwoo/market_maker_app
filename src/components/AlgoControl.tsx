@@ -432,10 +432,10 @@ const AlgoControl = (props: Props) => {
           validations[prop] = !(configEdit[prop] < configEdit.min_bid_order_usd_value || configEdit[prop] <= 0);
           break;
         case "min_ask_order_usd_value":
-          validations[prop] = !(configEdit[prop] > configEdit.max_bid_order_usd_value || configEdit[prop] <= 0);
+          validations[prop] = !(configEdit[prop] > configEdit.max_ask_order_usd_value || configEdit[prop] <= 0);
           break;
         case "max_ask_order_usd_value":
-          validations[prop] = !(configEdit[prop] < configEdit.min_bid_order_usd_value || configEdit[prop] <= 0);
+          validations[prop] = !(configEdit[prop] < configEdit.min_ask_order_usd_value || configEdit[prop] <= 0);
           break;
         case "vol_trade_per_hour":
         case "min_trade":
