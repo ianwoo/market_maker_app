@@ -75,18 +75,7 @@ const SweepAndPeg = (props: Props) => {
     if (addUSD) {
       payload.add_usd = addUSD;
     }
-    websocket.send(
-      JSON.stringify({
-        action: "SWEEP_AND_PEG",
-        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
-        target_px: targetPrice,
-        add_usd: addUSD,
-        add_from_px: addFromPrice,
-        add_to_px: addToPrice,
-        add_num_of_orders: addNumberOrders,
-        peg_amt: pegAmount,
-      })
-    );
+    websocket.send(JSON.stringify(payload));
   };
 
   const checkValidations = () => {
