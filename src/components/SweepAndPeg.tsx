@@ -145,9 +145,7 @@ const SweepAndPeg = (props: Props) => {
             <input className="grow" type="number" onChange={(e) => setAddToPrice(Number(e.target.value))} />
           </div>
           {(!validations.addFromPrice || !validations.addToPrice) && (
-            <span className="validation">
-              From price must be lower than To price, and both must be positive and non-zero!
-            </span>
+            <span className="validation">Both values must be positive and non-zero!</span>
           )}
           <div className="field col">
             <b>Number Of Peg Orders</b>
