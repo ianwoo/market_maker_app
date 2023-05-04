@@ -54,6 +54,7 @@ const Intervention = (props: Props) => {
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<PriceRange[]>([]);
   const [highlightedGroups, setHighlightedGroups] = useState<number[]>([]);
 
+  const [cancelAccount, setCancelAccount] = useState<string>(accountUpdate[0].account);
   const [cancellingPriceRanges, setCancellingPriceRanges] = useState<PriceRange[]>([]);
 
   websocket.onmessage = (event) => {
@@ -68,6 +69,7 @@ const Intervention = (props: Props) => {
       websocket.send(
         JSON.stringify({
           action: "CANCEL_ORDERS",
+          account: cancelAccount,
           request_id: id, //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
           from_px: pr.from,
           to_px: pr.to,
@@ -177,13 +179,18 @@ const Intervention = (props: Props) => {
             </div>
             <div className="field col">
               {orderBookIdx !== 0 ? (
-                <button
-                  className="supply cancel-btn"
-                  onClick={cancelOrders}
-                  disabled={selectedPriceRanges.length === 0}
-                >
-                  Cancel Orders
-                </button>
+                [
+                  <button
+                    className="supply cancel-btn"
+                    onClick={cancelOrders}
+                    disabled={selectedPriceRanges.length === 0}
+                  >
+                    Cancel Orders
+                  </button>,
+                  <select onChange={(e) => setCancelAccount(e.target.value)} defaultValue={accountUpdate[0].account}>
+                    {accountUpdate.map((a, i) => a.coin === "USDT" && <option value={a.account}>{a.account}</option>)}
+                  </select>,
+                ]
               ) : (
                 <div className="supply">Cannot Cancel External Orders</div>
               )}
