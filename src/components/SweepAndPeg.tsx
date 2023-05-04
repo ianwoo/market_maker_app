@@ -15,6 +15,7 @@ type SweepAndPegCall = {
   action: string;
   request_id: number;
   side: Side; //BUY or SELL
+  account: string;
   add_from_px?: number;
   add_to_px?: number;
   add_num_of_orders?: number;
@@ -31,6 +32,7 @@ const SweepAndPeg = (props: Props) => {
 
   const [targetPrice, setTargetPrice] = useState<number>();
   const [addUSD, setAddUSD] = useState<number>();
+  const [SPAccount, setSPAccount] = useState<string>(accountUpdate[0].account);
 
   const [addFromPrice, setAddFromPrice] = useState<number>();
   const [addToPrice, setAddToPrice] = useState<number>();
@@ -80,6 +82,7 @@ const SweepAndPeg = (props: Props) => {
       action: "SWEEP_AND_PEG",
       side: side,
       request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+      account: SPAccount,
     };
     if (targetPrice) {
       payload.target_px = targetPrice;
@@ -115,9 +118,6 @@ const SweepAndPeg = (props: Props) => {
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
-      <p>
-        Currently using <b>bybit_dev_mm1</b>
-      </p>
       <div className="info">
         <div className="inforow">
           <span className="account">Account</span>
@@ -135,6 +135,12 @@ const SweepAndPeg = (props: Props) => {
             <span>{Number(a.total).toFixed(4)}</span>
           </div>
         ))}
+      </div>
+      <div className="field col">
+        <b>Account</b>
+        <select onChange={(e) => setSPAccount(e.target.value)} defaultValue={accountUpdate[0].account}>
+          {accountUpdate.map((a, i) => a.coin === "USDT" && <option value={a.account}>{a.account}</option>)}
+        </select>
       </div>
       <div className="field col">
         <b>Target Limit Price {pegAdditionalOrders && "(Optional)"}</b>
