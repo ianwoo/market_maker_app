@@ -43,7 +43,7 @@ const SweepAndPeg = (props: Props) => {
     let validations: any = {};
     validations.targetPrice = !(
       (pegAdditionalOrders
-        ? targetPrice !== undefined
+        ? targetPrice !== undefined && targetPrice !== 0
           ? targetPrice <= 0
           : false //A
         : targetPrice !== undefined
@@ -53,7 +53,7 @@ const SweepAndPeg = (props: Props) => {
     // validations.targetPrice = !(targetPrice !== undefined ? targetPrice <= 0 : pegAdditionalOrders ? false : true);
     validations.addUSD = !(
       (pegAdditionalOrders
-        ? addUSD !== undefined
+        ? addUSD !== undefined && targetPrice !== 0
           ? addUSD <= 0
           : false //A
         : addUSD !== undefined
