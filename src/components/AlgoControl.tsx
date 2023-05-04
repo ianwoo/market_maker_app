@@ -188,7 +188,10 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Upper Best Range Quantity",
         fieldType: FieldType.Output,
         output: orderBook.ask
-          .filter((ask, i) => ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice))
+          .filter(
+            (ask, i) =>
+              ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice * (1 + config.best_ask_price_range))
+          )
           .reduce((acc, next) => acc + next[1], 0),
       },
       {
