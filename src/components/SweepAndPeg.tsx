@@ -41,30 +41,36 @@ const SweepAndPeg = (props: Props) => {
 
   useEffect(() => {
     let validations: any = {};
-    validations.targetPrice = !(pegAdditionalOrders
-      ? targetPrice === undefined
-        ? false
-        : targetPrice <= 0
-      : targetPrice === undefined
-      ? true
-      : targetPrice <= 0);
+    validations.targetPrice = !(
+      (pegAdditionalOrders
+        ? targetPrice !== undefined
+          ? targetPrice <= 0
+          : false //A
+        : targetPrice !== undefined
+        ? targetPrice <= 0
+        : true) //B
+    );
     // validations.targetPrice = !(targetPrice !== undefined ? targetPrice <= 0 : pegAdditionalOrders ? false : true);
-    validations.addUSD = !(pegAdditionalOrders
-      ? addUSD === undefined
-        ? false
-        : addUSD <= 0
-      : addUSD === undefined
-      ? true
-      : addUSD <= 0);
+    validations.addUSD = !(
+      (pegAdditionalOrders
+        ? addUSD !== undefined
+          ? addUSD <= 0
+          : false //A
+        : addUSD !== undefined
+        ? addUSD <= 0
+        : true) //B
+    );
     // validations.addUSD = !(addUSD !== undefined ? addUSD <= 0 : pegAdditionalOrders ? false : true);
-    validations.addFromPrice = !(pegAdditionalOrders
+    validations.addFromPrice = !(!pegAdditionalOrders
       ? false
       : addFromPrice === undefined || (addFromPrice !== undefined && addFromPrice <= 0));
-    validations.addToPrice = !(addToPrice === undefined || (addToPrice !== undefined && addToPrice <= 0));
-    validations.addNumberOrders = !(pegAdditionalOrders
+    validations.addToPrice = !(!pegAdditionalOrders
+      ? false
+      : addToPrice === undefined || (addToPrice !== undefined && addToPrice <= 0));
+    validations.addNumberOrders = !(!pegAdditionalOrders
       ? false
       : addNumberOrders !== undefined && addNumberOrders <= 0);
-    validations.pegAmount = !(pegAmount !== undefined && pegAmount <= 0);
+    validations.pegAmount = !(!pegAdditionalOrders ? false : pegAmount !== undefined && pegAmount <= 0);
     setValidations(validations);
   }, [targetPrice, addUSD, addFromPrice, addToPrice, addNumberOrders, pegAmount, pegAdditionalOrders]);
 
