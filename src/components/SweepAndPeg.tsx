@@ -15,10 +15,10 @@ type SweepAndPegCall = {
   action: string;
   request_id: number;
   side: Side; //BUY or SELL
-  add_from_px: number;
-  add_to_px: number;
-  add_num_of_orders: number;
-  peg_amt: number;
+  add_from_px?: number;
+  add_to_px?: number;
+  add_num_of_orders?: number;
+  peg_amt?: number;
   target_px?: number;
   add_usd?: number;
 };
@@ -75,21 +75,29 @@ const SweepAndPeg = (props: Props) => {
   }, [targetPrice, addUSD, addFromPrice, addToPrice, addNumberOrders, pegAmount, pegAdditionalOrders]);
 
   const handleSweepAndPeg = (side: Side) => {
-    if (!addFromPrice || !addToPrice || !addNumberOrders || !pegAmount) return;
+    if (pegAdditionalOrders && (!addFromPrice || !addToPrice || !addNumberOrders || !pegAmount)) return;
     let payload: SweepAndPegCall = {
       action: "SWEEP_AND_PEG",
       side: side,
       request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
-      add_from_px: addFromPrice,
-      add_to_px: addToPrice,
-      add_num_of_orders: addNumberOrders,
-      peg_amt: pegAmount,
     };
     if (targetPrice) {
       payload.target_px = targetPrice;
     }
     if (addUSD) {
       payload.add_usd = addUSD;
+    }
+    if (addFromPrice) {
+      payload.add_from_px = addFromPrice;
+    }
+    if (addToPrice) {
+      payload.add_to_px = addToPrice;
+    }
+    if (addNumberOrders) {
+      payload.add_num_of_orders = addNumberOrders;
+    }
+    if (pegAmount) {
+      payload.peg_amt = pegAmount;
     }
     websocket.send(JSON.stringify(payload));
   };
