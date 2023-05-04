@@ -64,7 +64,7 @@ function App() {
     <AlgoControl
       key="control"
       websocket={websocket}
-      orderBook={orderBookUpdate[0]} //this needs to change once we activate more than just one mm account
+      orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
       accountUpdate={accountUpdate}
     />,
     accountUpdate.length > 0 ? (
