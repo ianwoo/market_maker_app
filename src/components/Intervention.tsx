@@ -126,6 +126,7 @@ const Intervention = (props: Props) => {
                   setHighlightedGroups([]);
                   setOrderType(OrderType.Ask);
                   setOrderBookIdx(i);
+                  obu.account && setCancelAccount(obu.account);
                   externalsOnly && orderBookUpdate[0].external_ask && orderBookIdx === 0
                     ? setOrders(orderBookUpdate[0].external_ask)
                     : setOrders(obu.ask);
@@ -141,6 +142,7 @@ const Intervention = (props: Props) => {
                   setHighlightedGroups([]);
                   setOrderType(OrderType.Bid);
                   setOrderBookIdx(i);
+                  obu.account && setCancelAccount(obu.account);
                   externalsOnly && orderBookUpdate[0].external_bid && orderBookIdx === 0
                     ? setOrders(orderBookUpdate[0].external_bid)
                     : setOrders(obu.bid);
@@ -179,18 +181,13 @@ const Intervention = (props: Props) => {
             </div>
             <div className="field col">
               {orderBookIdx !== 0 ? (
-                [
-                  <button
-                    className="supply cancel-btn"
-                    onClick={cancelOrders}
-                    disabled={selectedPriceRanges.length === 0}
-                  >
-                    Cancel Orders
-                  </button>,
-                  <select onChange={(e) => setCancelAccount(e.target.value)} defaultValue={accountUpdate[0].account}>
-                    {accountUpdate.map((a, i) => a.coin === "USDT" && <option value={a.account}>{a.account}</option>)}
-                  </select>,
-                ]
+                <button
+                  className="supply cancel-btn"
+                  onClick={cancelOrders}
+                  disabled={selectedPriceRanges.length === 0}
+                >
+                  Cancel Orders
+                </button>
               ) : (
                 <div className="supply">Cannot Cancel External Orders</div>
               )}
