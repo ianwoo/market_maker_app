@@ -18,6 +18,7 @@ const HomePanel = (props: Props) => {
             <b>Locked</b>
             <b>Total</b>
             <b>MTM Price</b>
+            <b>Total (USD)</b>
           </div>
           {accountUpdate.length === 0 && <div className="loading">Loading...</div>}
           {accountUpdate.map((acc: any, i: number) => (
@@ -29,6 +30,7 @@ const HomePanel = (props: Props) => {
               <span>{Number(acc.locked).toFixed(4)}</span>
               <span>{Number(acc.total).toFixed(4)}</span>
               <span>${Number(acc.price).toFixed(4)}</span>
+              <span>${(Number(acc.total) * Number(acc.price)).toFixed(4)}</span>
             </div>
           ))}
         </div>

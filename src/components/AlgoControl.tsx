@@ -141,17 +141,18 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         output: totalAskPriceInUSD,
       },
-      {
-        fieldNames: ["total_ask_price_range"],
-        fieldTitle: "Upper Total Range Quantity",
-        fieldType: FieldType.Output,
-        output: orderBook.ask
-          .filter(
-            (ask, i) =>
-              ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice * (1 + config.total_ask_price_range))
-          )
-          .reduce((acc, next) => acc + next[1], 0),
-      },
+      //removing this for now because we cannot obtain full depth of book
+      // {
+      //   fieldNames: ["total_ask_price_range"],
+      //   fieldTitle: "Upper Total Range Quantity",
+      //   fieldType: FieldType.Output,
+      //   output: orderBook.ask
+      //     .filter(
+      //       (ask, i) =>
+      //         ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice * (1 + config.total_ask_price_range))
+      //     )
+      //     .reduce((acc, next) => acc + next[1], 0),
+      // },
       {
         fieldNames: ["total_ask_order_depth"],
         fieldTitle: "Total Ask Order Depth",
