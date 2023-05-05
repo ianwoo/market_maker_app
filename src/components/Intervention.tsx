@@ -216,6 +216,9 @@ const Intervention = (props: Props) => {
               ) : null}
               <b>Supply</b>
             </div>
+            <div className="header usd-value col">
+              <b>USD Value</b>
+            </div>
           </div>
           {aboveOfferRangeInc === 0 && priceRangeInc === 0
             ? orders.map((o, i) => (
@@ -246,6 +249,7 @@ const Intervention = (props: Props) => {
                   <div className="deviation">{Math.floor((o[0] / accountUpdate[0].price) * 100 - 100)}%</div>
                   <div className="price">${o[0]}</div>
                   <div className="supply">{o[1]}</div>
+                  <div className="usd-value">${(o[1] * accountUpdate[0].price).toFixed(2)}</div>
                 </div>
               ))
             : orders
@@ -351,7 +355,8 @@ const Intervention = (props: Props) => {
                   >
                     <div className="deviation">{g.dev}</div>
                     <div className="price">{g.price}</div>
-                    <div className="supply">{g.supply}</div>
+                    <div className="supply">{g.supply.toFixed(4)}</div>
+                    <div className="usd-value">{(g.supply * accountUpdate[0].price).toFixed(2)}</div>
                   </div>
                 ))}
         </div>
