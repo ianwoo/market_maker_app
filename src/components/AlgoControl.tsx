@@ -78,7 +78,7 @@ const AlgoControl = (props: Props) => {
   const { websocket, orderBook, accountUpdate } = props;
 
   const spotPrice = accountUpdate[0].price;
-  const capitalMaximum = Number(accountUpdate[0].total) * spotPrice + Number(accountUpdate[1].total);
+  const capitalMaximum = Number(accountUpdate[0].total) * spotPrice;
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
   const [config, setConfig] = useState<any>({});
@@ -184,17 +184,17 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         output: bestAskPriceInUSD,
       },
-      {
-        fieldNames: ["best_ask_price_range"],
-        fieldTitle: "Upper Best Range Quantity",
-        fieldType: FieldType.Output,
-        output: orderBook.ask
-          .filter(
-            (ask, i) =>
-              ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice * (1 + config.best_ask_price_range))
-          )
-          .reduce((acc, next) => acc + next[1], 0),
-      },
+      // {
+      //   fieldNames: ["best_ask_price_range"],
+      //   fieldTitle: "Upper Best Range Quantity",
+      //   fieldType: FieldType.Output,
+      //   output: orderBook.ask
+      //     .filter(
+      //       (ask, i) =>
+      //         ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice * (1 + config.best_ask_price_range))
+      //     )
+      //     .reduce((acc, next) => acc + next[1], 0),
+      // },
       {
         fieldNames: ["best_ask_order_depth"],
         fieldTitle: "Best Ask Order Depth",
@@ -299,14 +299,14 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         output: bestBidPriceInUSD,
       },
-      {
-        fieldNames: ["best_bid_price_range"],
-        fieldTitle: "Lower Best Range Quantity",
-        fieldType: FieldType.Output,
-        output: orderBook.bid
-          .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
-          .reduce((acc, next) => acc + next[1], 0),
-      },
+      // {
+      //   fieldNames: ["best_bid_price_range"],
+      //   fieldTitle: "Lower Best Range Quantity",
+      //   fieldType: FieldType.Output,
+      //   output: orderBook.bid
+      //     .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
+      //     .reduce((acc, next) => acc + next[1], 0),
+      // },
       {
         fieldNames: ["best_bid_order_depth"],
         fieldTitle: "Best Bid Order Depth",
@@ -338,17 +338,17 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         output: totalBidPriceInUSD,
       },
-      {
-        fieldNames: ["total_bid_price_range"],
-        fieldTitle: "Lower Total Range Quantity",
-        fieldType: FieldType.Output,
-        output: orderBook.bid
-          .filter(
-            (bid, i) =>
-              bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice * (1 + config.total_bid_price_range))
-          )
-          .reduce((acc, next) => acc + next[1], 0),
-      },
+      // {
+      //   fieldNames: ["total_bid_price_range"],
+      //   fieldTitle: "Lower Total Range Quantity",
+      //   fieldType: FieldType.Output,
+      //   output: orderBook.bid
+      //     .filter(
+      //       (bid, i) =>
+      //         bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice * (1 + config.total_bid_price_range))
+      //     )
+      //     .reduce((acc, next) => acc + next[1], 0),
+      // },
       {
         fieldNames: ["total_bid_order_depth"],
         fieldTitle: "Total Bid Order Depth",
