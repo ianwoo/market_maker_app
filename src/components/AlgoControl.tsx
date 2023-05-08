@@ -100,6 +100,7 @@ const AlgoControl = (props: Props) => {
 
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>();
+  const [templateLoaded, setTemplateLoaded] = useState<boolean>(false);
   const [newTemplateName, setNewTemplateName] = useState<string>();
   const [newTemplateNameValid, setNewTemplateNameValid] = useState<boolean>(true);
 
@@ -548,6 +549,7 @@ const AlgoControl = (props: Props) => {
 
   const loadTemplate = () => {
     const template = templates.find((t) => t.template_name === selectedTemplate);
+    setTemplateLoaded(true);
     setConfigEdit(template?.update_params);
   };
 
@@ -574,7 +576,15 @@ const AlgoControl = (props: Props) => {
           {f.suffix}
         </b>
       )}
-      {f.fieldType === FieldType.Input && (
+      {f.fieldType !== FieldType.Output && config[f.fieldNames[0]] !== configEdit[f.fieldNames[0]] && (
+        <b>
+          {"=> "}
+          {f.prefix}
+          {f.suffix !== "%" ? configEdit[f.fieldNames[0]] : configEdit[f.fieldNames[0]] * 100}
+          {f.suffix}
+        </b>
+      )}
+      {!templateLoaded && f.fieldType === FieldType.Input && (
         <input
           type="number"
           onChange={(e) => {
@@ -592,7 +602,7 @@ const AlgoControl = (props: Props) => {
           }}
         />
       )}
-      {f.fieldType === FieldType.Select && (
+      {!templateLoaded && f.fieldType === FieldType.Select && (
         <select
           onChange={(e) => {
             e.target.value === ""
@@ -607,6 +617,7 @@ const AlgoControl = (props: Props) => {
           <option value="high">High</option>
         </select>
       )}
+      {templateLoaded && f.fieldType !== FieldType.Output && <span>Template: {selectedTemplate}</span>}
       {f.fieldType === FieldType.Output && (
         <b>
           {f.prefix}
@@ -637,7 +648,18 @@ const AlgoControl = (props: Props) => {
             <button className="template load-template" onClick={loadTemplate}>
               LOAD TEMPLATE
             </button>
-            <select className="template" onChange={(e) => setSelectedTemplate(e.target.value)}>
+            <select
+              className="template"
+              onChange={(e) => {
+                if (e.target.value !== "") {
+                  setSelectedTemplate(e.target.value);
+                } else {
+                  setTemplateLoaded(false);
+                  setConfigEdit(config);
+                }
+              }}
+            >
+              {templateLoaded && <option value="">Reset</option>}
               {templates.map((t, i) => (
                 <option key={i} value={t.template_name}>
                   {t.template_name}
