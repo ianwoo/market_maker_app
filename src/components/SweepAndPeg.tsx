@@ -139,7 +139,14 @@ const SweepAndPeg = (props: Props) => {
       <div className="field col">
         <b>Account</b>
         <select onChange={(e) => setSPAccount(e.target.value)} defaultValue={accountUpdate[0].account}>
-          {accountUpdate.map((a, i) => a.coin === "USDT" && <option value={a.account}>{a.account}</option>)}
+          {accountUpdate.map(
+            (a, i) =>
+              a.coin === "USDT" && (
+                <option key={i} value={a.account}>
+                  {a.account}
+                </option>
+              )
+          )}
         </select>
       </div>
       <div className="field col">

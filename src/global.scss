@@ -98,7 +98,21 @@
         top: 0;
         right: 0;
         height: 69px;
+        gap: 10px;
         margin: 8px;
+
+        .templates-wrapper {
+          display: flex;
+          flex-direction: column;
+          .templates {
+            height: 69px;
+            display: flex;
+            flex-direction: column;
+            .template {
+              flex-grow: 1;
+            }
+          }
+        }
 
         .start-algo {
           background: powderblue;
