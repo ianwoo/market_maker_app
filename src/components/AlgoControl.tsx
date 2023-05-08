@@ -564,7 +564,21 @@ const AlgoControl = (props: Props) => {
     );
   };
 
-  const handleSaveTemplate = () => {};
+  const handleSaveTemplate = () => {
+    if (!newTemplateName || newTemplateName === "") {
+      setNewTemplateNameValid(false);
+      return;
+    } else {
+      setNewTemplateNameValid(true);
+      saveTemplate(newTemplateName);
+      websocket.send(
+        JSON.stringify({
+          action: "GET_TEMPLATES",
+          request_id: Date.now(),
+        })
+      );
+    }
+  };
 
   const renderField = (f: Field, i: number) => (
     <div key={i} className={"field col" + (f.fieldNames.some((fn) => !compare[fn]) ? " highlighted" : "")}>
@@ -670,11 +684,16 @@ const AlgoControl = (props: Props) => {
         </div>
         <div className="templates-wrapper">
           <div className="templates">
-            <button className="template save-template" disabled={!checkCompare() || !checkValidations()}>
+            <button
+              className="template save-template"
+              onClick={handleSaveTemplate}
+              disabled={!checkCompare() || !checkValidations()}
+            >
               SAVE TEMPLATE
             </button>
             <input className="template" onChange={(e) => setNewTemplateName(e.target.value)} />
           </div>
+          {!newTemplateNameValid && <span>Please enter a template name to save these values!</span>}
         </div>
         <button className="edit-config" disabled={checkCompare() || !checkValidations()} onClick={editConfig}>
           EDIT CONFIG
