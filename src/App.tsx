@@ -3,6 +3,7 @@ import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
 import "./global.scss";
+import Login from "./components/Login";
 
 export type AccountUpdate = {
   account: string;
@@ -29,25 +30,15 @@ const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
 const websocket = new WebSocket("ws://192.168.1.102:8055");
 
 function App() {
+  const [socketOpen, setSocketOpen] = useState<boolean>(false);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
   const [selectedTabIdx, setSelectedTabIdx] = useState<number>(0);
   const [accountUpdate, setAccountUpdate] = useState<AccountUpdate[]>([]);
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
-  // Wait until the socket is open
   websocket.addEventListener("open", () => {
-    websocket.send(
-      JSON.stringify({
-        action: "ORDER_BOOK_UPDATE_REQ",
-      })
-    );
-    websocket.send(
-      JSON.stringify({
-        action: "ACCOUNT_UPDATE_REQ",
-      })
-    );
-
-    // The socket is now ready to use
-    console.log("WebSocket is ready!");
+    setSocketOpen(true);
   });
 
   websocket.onmessage = (event) => {
@@ -56,6 +47,20 @@ function App() {
     message.type === "ORDER_BOOK_UPDATE_REQ" && setOrderBookUpdate(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
+    if (message.action === "2FA" && message.result) {
+      console.log("success!");
+      setLoggedIn(true);
+      websocket.send(
+        JSON.stringify({
+          action: "ORDER_BOOK_UPDATE_REQ",
+        })
+      );
+      websocket.send(
+        JSON.stringify({
+          action: "ACCOUNT_UPDATE_REQ",
+        })
+      );
+    }
   };
 
   const components = [
@@ -82,18 +87,22 @@ function App() {
   return (
     <div className="App">
       <div className="tabs">
-        {tabs.map((tab, i) => (
-          <div
-            key={i}
-            className={"tab" + (selectedTabIdx === i ? " selected" : "")}
-            // conditions are to ensure websocket packages are received before switching component
-            onClick={() => accountUpdate.length > 0 && orderBookUpdate.length > 0 && setSelectedTabIdx(i)}
-          >
-            <span>{tab}</span>
-          </div>
-        ))}
+        {loggedIn &&
+          tabs.map((tab, i) => (
+            <div
+              key={i}
+              className={"tab" + (selectedTabIdx === i ? " selected" : "")}
+              // conditions are to ensure websocket packages are received before switching component
+              onClick={() => accountUpdate.length > 0 && orderBookUpdate.length > 0 && setSelectedTabIdx(i)}
+            >
+              <span>{tab}</span>
+            </div>
+          ))}
       </div>
-      <div className="component">{components[selectedTabIdx]}</div>
+      <div className="component">
+        {!loggedIn && socketOpen && <Login websocket={websocket} />}
+        {loggedIn && components[selectedTabIdx]}
+      </div>
     </div>
   );
 }

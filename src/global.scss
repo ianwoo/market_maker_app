@@ -25,6 +25,15 @@
   }
   .component {
     padding-left: 8px;
+
+    .login {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
     .home {
       height: 100vh;
       .currentCapitalBalance {
