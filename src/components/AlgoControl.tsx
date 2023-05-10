@@ -80,7 +80,11 @@ const volAlgoFields: Field[] = [
 ];
 
 const AlgoControl = (props: Props) => {
-  const { websocket, orderBook, accountUpdate } = props;
+  const {
+    websocket,
+    // orderBook, we don't need this right now because supply quantity calc is inaccurate, orderbook is incomplete
+    accountUpdate,
+  } = props;
 
   const spotPrice = accountUpdate[0].price;
   const capitalMaximum = Number(accountUpdate[0].total) * spotPrice;
@@ -659,27 +663,42 @@ const AlgoControl = (props: Props) => {
       <div className="fixed-buttons">
         <div className="templates-wrapper">
           <div className="templates">
-            <button className="template load-template" onClick={loadTemplate}>
-              LOAD TEMPLATE
-            </button>
-            <select
-              className="template"
-              onChange={(e) => {
-                if (e.target.value !== "") {
-                  setSelectedTemplate(e.target.value);
-                } else {
+            {!templateLoaded ? (
+              <button className="template apply-template" onClick={loadTemplate}>
+                APPLY TEMPLATE
+              </button>
+            ) : (
+              <button
+                className="template remove-template"
+                onClick={() => {
                   setTemplateLoaded(false);
                   setConfigEdit(config);
-                }
-              }}
-            >
-              {templateLoaded && <option value="">Reset</option>}
-              {templates.map((t, i) => (
-                <option key={i} value={t.template_name}>
-                  {t.template_name}
-                </option>
-              ))}
-            </select>
+                }}
+              >
+                REMOVE TEMPLATE
+              </button>
+            )}
+            {!templateLoaded ? (
+              <select
+                className="template"
+                onChange={(e) => {
+                  if (e.target.value !== "") {
+                    setSelectedTemplate(e.target.value);
+                  } else {
+                    setTemplateLoaded(false);
+                    setConfigEdit(config);
+                  }
+                }}
+              >
+                {templates.map((t, i) => (
+                  <option key={i} value={t.template_name}>
+                    {t.template_name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span>{selectedTemplate}</span>
+            )}
           </div>
         </div>
         <div className="templates-wrapper">
@@ -693,7 +712,10 @@ const AlgoControl = (props: Props) => {
             </button>
             <input className="template" onChange={(e) => setNewTemplateName(e.target.value)} />
           </div>
-          {!newTemplateNameValid && <span>Please enter a template name to save these values!</span>}
+          {!newTemplateNameValid && [
+            <span>Please enter a template name to save these values!</span>,
+            <button onClick={() => setNewTemplateNameValid(true)}>Close Warning</button>,
+          ]}
         </div>
         <button className="edit-config" disabled={checkCompare() || !checkValidations()} onClick={editConfig}>
           EDIT CONFIG
