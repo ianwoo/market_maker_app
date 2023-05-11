@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { VictoryChart, VictoryBar } from "victory";
+import { VictoryChart, VictoryBar, VictoryAxis } from "victory";
 import { AccountUpdate, OrderBookUpdate } from "../App";
 import SweepAndPeg from "./SweepAndPeg";
 
@@ -10,8 +10,8 @@ type Props = {
 };
 
 enum OrderType {
-  Ask = 0,
-  Bid = 1,
+  Ask = "ask",
+  Bid = "bid",
 }
 
 type Group = {
@@ -152,6 +152,28 @@ const Intervention = (props: Props) => {
                 {obu.obtype === "total" ? obu.exchange + " Total" : obu.account} Bids
               </div>,
             ])}
+          </div>
+          <div>
+            <VictoryChart>
+              <VictoryBar
+                style={{ data: { fill: "#c43a31" } }}
+                data={orderBookUpdate[orderBookIdx][orderType].map((o, i) => ({ x: o[0], y: o[1] }))}
+              />
+              <VictoryAxis
+                dependentAxis
+                style={{
+                  axis: { stroke: "#ffffff" },
+                  grid: { stroke: "#ffffff" },
+                  ticks: { stroke: "#ffffff" },
+                  tickLabels: { fill: "#ffffff" },
+                }}
+              />
+              <VictoryAxis
+                style={{
+                  tickLabels: { fill: "#ffffff" },
+                }}
+              />
+            </VictoryChart>
           </div>
           <div className="range-controls">
             <div className={"field col deviation" + (activeGrouping === ActiveGrouping.Percent ? " active" : "")}>
@@ -360,7 +382,6 @@ const Intervention = (props: Props) => {
                     <div className="usd-value">{(g.supply * accountUpdate[0].price).toFixed(2)}</div>
                   </div>
                 ))}
-          <div>Hello world!</div>
         </div>
         <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} />
       </div>
