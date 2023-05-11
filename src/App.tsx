@@ -27,7 +27,7 @@ export type OrderBookUpdate = {
 
 const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
 
-const websocket = new WebSocket("ws://192.168.1.102:8055");
+const websocket = new WebSocket("ws://192.168.1.43:8055");
 
 function App() {
   const [socketOpen, setSocketOpen] = useState<boolean>(false);

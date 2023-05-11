@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { VictoryChart, VictoryBar } from "victory";
 import { AccountUpdate, OrderBookUpdate } from "../App";
 import SweepAndPeg from "./SweepAndPeg";
 
@@ -359,6 +360,7 @@ const Intervention = (props: Props) => {
                     <div className="usd-value">{(g.supply * accountUpdate[0].price).toFixed(2)}</div>
                   </div>
                 ))}
+          <div>Hello world!</div>
         </div>
         <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} />
       </div>
