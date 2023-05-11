@@ -495,7 +495,9 @@ const AlgoControl = (props: Props) => {
     }
     if (message.action === "GET_TEMPLATES") {
       setTemplates(JSON.parse(message.result));
-      setSelectedTemplate(JSON.parse(message.result)[0].template_name);
+      setSelectedTemplate(
+        JSON.parse(message.result)[0].template_name ? JSON.parse(message.result)[0].template_name : ""
+      );
     }
   };
 
@@ -552,6 +554,7 @@ const AlgoControl = (props: Props) => {
   };
 
   const loadTemplate = () => {
+    if (selectedTemplate === "") return;
     const template = templates.find((t) => t.template_name === selectedTemplate);
     setTemplateLoaded(true);
     setConfigEdit(template?.update_params);
