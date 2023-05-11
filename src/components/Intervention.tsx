@@ -156,8 +156,12 @@ const Intervention = (props: Props) => {
           <div>
             <VictoryChart>
               <VictoryBar
-                style={{ data: { fill: "#c43a31" } }}
-                data={orderBookUpdate[orderBookIdx][orderType].map((o, i) => ({ x: o[0], y: o[1] }))}
+                style={{ data: { fill: "red" } }}
+                data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({ x: o[0], y: o[1] }))}
+              />
+              <VictoryBar
+                style={{ data: { fill: "blue" } }}
+                data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({ x: o[0], y: o[1] }))}
               />
               <VictoryAxis
                 dependentAxis
@@ -270,7 +274,7 @@ const Intervention = (props: Props) => {
                   }}
                 >
                   <div className="deviation">{Math.floor((o[0] / accountUpdate[0].price) * 100 - 100)}%</div>
-                  <div className="price">${o[0]}</div>
+                  <div className="price">${o[0].toFixed(4)}</div>
                   <div className="supply">{o[1]}</div>
                   <div className="usd-value">${(o[1] * accountUpdate[0].price).toFixed(2)}</div>
                 </div>
@@ -278,7 +282,7 @@ const Intervention = (props: Props) => {
             : orders
                 .reduce((acc: Group[], next: [number, number]) => {
                   //                   tuple: [price, supply]
-                  const _decimals = countDecimals(accountUpdate[0].price);
+                  const _decimals = countDecimals(accountUpdate[0].price); //2 decimals is not enough to differentiate price ranges
 
                   const _grouping = Math.floor((next[0] - accountUpdate[0].price) / priceRangeInc);
                   const _percentGrouping = Math.floor(
