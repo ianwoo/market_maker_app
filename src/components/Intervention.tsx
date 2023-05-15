@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { VictoryChart, VictoryBar, VictoryAxis } from "victory";
-import { AccountUpdate, OrderBookUpdate } from "../App";
+import { AccountUpdate, OrderBookUpdate, PriceRange } from "../App";
 import SweepAndPeg from "./SweepAndPeg";
 
 type Props = {
   orderBookUpdate: OrderBookUpdate[];
-  setOrderBookUpdate: React.Dispatch<React.SetStateAction<OrderBookUpdate[]>>;
   accountUpdate: AccountUpdate[];
+  cancellingPriceRanges: PriceRange[];
+  setCancellingPriceRanges: React.Dispatch<React.SetStateAction<PriceRange[]>>;
   websocket: WebSocket;
 };
 
@@ -28,20 +29,13 @@ enum ActiveGrouping {
   Price = 1,
 }
 
-type PriceRange = {
-  from: number;
-  to: number;
-  supply: number;
-  request_id?: number;
-};
-
 const countDecimals = function (value: number) {
   if (Math.floor(value) === value) return 0;
   return value.toString().split(".")[1].length || 0;
 };
 
 const Intervention = (props: Props) => {
-  const { orderBookUpdate, setOrderBookUpdate, accountUpdate, websocket } = props;
+  const { orderBookUpdate, accountUpdate, cancellingPriceRanges, setCancellingPriceRanges, websocket } = props;
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
@@ -57,14 +51,6 @@ const Intervention = (props: Props) => {
   const [highlightedGroups, setHighlightedGroups] = useState<number[]>([]);
 
   const [cancelAccount, setCancelAccount] = useState<string>(accountUpdate[0].account);
-  const [cancellingPriceRanges, setCancellingPriceRanges] = useState<PriceRange[]>([]);
-
-  websocket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    message.type === "CANCEL_ORDERS" &&
-      setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id === message.request_id));
-    message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
-  };
 
   const cancelOrders = () => {
     selectedPriceRanges.forEach((pr, i) => {

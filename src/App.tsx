@@ -25,6 +25,13 @@ export type OrderBookUpdate = {
   external_ask?: [number, number][]; //tuple: [price, supply]
 };
 
+export type PriceRange = {
+  from: number;
+  to: number;
+  supply: number;
+  request_id?: number;
+};
+
 const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
 
 const websocket = new WebSocket("ws://192.168.1.43:8055");
@@ -37,16 +44,21 @@ function App() {
   const [accountUpdate, setAccountUpdate] = useState<AccountUpdate[]>([]);
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
+  const [cancellingPriceRanges, setCancellingPriceRanges] = useState<PriceRange[]>([]);
+
   websocket.addEventListener("open", () => {
     setSocketOpen(true);
   });
 
   websocket.onmessage = (event) => {
+    console.log("on message event happening in App");
     const message = JSON.parse(event.data);
     message.type === "ACCOUNT_UPDATE_REQ" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE_REQ" && setOrderBookUpdate(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
+    message.type === "CANCEL_ORDERS" &&
+      setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id === message.request_id));
     if (message.action === "2FA" && message.result) {
       console.log("success!");
       setLoggedIn(true);
@@ -97,8 +109,9 @@ function App() {
             <Intervention
               key="intervention"
               orderBookUpdate={orderBookUpdate}
-              setOrderBookUpdate={setOrderBookUpdate}
               accountUpdate={accountUpdate}
+              cancellingPriceRanges={cancellingPriceRanges}
+              setCancellingPriceRanges={setCancellingPriceRanges}
               websocket={websocket}
             />,
           ][selectedTabIdx]}
