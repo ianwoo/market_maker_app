@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { VictoryChart, VictoryBar, VictoryAxis } from "victory";
 import { AccountUpdate, OrderBookUpdate } from "../App";
 import SweepAndPeg from "./SweepAndPeg";
 
 type Props = {
   orderBookUpdate: OrderBookUpdate[];
+  setOrderBookUpdate: React.Dispatch<React.SetStateAction<OrderBookUpdate[]>>;
   accountUpdate: AccountUpdate[];
   websocket: WebSocket;
 };
@@ -40,7 +41,7 @@ const countDecimals = function (value: number) {
 };
 
 const Intervention = (props: Props) => {
-  const { orderBookUpdate, accountUpdate, websocket } = props;
+  const { orderBookUpdate, setOrderBookUpdate, accountUpdate, websocket } = props;
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
@@ -60,7 +61,9 @@ const Intervention = (props: Props) => {
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id === message.request_id));
+    message.type === "CANCEL_ORDERS" &&
+      setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id === message.request_id));
+    message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
   };
 
   const cancelOrders = () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
@@ -63,26 +63,9 @@ function App() {
     }
   };
 
-  const components = [
-    <HomePanel key="home" accountUpdate={accountUpdate} />,
-    // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
-    <AlgoControl
-      key="control"
-      websocket={websocket}
-      orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
-      accountUpdate={accountUpdate}
-    />,
-    accountUpdate.length > 0 ? (
-      <Intervention
-        key="intervention"
-        orderBookUpdate={orderBookUpdate}
-        accountUpdate={accountUpdate}
-        websocket={websocket}
-      />
-    ) : (
-      <div>Loading...</div>
-    ),
-  ];
+  useEffect(() => {
+    console.log(orderBookUpdate);
+  }, [orderBookUpdate]);
 
   return (
     <div className="App">
@@ -101,7 +84,24 @@ function App() {
       </div>
       <div className="component">
         {!loggedIn && socketOpen && <Login websocket={websocket} />}
-        {loggedIn && components[selectedTabIdx]}
+        {loggedIn &&
+          [
+            <HomePanel key="home" accountUpdate={accountUpdate} />,
+            // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
+            <AlgoControl
+              key="control"
+              websocket={websocket}
+              orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
+              accountUpdate={accountUpdate}
+            />,
+            <Intervention
+              key="intervention"
+              orderBookUpdate={orderBookUpdate}
+              setOrderBookUpdate={setOrderBookUpdate}
+              accountUpdate={accountUpdate}
+              websocket={websocket}
+            />,
+          ][selectedTabIdx]}
       </div>
     </div>
   );
