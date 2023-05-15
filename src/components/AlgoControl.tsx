@@ -1,39 +1,17 @@
 import { useEffect, useState } from "react";
-import { AccountUpdate, OrderBookUpdate } from "../App";
+import { AccountUpdate, OrderBookUpdate, Template } from "../App";
 
 type Props = {
   websocket: WebSocket;
   orderBook: OrderBookUpdate;
   accountUpdate: AccountUpdate[];
-};
-
-type Config = {
-  mm_engine_status: boolean;
-  self_trade_status: boolean;
-  vol_trade_per_hour: number;
-  min_trade: number;
-  max_trade: number;
-  random_walk_degree: string;
-  spread: number;
-  total_ask_price_range: number;
-  total_ask_order_depth: number;
-  total_ask_random_walk: string;
-  best_ask_price_range: number;
-  best_ask_order_depth: number;
-  best_ask_random_walk: string;
-  tilt_asks: number;
-  tilt_bids: number;
-  best_bid_price_range: number;
-  best_bid_order_depth: number;
-  best_bid_random_walk: string;
-  total_bid_price_range: number;
-  total_bid_order_depth: number;
-  total_bid_random_walk: string;
-};
-
-type Template = {
-  template_name: string;
-  update_params: Config;
+  configsLoaded: boolean;
+  config: any;
+  configEdit: any;
+  setConfigEdit: React.Dispatch<React.SetStateAction<any>>;
+  templates: Template[];
+  selectedTemplate: string;
+  setSelectedTemplate: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 enum FieldType {
@@ -84,14 +62,18 @@ const AlgoControl = (props: Props) => {
     websocket,
     // orderBook, we don't need this right now because supply quantity calc is inaccurate, orderbook is incomplete
     accountUpdate,
+    configsLoaded,
+    config,
+    configEdit,
+    setConfigEdit,
+    templates,
+    selectedTemplate,
+    setSelectedTemplate,
   } = props;
 
   const spotPrice = accountUpdate[0].price;
   const capitalMaximum = Number(accountUpdate[0].total) * spotPrice;
 
-  const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
-  const [config, setConfig] = useState<any>({});
-  const [configEdit, setConfigEdit] = useState<any>({});
   const [compare, setCompare] = useState<any>({});
   const [validations, setValidations] = useState<any>({});
 
@@ -102,8 +84,6 @@ const AlgoControl = (props: Props) => {
   const [spreadUpperPrice, setSpreadUpperPrice] = useState<number>();
   const [spreadLowerPrice, setSpreadLowerPrice] = useState<number>();
 
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>();
   const [templateLoaded, setTemplateLoaded] = useState<boolean>(false);
   const [newTemplateName, setNewTemplateName] = useState<string>();
   const [newTemplateNameValid, setNewTemplateNameValid] = useState<boolean>(true);
@@ -477,29 +457,6 @@ const AlgoControl = (props: Props) => {
     }
     setValidations(validations);
   }, [capitalMaximum, configEdit]);
-
-  websocket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    if (message.action === "GET_CONFIG") {
-      setConfig(JSON.parse(message.result));
-      setConfigEdit(JSON.parse(message.result));
-      setConfigsLoaded(true);
-    }
-    if (message.action === "UPDATE_CONFIG") {
-      if (JSON.parse(message.result)) {
-        setConfig(configEdit);
-      }
-    }
-    if (message.action === "START_STOP") {
-      setConfig({ ...config, [message.type + "_status"]: !config[message.type + "_status"] });
-    }
-    if (message.action === "GET_TEMPLATES") {
-      setTemplates(JSON.parse(message.result));
-      setSelectedTemplate(
-        JSON.parse(message.result)[0].template_name ? JSON.parse(message.result)[0].template_name : ""
-      );
-    }
-  };
 
   const editConfig = () => {
     websocket.send(

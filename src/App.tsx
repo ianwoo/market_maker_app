@@ -32,6 +32,35 @@ export type PriceRange = {
   request_id?: number;
 };
 
+export type Config = {
+  mm_engine_status: boolean;
+  self_trade_status: boolean;
+  vol_trade_per_hour: number;
+  min_trade: number;
+  max_trade: number;
+  random_walk_degree: string;
+  spread: number;
+  total_ask_price_range: number;
+  total_ask_order_depth: number;
+  total_ask_random_walk: string;
+  best_ask_price_range: number;
+  best_ask_order_depth: number;
+  best_ask_random_walk: string;
+  tilt_asks: number;
+  tilt_bids: number;
+  best_bid_price_range: number;
+  best_bid_order_depth: number;
+  best_bid_random_walk: string;
+  total_bid_price_range: number;
+  total_bid_order_depth: number;
+  total_bid_random_walk: string;
+};
+
+export type Template = {
+  template_name: string;
+  update_params: Config;
+};
+
 const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
 
 const websocket = new WebSocket("ws://192.168.1.43:8055");
@@ -45,6 +74,13 @@ function App() {
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
   const [cancellingPriceRanges, setCancellingPriceRanges] = useState<PriceRange[]>([]);
+
+  const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
+  const [config, setConfig] = useState<any>({});
+  const [configEdit, setConfigEdit] = useState<any>({});
+
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>();
 
   websocket.addEventListener("open", () => {
     setSocketOpen(true);
@@ -71,6 +107,25 @@ function App() {
         JSON.stringify({
           action: "ACCOUNT_UPDATE_REQ",
         })
+      );
+    }
+    if (message.action === "GET_CONFIG") {
+      setConfig(JSON.parse(message.result));
+      setConfigEdit(JSON.parse(message.result));
+      setConfigsLoaded(true);
+    }
+    if (message.action === "UPDATE_CONFIG") {
+      if (JSON.parse(message.result)) {
+        setConfig(configEdit);
+      }
+    }
+    if (message.action === "START_STOP") {
+      setConfig({ ...config, [message.type + "_status"]: !config[message.type + "_status"] });
+    }
+    if (message.action === "GET_TEMPLATES") {
+      setTemplates(JSON.parse(message.result));
+      setSelectedTemplate(
+        JSON.parse(message.result)[0].template_name ? JSON.parse(message.result)[0].template_name : ""
       );
     }
   };
@@ -105,6 +160,13 @@ function App() {
               websocket={websocket}
               orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
               accountUpdate={accountUpdate}
+              configsLoaded={configsLoaded}
+              config={config}
+              configEdit={configEdit}
+              setConfigEdit={setConfigEdit}
+              templates={templates}
+              selectedTemplate={selectedTemplate ? selectedTemplate : ""}
+              setSelectedTemplate={setSelectedTemplate}
             />,
             <Intervention
               key="intervention"
