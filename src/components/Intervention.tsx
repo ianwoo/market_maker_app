@@ -209,6 +209,16 @@ const Intervention = (props: Props) => {
     [aboveOfferRangeInc, accountUpdate, highlightedGroups, orderType, orders, priceRangeInc, selectedPriceRanges]
   );
 
+  const cancellations = useMemo(
+    () =>
+      cancellingPriceRanges.map((cpr, i) => (
+        <div key={"cpr" + i} className="cancel">
+          Cancelling all orders {cpr.from} to {cpr.to}
+        </div>
+      )),
+    [cancellingPriceRanges]
+  );
+
   return (
     <div className="intervention">
       <h1>Intervention</h1>
@@ -343,11 +353,7 @@ const Intervention = (props: Props) => {
               ) : (
                 <div className="supply">Cannot Cancel External Orders</div>
               )}
-              {cancellingPriceRanges.map((cpr, i) => (
-                <div key={"cpr" + i} className="cancel">
-                  Cancelling all orders {cpr.from} to {cpr.to}
-                </div>
-              ))}
+              {cancellations}
             </div>
           </div>
           <div className="headers">

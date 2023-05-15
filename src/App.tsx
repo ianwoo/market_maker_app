@@ -87,7 +87,6 @@ function App() {
   });
 
   websocket.onmessage = (event) => {
-    console.log("on message event happening in App");
     const message = JSON.parse(event.data);
     message.type === "ACCOUNT_UPDATE_REQ" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE_REQ" && setOrderBookUpdate(JSON.parse(message.content));
