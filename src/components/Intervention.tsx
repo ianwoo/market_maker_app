@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { VictoryChart, VictoryBar, VictoryAxis } from "victory";
 import { AccountUpdate, OrderBookUpdate, PriceRange } from "../App";
 import SweepAndPeg from "./SweepAndPeg";
@@ -72,6 +72,142 @@ const Intervention = (props: Props) => {
       })
     );
   };
+
+  const renderedBook = useMemo(
+    () =>
+      aboveOfferRangeInc === 0 && priceRangeInc === 0
+        ? orders.map((o, i) => (
+            <div
+              key={"o" + i}
+              className={"order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(i) ? " selected" : "")}
+              onClick={() => {
+                //if $ value price range increment...
+                if (!highlightedGroups.includes(i)) {
+                  setSelectedPriceRanges([
+                    ...selectedPriceRanges,
+                    {
+                      from: o[0],
+                      to: o[0],
+                      supply: o[1],
+                    },
+                  ]);
+                  setHighlightedGroups([...highlightedGroups, i]);
+                } else if (highlightedGroups.includes(i)) {
+                  const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== o[0]);
+                  setSelectedPriceRanges(_priceRangesTargetRemoved);
+                  setHighlightedGroups(highlightedGroups.filter((hg) => hg !== i));
+                }
+              }}
+            >
+              <div className="deviation">{Math.floor((o[0] / accountUpdate[0].price) * 100 - 100)}%</div>
+              <div className="price">${o[0].toFixed(4)}</div>
+              <div className="supply">{o[1]}</div>
+              <div className="usd-value">${(o[1] * accountUpdate[0].price).toFixed(2)}</div>
+            </div>
+          ))
+        : orders
+            .reduce((acc: Group[], next: [number, number]) => {
+              //                   tuple: [price, supply]
+              const _decimals = countDecimals(accountUpdate[0].price); //2 decimals is not enough to differentiate price ranges
+
+              const _grouping = Math.floor((next[0] - accountUpdate[0].price) / priceRangeInc);
+              const _percentGrouping = Math.floor(
+                Math.floor((next[0] / accountUpdate[0].price) * 100 - 100) / aboveOfferRangeInc
+              );
+
+              const _existingGroup =
+                aboveOfferRangeInc === 0
+                  ? acc.find((group) => group.grouping === _grouping)
+                  : acc.find((group) => group.grouping === _percentGrouping);
+
+              const _groupingPrice =
+                "$" +
+                (accountUpdate[0].price + _grouping * priceRangeInc).toFixed(_decimals).toString() +
+                " - $" +
+                (accountUpdate[0].price + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
+
+              const _percentGroupingPrice =
+                "$" +
+                (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
+                  .toFixed(_decimals)
+                  .toString() +
+                " - $" +
+                ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
+                  .toFixed(_decimals)
+                  .toString();
+
+              const _deviation =
+                Math.floor(((next[0] - priceRangeInc) / accountUpdate[0].price) * 100 - 100).toString() +
+                "% - " +
+                Math.floor((next[0] / accountUpdate[0].price) * 100 - 100).toString() +
+                "%";
+
+              const _percentDeviation =
+                (_percentGrouping * aboveOfferRangeInc).toString() +
+                "% - " +
+                ((_percentGrouping + 1) * aboveOfferRangeInc).toString() +
+                "%";
+
+              _existingGroup
+                ? (_existingGroup.supply = _existingGroup.supply + next[1])
+                : acc.push({
+                    grouping: aboveOfferRangeInc === 0 ? _grouping : _percentGrouping,
+                    supply: next[1],
+                    price: aboveOfferRangeInc === 0 ? _groupingPrice : _percentGroupingPrice,
+                    dev: aboveOfferRangeInc === 0 ? _deviation : _percentDeviation,
+                  });
+              return acc;
+            }, [])
+            .map((g, i) => (
+              <div
+                className={
+                  "order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(g.grouping) ? " selected" : "")
+                }
+                key={i}
+                onClick={() => {
+                  //if $ value price range increment...
+                  if (aboveOfferRangeInc === 0 && !highlightedGroups.includes(g.grouping)) {
+                    setSelectedPriceRanges([
+                      ...selectedPriceRanges,
+                      {
+                        from: accountUpdate[0].price + g.grouping * priceRangeInc,
+                        to: accountUpdate[0].price + (g.grouping + 1) * priceRangeInc,
+                        supply: g.supply,
+                      },
+                    ]);
+                    setHighlightedGroups([...highlightedGroups, g.grouping]);
+                  } else if (priceRangeInc === 0 && !highlightedGroups.includes(g.grouping)) {
+                    //if % value price range increment...
+                    setSelectedPriceRanges([
+                      ...selectedPriceRanges,
+                      {
+                        from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
+                        to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
+                        supply: g.supply,
+                      },
+                    ]);
+                    setHighlightedGroups([...highlightedGroups, g.grouping]);
+                  } else if (aboveOfferRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
+                    const _targetFromPrice = accountUpdate[0].price + g.grouping * priceRangeInc;
+                    const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== _targetFromPrice);
+                    setSelectedPriceRanges(_priceRangesTargetRemoved);
+                    setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
+                  } else if (priceRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
+                    const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price;
+                    const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== _targetFromPrice);
+                    setSelectedPriceRanges(_priceRangesTargetRemoved);
+                    setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
+                  }
+                }}
+              >
+                <div className="deviation">{g.dev}</div>
+                <div className="price">{g.price}</div>
+                <div className="supply">{g.supply.toFixed(4)}</div>
+                <div className="usd-value">{(g.supply * accountUpdate[0].price).toFixed(2)}</div>
+              </div>
+            )),
+    [aboveOfferRangeInc, accountUpdate, highlightedGroups, orderType, orders, priceRangeInc, selectedPriceRanges]
+  );
 
   return (
     <div className="intervention">
@@ -236,145 +372,7 @@ const Intervention = (props: Props) => {
               <b>USD Value</b>
             </div>
           </div>
-          {aboveOfferRangeInc === 0 && priceRangeInc === 0
-            ? orders.map((o, i) => (
-                <div
-                  key={"o" + i}
-                  className={
-                    "order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(i) ? " selected" : "")
-                  }
-                  onClick={() => {
-                    //if $ value price range increment...
-                    if (!highlightedGroups.includes(i)) {
-                      setSelectedPriceRanges([
-                        ...selectedPriceRanges,
-                        {
-                          from: o[0],
-                          to: o[0],
-                          supply: o[1],
-                        },
-                      ]);
-                      setHighlightedGroups([...highlightedGroups, i]);
-                    } else if (highlightedGroups.includes(i)) {
-                      const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== o[0]);
-                      setSelectedPriceRanges(_priceRangesTargetRemoved);
-                      setHighlightedGroups(highlightedGroups.filter((hg) => hg !== i));
-                    }
-                  }}
-                >
-                  <div className="deviation">{Math.floor((o[0] / accountUpdate[0].price) * 100 - 100)}%</div>
-                  <div className="price">${o[0].toFixed(4)}</div>
-                  <div className="supply">{o[1]}</div>
-                  <div className="usd-value">${(o[1] * accountUpdate[0].price).toFixed(2)}</div>
-                </div>
-              ))
-            : orders
-                .reduce((acc: Group[], next: [number, number]) => {
-                  //                   tuple: [price, supply]
-                  const _decimals = countDecimals(accountUpdate[0].price); //2 decimals is not enough to differentiate price ranges
-
-                  const _grouping = Math.floor((next[0] - accountUpdate[0].price) / priceRangeInc);
-                  const _percentGrouping = Math.floor(
-                    Math.floor((next[0] / accountUpdate[0].price) * 100 - 100) / aboveOfferRangeInc
-                  );
-
-                  const _existingGroup =
-                    aboveOfferRangeInc === 0
-                      ? acc.find((group) => group.grouping === _grouping)
-                      : acc.find((group) => group.grouping === _percentGrouping);
-
-                  const _groupingPrice =
-                    "$" +
-                    (accountUpdate[0].price + _grouping * priceRangeInc).toFixed(_decimals).toString() +
-                    " - $" +
-                    (accountUpdate[0].price + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
-
-                  const _percentGroupingPrice =
-                    "$" +
-                    (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
-                      .toFixed(_decimals)
-                      .toString() +
-                    " - $" +
-                    ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
-                      .toFixed(_decimals)
-                      .toString();
-
-                  const _deviation =
-                    Math.floor(((next[0] - priceRangeInc) / accountUpdate[0].price) * 100 - 100).toString() +
-                    "% - " +
-                    Math.floor((next[0] / accountUpdate[0].price) * 100 - 100).toString() +
-                    "%";
-
-                  const _percentDeviation =
-                    (_percentGrouping * aboveOfferRangeInc).toString() +
-                    "% - " +
-                    ((_percentGrouping + 1) * aboveOfferRangeInc).toString() +
-                    "%";
-
-                  _existingGroup
-                    ? (_existingGroup.supply = _existingGroup.supply + next[1])
-                    : acc.push({
-                        grouping: aboveOfferRangeInc === 0 ? _grouping : _percentGrouping,
-                        supply: next[1],
-                        price: aboveOfferRangeInc === 0 ? _groupingPrice : _percentGroupingPrice,
-                        dev: aboveOfferRangeInc === 0 ? _deviation : _percentDeviation,
-                      });
-                  return acc;
-                }, [])
-                .map((g, i) => (
-                  <div
-                    className={
-                      "order " +
-                      (orderType ? "bid" : "ask") +
-                      (highlightedGroups.includes(g.grouping) ? " selected" : "")
-                    }
-                    key={i}
-                    onClick={() => {
-                      //if $ value price range increment...
-                      if (aboveOfferRangeInc === 0 && !highlightedGroups.includes(g.grouping)) {
-                        setSelectedPriceRanges([
-                          ...selectedPriceRanges,
-                          {
-                            from: accountUpdate[0].price + g.grouping * priceRangeInc,
-                            to: accountUpdate[0].price + (g.grouping + 1) * priceRangeInc,
-                            supply: g.supply,
-                          },
-                        ]);
-                        setHighlightedGroups([...highlightedGroups, g.grouping]);
-                      } else if (priceRangeInc === 0 && !highlightedGroups.includes(g.grouping)) {
-                        //if % value price range increment...
-                        setSelectedPriceRanges([
-                          ...selectedPriceRanges,
-                          {
-                            from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
-                            to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
-                            supply: g.supply,
-                          },
-                        ]);
-                        setHighlightedGroups([...highlightedGroups, g.grouping]);
-                      } else if (aboveOfferRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
-                        const _targetFromPrice = accountUpdate[0].price + g.grouping * priceRangeInc;
-                        const _priceRangesTargetRemoved = selectedPriceRanges.filter(
-                          (r) => r.from !== _targetFromPrice
-                        );
-                        setSelectedPriceRanges(_priceRangesTargetRemoved);
-                        setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
-                      } else if (priceRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
-                        const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price;
-                        const _priceRangesTargetRemoved = selectedPriceRanges.filter(
-                          (r) => r.from !== _targetFromPrice
-                        );
-                        setSelectedPriceRanges(_priceRangesTargetRemoved);
-                        setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
-                      }
-                    }}
-                  >
-                    <div className="deviation">{g.dev}</div>
-                    <div className="price">{g.price}</div>
-                    <div className="supply">{g.supply.toFixed(4)}</div>
-                    <div className="usd-value">{(g.supply * accountUpdate[0].price).toFixed(2)}</div>
-                  </div>
-                ))}
+          {renderedBook}
         </div>
         <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} />
       </div>
