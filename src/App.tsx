@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
@@ -88,12 +88,16 @@ function App() {
 
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
+
+    //type
     message.type === "ACCOUNT_UPDATE_REQ" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE_REQ" && setOrderBookUpdate(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
-    message.type === "CANCEL_ORDERS" &&
-      setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id === message.request_id));
+
+    //action
+    message.action === "CANCEL_ORDERS" &&
+      setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id !== message.request_id));
     if (message.action === "2FA" && message.result) {
       console.log("success!");
       setLoggedIn(true);
@@ -129,6 +133,44 @@ function App() {
     }
   };
 
+  const components = useMemo(
+    () => [
+      <HomePanel key="home" accountUpdate={accountUpdate} />,
+      // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
+      <AlgoControl
+        key="control"
+        websocket={websocket}
+        orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
+        accountUpdate={accountUpdate}
+        configsLoaded={configsLoaded}
+        config={config}
+        configEdit={configEdit}
+        setConfigEdit={setConfigEdit}
+        templates={templates}
+        selectedTemplate={selectedTemplate ? selectedTemplate : ""}
+        setSelectedTemplate={setSelectedTemplate}
+      />,
+      <Intervention
+        key="intervention"
+        orderBookUpdate={orderBookUpdate}
+        accountUpdate={accountUpdate}
+        cancellingPriceRanges={cancellingPriceRanges}
+        setCancellingPriceRanges={setCancellingPriceRanges}
+        websocket={websocket}
+      />,
+    ],
+    [
+      accountUpdate,
+      orderBookUpdate,
+      cancellingPriceRanges,
+      configsLoaded,
+      config,
+      configEdit,
+      templates,
+      selectedTemplate,
+    ]
+  );
+
   useEffect(() => {
     console.log(orderBookUpdate);
   }, [orderBookUpdate]);
@@ -150,32 +192,7 @@ function App() {
       </div>
       <div className="component">
         {!loggedIn && socketOpen && <Login websocket={websocket} />}
-        {loggedIn &&
-          [
-            <HomePanel key="home" accountUpdate={accountUpdate} />,
-            // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
-            <AlgoControl
-              key="control"
-              websocket={websocket}
-              orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
-              accountUpdate={accountUpdate}
-              configsLoaded={configsLoaded}
-              config={config}
-              configEdit={configEdit}
-              setConfigEdit={setConfigEdit}
-              templates={templates}
-              selectedTemplate={selectedTemplate ? selectedTemplate : ""}
-              setSelectedTemplate={setSelectedTemplate}
-            />,
-            <Intervention
-              key="intervention"
-              orderBookUpdate={orderBookUpdate}
-              accountUpdate={accountUpdate}
-              cancellingPriceRanges={cancellingPriceRanges}
-              setCancellingPriceRanges={setCancellingPriceRanges}
-              websocket={websocket}
-            />,
-          ][selectedTabIdx]}
+        {loggedIn && components[selectedTabIdx]}
       </div>
     </div>
   );

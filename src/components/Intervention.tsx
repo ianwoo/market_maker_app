@@ -250,7 +250,7 @@ const Intervention = (props: Props) => {
           )}
           <div className="spot-price field col">
             <b>Spot Price</b>
-            <b>{accountUpdate[0].price}</b>
+            <b className="spot-price-value">{accountUpdate[0].price}</b>
           </div>
           <div className="tabs">
             {orderBookUpdate.map((obu, i) => [
@@ -295,6 +295,7 @@ const Intervention = (props: Props) => {
                 data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({ x: o[0], y: o[1] }))}
               />
               <VictoryBar
+                barRatio={1}
                 style={{ data: { fill: "blue" } }}
                 data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({ x: o[0], y: o[1] }))}
               />
@@ -305,6 +306,16 @@ const Intervention = (props: Props) => {
                   grid: { stroke: "#ffffff" },
                   ticks: { stroke: "#ffffff" },
                   tickLabels: { fill: "#ffffff" },
+                }}
+              />
+              <VictoryAxis
+                dependentAxis
+                axisValue={accountUpdate[0].price}
+                tickFormat={() => ""}
+                style={{
+                  axis: { stroke: "fuchsia", "stroke-width": 2 },
+                  grid: { stroke: "#ffffff" },
+                  axisLabel: { fill: "#ffffff" },
                 }}
               />
               <VictoryAxis
