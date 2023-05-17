@@ -52,6 +52,10 @@ const Intervention = (props: Props) => {
 
   const [cancelAccount, setCancelAccount] = useState<string>(accountUpdate[0].account);
 
+  const [hideChart, setHideChart] = useState<boolean>(false);
+  const [chartSupplyUSD, setChartSupplyUSD] = useState<boolean>(false);
+  const [logarithmic, setLogarithmic] = useState<boolean>(false);
+
   const cancelOrders = () => {
     selectedPriceRanges.forEach((pr, i) => {
       const id = Date.now();
@@ -219,6 +223,10 @@ const Intervention = (props: Props) => {
     [cancellingPriceRanges]
   );
 
+  const concatenated = orderBookUpdate[orderBookIdx][OrderType.Bid].concat(
+    orderBookUpdate[orderBookIdx][OrderType.Ask]
+  );
+
   return (
     <div className="intervention">
       <h1>Intervention</h1>
@@ -288,42 +296,77 @@ const Intervention = (props: Props) => {
               </div>,
             ])}
           </div>
-          <div>
-            <VictoryChart>
-              <VictoryBar
-                style={{ data: { fill: "red" } }}
-                data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({ x: o[0], y: o[1] }))}
-              />
-              <VictoryBar
-                barRatio={1}
-                style={{ data: { fill: "blue" } }}
-                data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({ x: o[0], y: o[1] }))}
-              />
-              <VictoryAxis
-                dependentAxis
-                style={{
-                  axis: { stroke: "#ffffff" },
-                  grid: { stroke: "#ffffff" },
-                  ticks: { stroke: "#ffffff" },
-                  tickLabels: { fill: "#ffffff" },
-                }}
-              />
-              <VictoryAxis
-                dependentAxis
-                axisValue={accountUpdate[0].price}
-                tickFormat={() => ""}
-                style={{
-                  axis: { stroke: "fuchsia", "stroke-width": 2 },
-                  grid: { stroke: "#ffffff" },
-                  axisLabel: { fill: "#ffffff" },
-                }}
-              />
-              <VictoryAxis
-                style={{
-                  tickLabels: { fill: "#ffffff" },
-                }}
-              />
-            </VictoryChart>
+          <div className="chart">
+            <div className="chart-controls">
+              <div className="field gap">
+                <span>Hide Chart</span>
+                <input type="checkbox" onChange={() => setHideChart(!hideChart)} />
+              </div>
+              <div className="field gap">
+                <span>Supply in USD Value</span>
+                <input type="checkbox" onChange={() => setChartSupplyUSD(!chartSupplyUSD)} />
+              </div>
+              <div className="field gap">
+                <span>Logarithmic Scaling</span>
+                <input type="checkbox" onChange={() => setLogarithmic(!logarithmic)} />
+              </div>
+            </div>
+            {!hideChart && (
+              <VictoryChart
+                scale={logarithmic ? { y: "log" } : undefined}
+                domain={
+                  logarithmic
+                    ? {
+                        y: [
+                          concatenated.sort((a, b) => a[1] - b[1])[0][1],
+                          concatenated.sort((a, b) => b[1] - a[1])[0][1],
+                        ],
+                      }
+                    : undefined
+                }
+              >
+                <VictoryBar
+                  barRatio={1}
+                  style={{ data: { fill: "red" } }}
+                  data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({
+                    x: o[0],
+                    y: chartSupplyUSD ? o[1] * accountUpdate[0].price : o[1],
+                  }))}
+                />
+                <VictoryBar
+                  barRatio={1}
+                  style={{ data: { fill: "blue" } }}
+                  data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({
+                    x: o[0],
+                    y: chartSupplyUSD ? o[1] * accountUpdate[0].price : o[1],
+                  }))}
+                />
+                <VictoryAxis
+                  dependentAxis
+                  style={{
+                    axis: { stroke: "#ffffff" },
+                    grid: { stroke: "#ffffff" },
+                    ticks: { stroke: "#ffffff" },
+                    tickLabels: { fill: "#ffffff" },
+                  }}
+                />
+                <VictoryAxis
+                  dependentAxis
+                  axisValue={accountUpdate[0].price}
+                  tickFormat={() => ""}
+                  style={{
+                    axis: { stroke: "fuchsia", "stroke-width": 2 },
+                    grid: { stroke: "#ffffff" },
+                    axisLabel: { fill: "#ffffff" },
+                  }}
+                />
+                <VictoryAxis
+                  style={{
+                    tickLabels: { fill: "#ffffff" },
+                  }}
+                />
+              </VictoryChart>
+            )}
           </div>
           <div className="range-controls">
             <div className={"field col deviation" + (activeGrouping === ActiveGrouping.Percent ? " active" : "")}>

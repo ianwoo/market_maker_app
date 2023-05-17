@@ -23,6 +23,12 @@
       }
     }
   }
+  .chart {
+    .chart-controls {
+      display: flex;
+      gap: 25px;
+    }
+  }
   .component {
     padding-left: 8px;
 
@@ -74,7 +80,6 @@
       justify-content: flex-start;
       &.col {
         flex-direction: column;
-
         span {
           height: 42px;
         }
