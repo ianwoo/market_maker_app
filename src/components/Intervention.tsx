@@ -361,11 +361,12 @@ const Intervention = (props: Props) => {
                 />
                 <VictoryAxis
                   dependentAxis
+                  tickFormat={(t) => (chartSupplyUSD ? "$" : "") + t}
                   style={{
                     axis: { stroke: "#ffffff" },
-                    grid: { stroke: "#ffffff" },
+                    grid: { stroke: "darkgrey", strokeWidth: 0.5 },
                     ticks: { stroke: "#ffffff" },
-                    tickLabels: { fill: "#ffffff" },
+                    tickLabels: { fill: "#ffffff", fontSize: 8 },
                   }}
                 />
                 <VictoryAxis
@@ -374,13 +375,14 @@ const Intervention = (props: Props) => {
                   tickFormat={() => ""}
                   style={{
                     axis: { stroke: "orange", strokeWidth: 2 },
-                    grid: { stroke: "#ffffff" },
+                    grid: { strokeWidth: 0 },
                     axisLabel: { fill: "#ffffff" },
                   }}
                 />
                 <VictoryAxis
+                  tickFormat={(t) => "$" + t}
                   style={{
-                    tickLabels: { fill: "#ffffff" },
+                    tickLabels: { fill: "#ffffff", fontSize: 8 },
                   }}
                 />
               </VictoryChart>
