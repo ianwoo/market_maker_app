@@ -348,7 +348,7 @@ const Intervention = (props: Props) => {
                   style={{ data: { fill: "red" } }}
                   data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({
                     x: o[0],
-                    y: chartSupplyUSD ? o[1] * orderBookSpotPrice : o[1],
+                    y: chartSupplyUSD ? o[1] * o[0] : o[1],
                   }))}
                 />
                 <VictoryBar
@@ -356,7 +356,7 @@ const Intervention = (props: Props) => {
                   style={{ data: { fill: "blue" } }}
                   data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({
                     x: o[0],
-                    y: chartSupplyUSD ? o[1] * orderBookSpotPrice : o[1],
+                    y: chartSupplyUSD ? o[1] * o[0] : o[1],
                   }))}
                 />
                 <VictoryAxis
@@ -366,7 +366,7 @@ const Intervention = (props: Props) => {
                     axis: { stroke: "#ffffff" },
                     grid: { stroke: "darkgrey", strokeWidth: 0.5 },
                     ticks: { stroke: "#ffffff" },
-                    tickLabels: { fill: "#ffffff", fontSize: 8 },
+                    tickLabels: { fill: "#ffffff", fontSize: logarithmic ? 5 : 8 },
                   }}
                 />
                 <VictoryAxis
