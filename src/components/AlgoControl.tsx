@@ -72,7 +72,8 @@ const AlgoControl = (props: Props) => {
   } = props;
 
   const spotPrice = accountUpdate[0].price;
-  const capitalMaximum = Number(accountUpdate[0].total) * spotPrice + Number(accountUpdate[1].total) * spotPrice;
+  const capitalMaximumAsk = Number(accountUpdate[0].total) * spotPrice;
+  const capitalMaximumBid = Number(accountUpdate[1].total);
 
   const [compare, setCompare] = useState<any>({});
   const [validations, setValidations] = useState<any>({});
@@ -155,7 +156,7 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         validation:
           "Cannot be higher than amount of capital available ($" +
-          capitalMaximum.toFixed(4) +
+          capitalMaximumAsk.toFixed(4) +
           "), and must be positive!",
       },
       {
@@ -197,7 +198,7 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         validation:
           "Cannot be higher than amount of capital available ($" +
-          capitalMaximum.toFixed(4) +
+          capitalMaximumAsk.toFixed(4) +
           "), and must be positive!",
       },
       {
@@ -309,7 +310,7 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         validation:
           "Cannot be higher than amount of capital available ($" +
-          capitalMaximum.toFixed(4) +
+          capitalMaximumBid.toFixed(4) +
           "), and must be positive!",
       },
       {
@@ -351,7 +352,7 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         validation:
           "Cannot be higher than amount of capital available ($" +
-          capitalMaximum.toFixed(4) +
+          capitalMaximumBid.toFixed(4) +
           "), and must be positive!",
       },
       {
@@ -426,9 +427,10 @@ const AlgoControl = (props: Props) => {
           break;
         case "total_ask_order_depth":
         case "best_ask_order_depth":
+          validations[prop] = !(configEdit[prop] > capitalMaximumAsk || configEdit[prop] < 0);
         case "total_bid_order_depth":
         case "best_bid_order_depth":
-          validations[prop] = !(configEdit[prop] > capitalMaximum || configEdit[prop] < 0);
+          validations[prop] = !(configEdit[prop] > capitalMaximumBid || configEdit[prop] < 0);
           break;
         case "min_bid_order_usd_value":
           validations[prop] = !(configEdit[prop] > configEdit.max_bid_order_usd_value || configEdit[prop] <= 0);
@@ -456,7 +458,7 @@ const AlgoControl = (props: Props) => {
       }
     }
     setValidations(validations);
-  }, [capitalMaximum, configEdit]);
+  }, [capitalMaximumAsk, capitalMaximumBid, configEdit]);
 
   const editConfig = () => {
     websocket.send(
@@ -608,11 +610,19 @@ const AlgoControl = (props: Props) => {
         f.fieldTitle === "Best Ask Order Depth" ||
         f.fieldTitle === "Total Bid Order Depth" ||
         f.fieldTitle === "Best Bid Order Depth") &&
-        configEdit[f.fieldNames[0]] > capitalMaximum / 2 &&
+        configEdit[f.fieldNames[0]] >
+          (f.fieldTitle === "Total Ask Order Depth" || f.fieldTitle === "Best Ask Order Depth"
+            ? capitalMaximumAsk
+            : capitalMaximumBid) /
+            2 &&
         validations[f.fieldNames[0]] && (
           <span className="warning">
-            This will commit more than half of available capital ({capitalMaximum.toFixed(4)}) to this order depth! Are
-            you sure?
+            This will commit more than half of available capital (
+            {(f.fieldTitle === "Total Ask Order Depth" || f.fieldTitle === "Best Ask Order Depth"
+              ? capitalMaximumAsk
+              : capitalMaximumBid
+            ).toFixed(4)}
+            ) to this order depth! Are you sure?
           </span>
         )}
     </div>
