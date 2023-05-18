@@ -83,7 +83,7 @@ const Intervention = (props: Props) => {
         ? orders.map((o, i) => (
             <div
               key={"o" + i}
-              className={"order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(i) ? " selected" : "")}
+              className={"order " + orderType + (highlightedGroups.includes(i) ? " selected" : "")}
               onClick={() => {
                 //if $ value price range increment...
                 if (!highlightedGroups.includes(i)) {
@@ -164,9 +164,7 @@ const Intervention = (props: Props) => {
             }, [])
             .map((g, i) => (
               <div
-                className={
-                  "order " + (orderType ? "bid" : "ask") + (highlightedGroups.includes(g.grouping) ? " selected" : "")
-                }
+                className={"order " + orderType + (highlightedGroups.includes(g.grouping) ? " selected" : "")}
                 key={i}
                 onClick={() => {
                   //if $ value price range increment...

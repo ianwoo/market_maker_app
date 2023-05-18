@@ -428,6 +428,7 @@ const AlgoControl = (props: Props) => {
         case "total_ask_order_depth":
         case "best_ask_order_depth":
           validations[prop] = !(configEdit[prop] > capitalMaximumAsk || configEdit[prop] < 0);
+          break;
         case "total_bid_order_depth":
         case "best_bid_order_depth":
           validations[prop] = !(configEdit[prop] > capitalMaximumBid || configEdit[prop] < 0);
