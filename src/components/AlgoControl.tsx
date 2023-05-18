@@ -72,7 +72,7 @@ const AlgoControl = (props: Props) => {
   } = props;
 
   const spotPrice = accountUpdate[0].price;
-  const capitalMaximum = Number(accountUpdate[0].total) * spotPrice;
+  const capitalMaximum = Number(accountUpdate[0].total) * spotPrice + Number(accountUpdate[1].total) * spotPrice;
 
   const [compare, setCompare] = useState<any>({});
   const [validations, setValidations] = useState<any>({});
