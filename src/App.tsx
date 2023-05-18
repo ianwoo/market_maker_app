@@ -30,6 +30,7 @@ export type PriceRange = {
   to: number;
   supply: number;
   request_id?: number;
+  receivedBackend?: boolean;
 };
 
 export type Config = {
@@ -95,9 +96,16 @@ function App() {
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
 
-    //action
-    message.action === "CANCEL_ORDERS" &&
-      setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id !== message.request_id));
+    //action\
+    if (message.action === "CANCEL_ORDERS") {
+      const priceRangesCopy = [...cancellingPriceRanges];
+      priceRangesCopy.forEach((pr) => {
+        if (pr.request_id === message.request_id) {
+          pr.receivedBackend = true;
+        }
+      });
+      setCancellingPriceRanges(priceRangesCopy);
+    }
     if (message.action === "2FA" && message.result) {
       console.log("success!");
       setLoggedIn(true);

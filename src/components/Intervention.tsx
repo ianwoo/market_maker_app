@@ -59,7 +59,7 @@ const Intervention = (props: Props) => {
   const cancelOrders = () => {
     selectedPriceRanges.forEach((pr, i) => {
       const id = Date.now();
-      setCancellingPriceRanges([...cancellingPriceRanges, { ...pr, request_id: id }]);
+      setCancellingPriceRanges([...cancellingPriceRanges, { ...pr, request_id: id, receivedBackend: false }]);
       websocket.send(
         JSON.stringify({
           action: "CANCEL_ORDERS",
@@ -214,11 +214,23 @@ const Intervention = (props: Props) => {
   const cancellations = useMemo(
     () =>
       cancellingPriceRanges.map((cpr, i) => (
-        <div key={"cpr" + i} className="cancel">
-          Cancelling all orders {cpr.from} to {cpr.to}
+        <div key={"cpr" + i} className="field gap cancel">
+          <span>
+            {!cpr.receivedBackend
+              ? "Cancelling all orders " + cpr.from + " to " + cpr.to
+              : "Backend received cancellation from " + cpr.from + " to " + cpr.to}
+          </span>
+          <div
+            className="clear-feedback"
+            onClick={() =>
+              setCancellingPriceRanges(cancellingPriceRanges.filter((pr) => pr.request_id !== cpr.request_id))
+            }
+          >
+            X
+          </div>
         </div>
       )),
-    [cancellingPriceRanges]
+    [setCancellingPriceRanges, cancellingPriceRanges]
   );
 
   const concatenated = orderBookUpdate[orderBookIdx][OrderType.Bid].concat(

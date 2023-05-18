@@ -26,7 +26,7 @@ const Login = (props: Props) => {
       <span>Username</span>
       <input className="user-name" onChange={(e) => setUsername(e.target.value)} />
       <span>Authentication Code</span>
-      <input className="2fa" onChange={(e) => setAuthenticationCode(e.target.value)} />
+      <input className="twofa" onChange={(e) => setAuthenticationCode(e.target.value)} />
       <button onClick={authenticate}>Login</button>
     </div>
   );
