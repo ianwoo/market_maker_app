@@ -6,6 +6,7 @@ import SweepAndPeg from "./SweepAndPeg";
 type Props = {
   orderBookUpdate: OrderBookUpdate[];
   accountUpdate: AccountUpdate[];
+  orderBookSpotPrice: number;
   cancellingPriceRanges: PriceRange[];
   setCancellingPriceRanges: React.Dispatch<React.SetStateAction<PriceRange[]>>;
   websocket: WebSocket;
@@ -35,7 +36,14 @@ const countDecimals = function (value: number) {
 };
 
 const Intervention = (props: Props) => {
-  const { orderBookUpdate, accountUpdate, cancellingPriceRanges, setCancellingPriceRanges, websocket } = props;
+  const {
+    orderBookUpdate,
+    accountUpdate,
+    orderBookSpotPrice,
+    cancellingPriceRanges,
+    setCancellingPriceRanges,
+    websocket,
+  } = props;
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
@@ -103,20 +111,20 @@ const Intervention = (props: Props) => {
                 }
               }}
             >
-              <div className="deviation">{Math.floor((o[0] / accountUpdate[0].price) * 100 - 100)}%</div>
+              <div className="deviation">{Math.floor((o[0] / orderBookSpotPrice) * 100 - 100)}%</div>
               <div className="price">${o[0].toFixed(4)}</div>
               <div className="supply">{o[1]}</div>
-              <div className="usd-value">${(o[1] * accountUpdate[0].price).toFixed(2)}</div>
+              <div className="usd-value">${(o[1] * orderBookSpotPrice).toFixed(2)}</div>
             </div>
           ))
         : orders
             .reduce((acc: Group[], next: [number, number]) => {
               //                   tuple: [price, supply]
-              const _decimals = countDecimals(accountUpdate[0].price); //2 decimals is not enough to differentiate price ranges
+              const _decimals = countDecimals(orderBookSpotPrice); //2 decimals is not enough to differentiate price ranges
 
-              const _grouping = Math.floor((next[0] - accountUpdate[0].price) / priceRangeInc);
+              const _grouping = Math.floor((next[0] - orderBookSpotPrice) / priceRangeInc);
               const _percentGrouping = Math.floor(
-                Math.floor((next[0] / accountUpdate[0].price) * 100 - 100) / aboveOfferRangeInc
+                Math.floor((next[0] / orderBookSpotPrice) * 100 - 100) / aboveOfferRangeInc
               );
 
               const _existingGroup =
@@ -126,24 +134,24 @@ const Intervention = (props: Props) => {
 
               const _groupingPrice =
                 "$" +
-                (accountUpdate[0].price + _grouping * priceRangeInc).toFixed(_decimals).toString() +
+                (orderBookSpotPrice + _grouping * priceRangeInc).toFixed(_decimals).toString() +
                 " - $" +
-                (accountUpdate[0].price + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
+                (orderBookSpotPrice + (_grouping + 1) * priceRangeInc).toFixed(_decimals).toString();
 
               const _percentGroupingPrice =
                 "$" +
-                (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
+                (((_percentGrouping * aboveOfferRangeInc) / 100 + 1) * orderBookSpotPrice)
                   .toFixed(_decimals)
                   .toString() +
                 " - $" +
-                ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price)
+                ((((_percentGrouping + 1) * aboveOfferRangeInc) / 100 + 1) * orderBookSpotPrice)
                   .toFixed(_decimals)
                   .toString();
 
               const _deviation =
-                Math.floor(((next[0] - priceRangeInc) / accountUpdate[0].price) * 100 - 100).toString() +
+                Math.floor(((next[0] - priceRangeInc) / orderBookSpotPrice) * 100 - 100).toString() +
                 "% - " +
-                Math.floor((next[0] / accountUpdate[0].price) * 100 - 100).toString() +
+                Math.floor((next[0] / orderBookSpotPrice) * 100 - 100).toString() +
                 "%";
 
               const _percentDeviation =
@@ -172,8 +180,8 @@ const Intervention = (props: Props) => {
                     setSelectedPriceRanges([
                       ...selectedPriceRanges,
                       {
-                        from: accountUpdate[0].price + g.grouping * priceRangeInc,
-                        to: accountUpdate[0].price + (g.grouping + 1) * priceRangeInc,
+                        from: orderBookSpotPrice + g.grouping * priceRangeInc,
+                        to: orderBookSpotPrice + (g.grouping + 1) * priceRangeInc,
                         supply: g.supply,
                       },
                     ]);
@@ -183,19 +191,19 @@ const Intervention = (props: Props) => {
                     setSelectedPriceRanges([
                       ...selectedPriceRanges,
                       {
-                        from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
-                        to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price,
+                        from: ((g.grouping * aboveOfferRangeInc) / 100 + 1) * orderBookSpotPrice,
+                        to: (((g.grouping + 1) * aboveOfferRangeInc) / 100 + 1) * orderBookSpotPrice,
                         supply: g.supply,
                       },
                     ]);
                     setHighlightedGroups([...highlightedGroups, g.grouping]);
                   } else if (aboveOfferRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
-                    const _targetFromPrice = accountUpdate[0].price + g.grouping * priceRangeInc;
+                    const _targetFromPrice = orderBookSpotPrice + g.grouping * priceRangeInc;
                     const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== _targetFromPrice);
                     setSelectedPriceRanges(_priceRangesTargetRemoved);
                     setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
                   } else if (priceRangeInc === 0 && highlightedGroups.includes(g.grouping)) {
-                    const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * accountUpdate[0].price;
+                    const _targetFromPrice = ((g.grouping * aboveOfferRangeInc) / 100 + 1) * orderBookSpotPrice;
                     const _priceRangesTargetRemoved = selectedPriceRanges.filter((r) => r.from !== _targetFromPrice);
                     setSelectedPriceRanges(_priceRangesTargetRemoved);
                     setHighlightedGroups(highlightedGroups.filter((hg) => hg !== g.grouping));
@@ -205,10 +213,10 @@ const Intervention = (props: Props) => {
                 <div className="deviation">{g.dev}</div>
                 <div className="price">{g.price}</div>
                 <div className="supply">{g.supply.toFixed(4)}</div>
-                <div className="usd-value">{(g.supply * accountUpdate[0].price).toFixed(2)}</div>
+                <div className="usd-value">{(g.supply * orderBookSpotPrice).toFixed(2)}</div>
               </div>
             )),
-    [aboveOfferRangeInc, accountUpdate, highlightedGroups, orderType, orders, priceRangeInc, selectedPriceRanges]
+    [orderBookSpotPrice, aboveOfferRangeInc, highlightedGroups, orderType, orders, priceRangeInc, selectedPriceRanges]
   );
 
   const cancellations = useMemo(
@@ -268,7 +276,7 @@ const Intervention = (props: Props) => {
           )}
           <div className="spot-price field col">
             <b>Spot Price</b>
-            <b className="spot-price-value">{accountUpdate[0].price}</b>
+            <b className="spot-price-value">{orderBookSpotPrice}</b>
           </div>
           <div className="tabs">
             {orderBookUpdate.map((obu, i) => [
@@ -336,19 +344,19 @@ const Intervention = (props: Props) => {
                 }
               >
                 <VictoryBar
-                  barRatio={1}
+                  barWidth={2}
                   style={{ data: { fill: "red" } }}
                   data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({
                     x: o[0],
-                    y: chartSupplyUSD ? o[1] * accountUpdate[0].price : o[1],
+                    y: chartSupplyUSD ? o[1] * orderBookSpotPrice : o[1],
                   }))}
                 />
                 <VictoryBar
-                  barRatio={1}
+                  barWidth={2}
                   style={{ data: { fill: "blue" } }}
                   data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({
                     x: o[0],
-                    y: chartSupplyUSD ? o[1] * accountUpdate[0].price : o[1],
+                    y: chartSupplyUSD ? o[1] * orderBookSpotPrice : o[1],
                   }))}
                 />
                 <VictoryAxis
@@ -362,10 +370,10 @@ const Intervention = (props: Props) => {
                 />
                 <VictoryAxis
                   dependentAxis
-                  axisValue={accountUpdate[0].price}
+                  axisValue={orderBookSpotPrice}
                   tickFormat={() => ""}
                   style={{
-                    axis: { stroke: "fuchsia", "stroke-width": 2 },
+                    axis: { stroke: "orange", strokeWidth: 2 },
                     grid: { stroke: "#ffffff" },
                     axisLabel: { fill: "#ffffff" },
                   }}

@@ -4,6 +4,7 @@ import { AccountUpdate, OrderBookUpdate, Template } from "../App";
 type Props = {
   websocket: WebSocket;
   orderBook: OrderBookUpdate;
+  orderBookSpotPrice: number;
   accountUpdate: AccountUpdate[];
   configsLoaded: boolean;
   config: any;
@@ -61,6 +62,7 @@ const AlgoControl = (props: Props) => {
   const {
     websocket,
     // orderBook, we don't need this right now because supply quantity calc is inaccurate, orderbook is incomplete
+    orderBookSpotPrice,
     accountUpdate,
     configsLoaded,
     config,
@@ -71,8 +73,7 @@ const AlgoControl = (props: Props) => {
     setSelectedTemplate,
   } = props;
 
-  const spotPrice = accountUpdate[0].price;
-  const capitalMaximumAsk = Number(accountUpdate[0].total) * spotPrice;
+  const capitalMaximumAsk = Number(accountUpdate[0].total) * orderBookSpotPrice;
   const capitalMaximumBid = Number(accountUpdate[1].total);
 
   const [compare, setCompare] = useState<any>({});
@@ -145,7 +146,7 @@ const AlgoControl = (props: Props) => {
       //   output: orderBook.ask
       //     .filter(
       //       (ask, i) =>
-      //         ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : spotPrice * (1 + config.total_ask_price_range))
+      //         ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : orderBookSpotPrice * (1 + config.total_ask_price_range))
       //     )
       //     .reduce((acc, next) => acc + next[1], 0),
       // },
@@ -187,7 +188,7 @@ const AlgoControl = (props: Props) => {
       //   output: orderBook.ask
       //     .filter(
       //       (ask, i) =>
-      //         ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : spotPrice * (1 + config.best_ask_price_range))
+      //         ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : orderBookSpotPrice * (1 + config.best_ask_price_range))
       //     )
       //     .reduce((acc, next) => acc + next[1], 0),
       // },
@@ -245,7 +246,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Spot Price",
         fieldType: FieldType.Output,
         prefix: "$",
-        output: spotPrice,
+        output: orderBookSpotPrice,
       },
     ],
     [
@@ -300,7 +301,7 @@ const AlgoControl = (props: Props) => {
       //   fieldTitle: "Lower Best Range Quantity",
       //   fieldType: FieldType.Output,
       //   output: orderBook.bid
-      //     .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : spotPrice))
+      //     .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : orderBookSpotPrice))
       //     .reduce((acc, next) => acc + next[1], 0),
       // },
       {
@@ -341,7 +342,7 @@ const AlgoControl = (props: Props) => {
       //   output: orderBook.bid
       //     .filter(
       //       (bid, i) =>
-      //         bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : spotPrice * (1 + config.total_bid_price_range))
+      //         bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : orderBookSpotPrice * (1 + config.total_bid_price_range))
       //     )
       //     .reduce((acc, next) => acc + next[1], 0),
       // },
@@ -367,26 +368,26 @@ const AlgoControl = (props: Props) => {
     //set initial variable and react to spot price change / actual config changes
     if (configsLoaded) {
       //update variables if spot price or config (but not config edit) changes
-      setTotalAskPriceInUSD(spotPrice * (1 + config.total_ask_price_range));
-      setTotalBidPriceInUSD(spotPrice * (1 - config.total_bid_price_range));
-      setBestAskPriceInUSD(spotPrice * (1 + config.best_ask_price_range));
-      setBestBidPriceInUSD(spotPrice * (1 - config.best_bid_price_range));
-      setSpreadUpperPrice(spotPrice * (1 + config.spread / 2));
-      setSpreadLowerPrice(spotPrice * (1 - config.spread / 2));
+      setTotalAskPriceInUSD(orderBookSpotPrice * (1 + config.total_ask_price_range));
+      setTotalBidPriceInUSD(orderBookSpotPrice * (1 - config.total_bid_price_range));
+      setBestAskPriceInUSD(orderBookSpotPrice * (1 + config.best_ask_price_range));
+      setBestBidPriceInUSD(orderBookSpotPrice * (1 - config.best_bid_price_range));
+      setSpreadUpperPrice(orderBookSpotPrice * (1 + config.spread / 2));
+      setSpreadLowerPrice(orderBookSpotPrice * (1 - config.spread / 2));
     }
-  }, [spotPrice, configsLoaded, config]);
+  }, [orderBookSpotPrice, configsLoaded, config]);
 
   useEffect(() => {
     if (configsLoaded) {
       //reactive variables on edit
-      setTotalAskPriceInUSD(spotPrice * (1 + configEdit.total_ask_price_range));
-      setTotalBidPriceInUSD(spotPrice * (1 - configEdit.total_bid_price_range));
-      setBestAskPriceInUSD(spotPrice * (1 + configEdit.best_ask_price_range));
-      setBestBidPriceInUSD(spotPrice * (1 - configEdit.best_bid_price_range));
-      setSpreadUpperPrice(spotPrice * (1 + configEdit.spread / 2));
-      setSpreadLowerPrice(spotPrice * (1 - configEdit.spread / 2));
+      setTotalAskPriceInUSD(orderBookSpotPrice * (1 + configEdit.total_ask_price_range));
+      setTotalBidPriceInUSD(orderBookSpotPrice * (1 - configEdit.total_bid_price_range));
+      setBestAskPriceInUSD(orderBookSpotPrice * (1 + configEdit.best_ask_price_range));
+      setBestBidPriceInUSD(orderBookSpotPrice * (1 - configEdit.best_bid_price_range));
+      setSpreadUpperPrice(orderBookSpotPrice * (1 + configEdit.spread / 2));
+      setSpreadLowerPrice(orderBookSpotPrice * (1 - configEdit.spread / 2));
     }
-  }, [spotPrice, configsLoaded, config, configEdit]);
+  }, [orderBookSpotPrice, configsLoaded, config, configEdit]);
 
   useEffect(() => {
     websocket.send(

@@ -83,6 +83,16 @@ function App() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>();
 
+  const orderBookSpotPrice = useMemo(
+    () =>
+      orderBookUpdate.length > 0
+        ? (orderBookUpdate[0].ask.sort((a, b) => a[0] - b[0])[0][0] +
+            orderBookUpdate[0].bid.sort((a, b) => b[0] - a[0])[0][0]) /
+          2
+        : 0,
+    [orderBookUpdate]
+  );
+
   websocket.addEventListener("open", () => {
     setSocketOpen(true);
   });
@@ -96,7 +106,7 @@ function App() {
     message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
 
-    //action\
+    //action
     if (message.action === "CANCEL_ORDERS") {
       const priceRangesCopy = [...cancellingPriceRanges];
       priceRangesCopy.forEach((pr) => {
@@ -149,6 +159,7 @@ function App() {
         key="control"
         websocket={websocket}
         orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
+        orderBookSpotPrice={orderBookSpotPrice}
         accountUpdate={accountUpdate}
         configsLoaded={configsLoaded}
         config={config}
@@ -162,6 +173,7 @@ function App() {
         key="intervention"
         orderBookUpdate={orderBookUpdate}
         accountUpdate={accountUpdate}
+        orderBookSpotPrice={orderBookSpotPrice}
         cancellingPriceRanges={cancellingPriceRanges}
         setCancellingPriceRanges={setCancellingPriceRanges}
         websocket={websocket}
@@ -170,6 +182,7 @@ function App() {
     [
       accountUpdate,
       orderBookUpdate,
+      orderBookSpotPrice,
       cancellingPriceRanges,
       configsLoaded,
       config,
