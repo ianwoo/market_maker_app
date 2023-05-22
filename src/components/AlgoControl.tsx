@@ -31,6 +31,7 @@ type Field = {
   validation?: string;
   gap?: boolean;
   hideLabel?: boolean;
+  extended?: boolean;
 };
 
 const volAlgoFields: Field[] = [
@@ -113,6 +114,17 @@ const volAlgoFields: Field[] = [
 //   fieldType: FieldType.Output,
 //   output: orderBook.bid
 //     .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : orderBookSpotPrice))
+//     .reduce((acc, next) => acc + next[1], 0),
+// },
+// {
+//   fieldNames: ["total_bid_price_range"],
+//   fieldTitle: "Lower Total Range Quantity",
+//   fieldType: FieldType.Output,
+//   output: orderBook.bid
+//     .filter(
+//       (bid, i) =>
+//         bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : orderBookSpotPrice * (1 + config.total_bid_price_range))
+//     )
 //     .reduce((acc, next) => acc + next[1], 0),
 // },
 
@@ -268,12 +280,15 @@ const AlgoControl = (props: Props) => {
         hideLabel: true,
       },
     ],
+  ];
+  const AskFieldGroups2: Field[][] = [
     [
       {
         fieldNames: ["tilt_asks"],
         fieldTitle: "Order Tilt (Asks)",
         fieldType: FieldType.Input,
         validation: "Must enter a value from -5 to 5!",
+        hideLabel: true,
       },
       {
         fieldNames: ["min_ask_order_usd_value"],
@@ -281,6 +296,7 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Input,
         prefix: "$",
         validation: "Cannot be higher than Maximum Ask Order!",
+        hideLabel: true,
       },
       {
         fieldNames: ["max_ask_order_usd_value"],
@@ -288,28 +304,74 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Input,
         prefix: "$",
         validation: "Cannot be lower than Minimum Ask Order!",
+        hideLabel: true,
       },
       {
         fieldNames: ["best_ask_random_walk"],
         fieldTitle: "Random Walk (Best Ask)",
         fieldType: FieldType.Select,
+        hideLabel: true,
       },
-    ],
-    [
-      {
-        fieldNames: ["spread"],
-        fieldTitle: "Price Gap Allowance / Spread",
-        fieldType: FieldType.Input,
-        suffix: "%",
-      },
-    ],
-    [
       {
         fieldNames: ["total_ask_random_walk"],
         fieldTitle: "Random Walk (Total Ask)",
         fieldType: FieldType.Select,
+        hideLabel: true,
       },
     ],
+  ];
+  const BidFieldGroups2: Field[][] = [
+    [
+      {
+        fieldNames: ["tilt_bids"],
+        fieldTitle: "Order Tilt (Bids)",
+        fieldType: FieldType.Input,
+        validation: "Must enter a value from -5 to 5!",
+        hideLabel: true,
+      },
+      {
+        fieldNames: ["min_bid_order_usd_value"],
+        fieldTitle: "Minimum Bid Order Size (USD)",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Cannot be higher than Maximum Bid Order!",
+        hideLabel: true,
+      },
+      {
+        fieldNames: ["max_bid_order_usd_value"],
+        fieldTitle: "Maximum Bid Order Size (USD)",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation: "Cannot be lower than Minimum Bid Order!",
+        hideLabel: true,
+      },
+      {
+        fieldNames: ["best_bid_random_walk"],
+        fieldTitle: "Random Walk (Best Bid)",
+        fieldType: FieldType.Select,
+        hideLabel: true,
+      },
+      {
+        fieldNames: ["total_bid_random_walk"],
+        fieldTitle: "Random Walk (Total Ask)",
+        fieldType: FieldType.Select,
+        hideLabel: true,
+      },
+    ],
+  ];
+  const SpreadFieldGroups1: Field[][] = [
+    [
+      {
+        fieldNames: ["spread"],
+        fieldTitle: "Price Gap",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        gap: true,
+        extended: true,
+      },
+    ],
+  ];
+  const SpreadFieldGroups2: Field[][] = [
     [
       {
         fieldNames: ["spread"],
@@ -318,6 +380,8 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Output,
         prefix: "$",
         output: spreadUpperPrice,
+        gap: true,
+        extended: true,
       },
     ],
     [
@@ -327,6 +391,8 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Output,
         prefix: "$",
         output: orderBookSpotPrice,
+        gap: true,
+        extended: true,
       },
     ],
     [
@@ -337,51 +403,8 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Output,
         prefix: "$",
         output: spreadLowerPrice,
-      },
-    ],
-    [
-      {
-        fieldNames: ["tilt_bids"],
-        fieldTitle: "Order Tilt (Bids)",
-        fieldType: FieldType.Input,
-        validation: "Must enter a value from -5 to 5!",
-      },
-      {
-        fieldNames: ["min_bid_order_usd_value"],
-        fieldTitle: "Minimum Bid Order Size (USD)",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation: "Cannot be higher than Maximum Bid Order!",
-      },
-      {
-        fieldNames: ["max_bid_order_usd_value"],
-        fieldTitle: "Maximum Bid Order Size (USD)",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation: "Cannot be lower than Minimum Bid Order!",
-      },
-      {
-        fieldNames: ["best_bid_random_walk"],
-        fieldTitle: "Random Walk (Best Bid)",
-        fieldType: FieldType.Select,
-      },
-    ],
-    [
-      // {
-      //   fieldNames: ["total_bid_price_range"],
-      //   fieldTitle: "Lower Total Range Quantity",
-      //   fieldType: FieldType.Output,
-      //   output: orderBook.bid
-      //     .filter(
-      //       (bid, i) =>
-      //         bid[0] <= (totalBidPriceInUSD ? totalBidPriceInUSD : orderBookSpotPrice * (1 + config.total_bid_price_range))
-      //     )
-      //     .reduce((acc, next) => acc + next[1], 0),
-      // },
-      {
-        fieldNames: ["total_bid_random_walk"],
-        fieldTitle: "Random Walk (Total Bid)",
-        fieldType: FieldType.Select,
+        gap: true,
+        extended: true,
       },
     ],
   ];
@@ -573,7 +596,12 @@ const AlgoControl = (props: Props) => {
   const renderField = (f: Field, i: number) => (
     <div
       key={i}
-      className={"field " + (f.gap ? "gap" : "col") + (f.fieldNames.some((fn) => !compare[fn]) ? " highlighted" : "")}
+      className={
+        "field " +
+        (f.gap ? "gap" : "col") +
+        (f.extended ? " extended" : "") +
+        (f.fieldNames.some((fn) => !compare[fn]) ? " highlighted" : "")
+      }
     >
       {!f.hideLabel && <span>{f.fieldTitle}</span>}
       {f.fieldType !== FieldType.Output && (
@@ -769,9 +797,50 @@ const AlgoControl = (props: Props) => {
             {fg.map((f, j) => renderField(f, 3 + j))}
           </div>
         ))}
-        {/* <div className="header">Tilt - Total Offers Depth</div>
+        <h1>Tilt, Min/Max Order Sizes, Random Walk</h1>
+        <div className="headers ask">
+          <div className="header">Tilt - Total Offers Depth</div>
           <div className="header">Min Order Size (USD)/Slice</div>
-          <div className="header">Max Order Size (USD)/Slice</div> */}
+          <div className="header">Max Order Size (USD)/Slice</div>
+          <div className="header">Inner Bound Random Walk</div>
+          <div className="header">Outer Bound Random Walk</div>
+        </div>
+        {AskFieldGroups2.map((fg, i) => (
+          <div className="field-group" key={"fg" + i}>
+            {fg.map((f, j) => renderField(f, 3 + j))}
+          </div>
+        ))}
+        <div className="headers bid">
+          <div className="header">Tilt - Total Bids Depth</div>
+          <div className="header">Min Order Size (USD)/Slice</div>
+          <div className="header">Max Order Size (USD)/Slice</div>
+          <div className="header">Inner Bound Random Walk</div>
+          <div className="header">Outer Bound Random Walk</div>
+        </div>
+        {BidFieldGroups2.map((fg, i) => (
+          <div className="field-group" key={"fg" + i}>
+            {fg.map((f, j) => renderField(f, 3 + j))}
+          </div>
+        ))}
+        <h1>Spread</h1>
+        <div className="headers spread">
+          <div className="header">Spread - Order Book</div>
+          <div className="header">Allowance</div>
+        </div>
+        {SpreadFieldGroups1.map((fg, i) => (
+          <div className="field-group spread" key={"fg" + i}>
+            {fg.map((f, j) => renderField(f, 3 + j))}
+          </div>
+        ))}
+        <div className="headers spread">
+          <div className="header">Spread - Order Book</div>
+          <div className="header">Allowance</div>
+        </div>
+        {SpreadFieldGroups2.map((fg, i) => (
+          <div className="field-group spread" key={"fg" + i}>
+            {fg.map((f, j) => renderField(f, 3 + j))}
+          </div>
+        ))}
       </div>
     </div>
   );
