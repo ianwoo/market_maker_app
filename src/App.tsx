@@ -192,10 +192,6 @@ function App() {
     ]
   );
 
-  useEffect(() => {
-    console.log(orderBookUpdate);
-  }, [orderBookUpdate]);
-
   return (
     <div className="App">
       <div className="tabs">
