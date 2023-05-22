@@ -4,6 +4,7 @@ import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
 import "./global.scss";
 import Login from "./components/Login";
+import AlertControl from "./components/AlertControl";
 
 export type AccountUpdate = {
   account: string;
@@ -62,6 +63,27 @@ export type Template = {
   update_params: Config;
 };
 
+export type AlertCommonConfig = {
+  alert_env: string; //ex. DEV
+  observation_frequency: number;
+  lookback_windows: number;
+  enable_email_alert: boolean;
+  enable_slack_alert: boolean;
+  email_recipients: string[];
+  slack_channels: string[];
+  enable_postgresdb: boolean;
+  postgres_table_list: string[];
+  enable_google_sheet: boolean;
+  google_sheets_map: any;
+};
+
+export type Alert = {
+  alert_name: string; //ex. token_inflow_outflow
+  alert_id: string; //ex. token_inflow_outflow_AGIX_DEV_1
+  common_config: AlertCommonConfig;
+  specific_config: any;
+};
+
 const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
 
 const websocket = new WebSocket("ws://192.168.1.43:8055");
@@ -82,6 +104,8 @@ function App() {
 
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>();
+
+  const [alerts, setAlerts] = useState<Alert[]>([]);
 
   const orderBookSpotPrice = useMemo(
     () =>
@@ -149,6 +173,9 @@ function App() {
         JSON.parse(message.result)[0].template_name ? JSON.parse(message.result)[0].template_name : ""
       );
     }
+    if (message.action === "GET_ALERTS") {
+      setAlerts(JSON.parse(message.result));
+    }
   };
 
   const components = useMemo(
@@ -178,6 +205,7 @@ function App() {
         setCancellingPriceRanges={setCancellingPriceRanges}
         websocket={websocket}
       />,
+      <AlertControl websocket={websocket} alerts={alerts} />,
     ],
     [
       accountUpdate,
@@ -189,6 +217,7 @@ function App() {
       configEdit,
       templates,
       selectedTemplate,
+      alerts,
     ]
   );
 
