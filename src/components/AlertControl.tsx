@@ -18,7 +18,19 @@ const AlertControl = (props: Props) => {
     );
   }, [websocket]);
 
-  return <div className="alerts"></div>;
+  return (
+    <div className="alerts">
+      {alerts.map((a, i) => (
+        <div className="alert" key={i}>
+          {Object.entries(a.common_config).map((cc, j) => (
+            <div className="common-config" key={j}>
+              {cc[0] + ":" + cc[1]}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default AlertControl;

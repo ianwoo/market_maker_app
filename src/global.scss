@@ -153,10 +153,6 @@
           background: lightblue;
           color: blue;
         }
-
-        .validation {
-          padding-bottom: 20px;
-        }
       }
       .field-group {
         display: flex;
@@ -165,8 +161,14 @@
         margin-bottom: 8px;
         padding: 8px;
         border: 1px solid white;
-        div {
-          width: 20%;
+        .field {
+          width: 25%;
+
+          &.gap {
+            width: 35%;
+            margin-right: 15%;
+            justify-content: space-between;
+          }
         }
       }
       .vol-algo {
@@ -177,150 +179,171 @@
       }
       .order-book-depth {
         width: 100%;
-      }
-    }
-    .intervention {
-      .flex {
-        display: flex;
-        justify-content: space-between;
-        .range-controls {
+
+        //copied from field-group
+        .headers {
           display: flex;
           justify-content: space-between;
-          .field.col {
-            padding: 8px;
+          gap: 16px;
+          margin-bottom: 8px;
+          padding: 8px;
+          border: 1px solid white;
+
+          &.ask {
+            background: red;
+          }
+          &.bid {
+            background: darkblue;
+          }
+
+          .header {
+            width: 25%;
           }
         }
-        .order-book {
+      }
+      .intervention {
+        .flex {
           display: flex;
-          flex-direction: column;
-          padding: 16px;
-          width: 66%;
-          gap: 8px;
-
-          .toggle-external-only {
-            width: 100%;
-            display: flex;
-            justify-content: flex-start;
-            input {
-              margin-right: 16px;
-            }
-          }
-          .stop-algo {
-            margin-bottom: 16px;
-          }
-          .spot-price {
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 16px;
-            .spot-price-value {
-              color: orange;
-            }
-          }
-          .deviation {
-            width: 230px;
-          }
-          .price {
-            width: 242px;
-          }
-          .supply {
-            width: 142px;
-            text-align: right;
-            .subheader {
-              margin-bottom: 16px;
-            }
-            &.cancel-btn {
-              height: 69px;
-              font-size: 16px;
-              font-weight: 600;
-            }
-          }
-          .usd-value {
-            width: 90px;
-          }
-          .headers {
-            display: flex;
-            justify-content: space-between;
-            .header {
-              &.col {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-              }
-            }
-          }
+          justify-content: space-between;
           .range-controls {
-            .field.col {
-              &.active {
-                color: blue;
-                background: lightblue;
-              }
-            }
-            .field.gap {
-              &.cancel {
-                margin: 12px 0;
-                span {
-                  width: 100px;
-                  font-size: 12px;
-                }
-                .clear-feedback {
-                  cursor: pointer;
-                }
-              }
-            }
-          }
-          .order {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            height: 69px;
-            border: 1px solid black;
-            border-radius: 8px;
-            padding: 0 8px;
-            &.ask {
-              background: darkred;
-            }
-            &.bid {
-              background: darkblue;
-            }
-            &.selected {
-              border: 3px solid lightblue;
+            .field.col {
+              padding: 8px;
             }
           }
-        }
-        .sweep-and-peg {
-          width: 33%;
-          padding: 16px;
-
-          .info {
+          .order-book {
             display: flex;
             flex-direction: column;
-            margin-bottom: 16px;
+            padding: 16px;
+            width: 66%;
+            gap: 8px;
 
-            .inforow {
+            .toggle-external-only {
+              width: 100%;
+              display: flex;
+              justify-content: flex-start;
+              input {
+                margin-right: 16px;
+              }
+            }
+            .stop-algo {
+              margin-bottom: 16px;
+            }
+            .spot-price {
+              text-align: center;
+              font-size: 20px;
+              margin-bottom: 16px;
+              .spot-price-value {
+                color: orange;
+              }
+            }
+            .deviation {
+              width: 230px;
+            }
+            .price {
+              width: 242px;
+            }
+            .supply {
+              width: 142px;
+              text-align: right;
+              .subheader {
+                margin-bottom: 16px;
+              }
+              &.cancel-btn {
+                height: 69px;
+                font-size: 16px;
+                font-weight: 600;
+              }
+            }
+            .usd-value {
+              width: 90px;
+            }
+            .headers {
               display: flex;
               justify-content: space-between;
-
-              span {
-                width: 20%;
-
-                &.account {
-                  width: 27%;
-                }
-                &.coin {
-                  width: 13%;
+              .header {
+                &.col {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: flex-end;
                 }
               }
             }
+            .range-controls {
+              .field.col {
+                &.active {
+                  color: blue;
+                  background: lightblue;
+                }
+              }
+              .field.gap {
+                &.cancel {
+                  margin: 12px 0;
+                  span {
+                    width: 100px;
+                    font-size: 12px;
+                  }
+                  .clear-feedback {
+                    cursor: pointer;
+                  }
+                }
+              }
+            }
+            .order {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              height: 69px;
+              border: 1px solid black;
+              border-radius: 8px;
+              padding: 0 8px;
+              &.ask {
+                background: darkred;
+              }
+              &.bid {
+                background: darkblue;
+              }
+              &.selected {
+                border: 3px solid lightblue;
+              }
+            }
           }
+          .sweep-and-peg {
+            width: 33%;
+            padding: 16px;
 
-          .field {
-            margin-bottom: 16px;
-          }
+            .info {
+              display: flex;
+              flex-direction: column;
+              margin-bottom: 16px;
 
-          .peg-fields {
-            .validation {
-              background: black;
-              color: red;
+              .inforow {
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                  width: 20%;
+
+                  &.account {
+                    width: 27%;
+                  }
+                  &.coin {
+                    width: 13%;
+                  }
+                }
+              }
+            }
+
+            .field {
+              margin-bottom: 16px;
+            }
+
+            .peg-fields {
+              .validation {
+                background: black;
+                color: red;
+              }
             }
           }
         }

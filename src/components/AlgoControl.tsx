@@ -29,6 +29,8 @@ type Field = {
   suffix?: string;
   output?: number;
   validation?: string;
+  gap?: boolean;
+  hideLabel?: boolean;
 };
 
 const volAlgoFields: Field[] = [
@@ -57,6 +59,62 @@ const volAlgoFields: Field[] = [
     fieldType: FieldType.Select,
   },
 ];
+
+//THESE FIELDS ARE NOT PRESENT IN SCOTTIE'S NEW DESIGN:
+// {
+//   fieldNames: ["total_ask_price_range", "total_bid_price_range"],
+//   fieldTitle: "Total Range in $",
+//   fieldType: FieldType.Output,
+//   prefix: "$",
+//   output:
+//     totalAskPriceInUSD !== undefined && totalBidPriceInUSD !== undefined
+//       ? totalAskPriceInUSD - totalBidPriceInUSD
+//       : undefined,
+//   gap: true,
+// },
+// {
+//   fieldNames: ["best_ask_price_range", "best_bid_price_range"],
+//   fieldTitle: "Best Range in $",
+//   fieldType: FieldType.Output,
+//   prefix: "$",
+//   output:
+//     bestAskPriceInUSD !== undefined && bestBidPriceInUSD !== undefined
+//       ? bestAskPriceInUSD - bestBidPriceInUSD
+//       : undefined,
+//   gap: true,
+// },
+
+//THESE FIELDS CAN'T BE CALCULATED RIGHT NOW BECAUSE OF 200 LINE CALL MAX
+// {
+//   fieldNames: ["best_ask_price_range"],
+//   fieldTitle: "Upper Best Range Quantity",
+//   fieldType: FieldType.Output,
+//   output: orderBook.ask
+//     .filter(
+//       (ask, i) =>
+//         ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : orderBookSpotPrice * (1 + config.best_ask_price_range))
+//     )
+//     .reduce((acc, next) => acc + next[1], 0),
+// },
+// {
+//   fieldNames: ["total_ask_price_range"],
+//   fieldTitle: "Upper Total Range Quantity",
+//   fieldType: FieldType.Output,
+//   output: orderBook.ask
+//     .filter(
+//       (ask, i) =>
+//         ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : orderBookSpotPrice * (1 + config.total_ask_price_range))
+//     )
+//     .reduce((acc, next) => acc + next[1], 0),
+// },
+// {
+//   fieldNames: ["best_bid_price_range"],
+//   fieldTitle: "Lower Best Range Quantity",
+//   fieldType: FieldType.Output,
+//   output: orderBook.bid
+//     .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : orderBookSpotPrice))
+//     .reduce((acc, next) => acc + next[1], 0),
+// },
 
 const AlgoControl = (props: Props) => {
   const {
@@ -90,66 +148,24 @@ const AlgoControl = (props: Props) => {
   const [newTemplateName, setNewTemplateName] = useState<string>();
   const [newTemplateNameValid, setNewTemplateNameValid] = useState<boolean>(true);
 
-  const orderBookAlgoFieldGroups: Field[][] = [
-    [
-      {
-        fieldNames: ["total_ask_price_range", "total_bid_price_range"],
-        fieldTitle: "Total Range in $",
-        fieldType: FieldType.Output,
-        prefix: "$",
-        output:
-          totalAskPriceInUSD !== undefined && totalBidPriceInUSD !== undefined
-            ? totalAskPriceInUSD - totalBidPriceInUSD
-            : undefined,
-      },
-    ],
-    [
-      {
-        fieldNames: ["best_ask_price_range", "best_bid_price_range"],
-        fieldTitle: "Best Range in $",
-        fieldType: FieldType.Output,
-        prefix: "$",
-        output:
-          bestAskPriceInUSD !== undefined && bestBidPriceInUSD !== undefined
-            ? bestAskPriceInUSD - bestBidPriceInUSD
-            : undefined,
-      },
-    ],
-    [
-      {
-        fieldNames: ["spread"],
-        fieldTitle: "Price Gap Allowance / Spread",
-        fieldType: FieldType.Input,
-        suffix: "%",
-      },
-    ],
+  const AskFieldGroups1: Field[][] = [
     [
       {
         fieldNames: ["total_ask_price_range"],
-        fieldTitle: "Upper Total Range / Total Ask",
-        fieldType: FieldType.Input,
-        suffix: "%",
-        validation: "Must be higher than Upper Best Range / Best Ask, and must be positive!",
-      },
-      {
-        fieldNames: ["total_ask_price_range"],
-        fieldTitle: "Upper Total Range Price / Total Ask Price",
+        fieldTitle: "Outer Offer Bound Price",
         fieldType: FieldType.Output,
         prefix: "$",
         output: totalAskPriceInUSD,
+        gap: true,
       },
-      //removing this for now because we cannot obtain full depth of book
-      // {
-      //   fieldNames: ["total_ask_price_range"],
-      //   fieldTitle: "Upper Total Range Quantity",
-      //   fieldType: FieldType.Output,
-      //   output: orderBook.ask
-      //     .filter(
-      //       (ask, i) =>
-      //         ask[0] <= (totalAskPriceInUSD ? totalAskPriceInUSD : orderBookSpotPrice * (1 + config.total_ask_price_range))
-      //     )
-      //     .reduce((acc, next) => acc + next[1], 0),
-      // },
+      {
+        fieldNames: ["total_ask_price_range"],
+        fieldTitle: "Outer Offer Bound %",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must be higher than Upper Best Range / Best Ask, and must be positive!",
+        hideLabel: true,
+      },
       {
         fieldNames: ["total_ask_order_depth"],
         fieldTitle: "Total Ask Order Depth",
@@ -159,39 +175,26 @@ const AlgoControl = (props: Props) => {
           "Cannot be higher than amount of capital available ($" +
           capitalMaximumAsk.toFixed(4) +
           "), and must be positive!",
-      },
-      {
-        fieldNames: ["total_ask_random_walk"],
-        fieldTitle: "Random Walk (Total Ask)",
-        fieldType: FieldType.Select,
+        hideLabel: true,
       },
     ],
     [
       {
         fieldNames: ["best_ask_price_range"],
-        fieldTitle: "Upper Best Range / Best Ask",
-        fieldType: FieldType.Input,
-        suffix: "%",
-        validation: "Must be higher than half the spread, and must be positive!",
-      },
-      {
-        fieldNames: ["best_ask_price_range"],
-        fieldTitle: "Upper Best Range Price / Best Ask Price",
+        fieldTitle: "Inner Offer Bound Price",
         fieldType: FieldType.Output,
         prefix: "$",
         output: bestAskPriceInUSD,
+        gap: true,
       },
-      // {
-      //   fieldNames: ["best_ask_price_range"],
-      //   fieldTitle: "Upper Best Range Quantity",
-      //   fieldType: FieldType.Output,
-      //   output: orderBook.ask
-      //     .filter(
-      //       (ask, i) =>
-      //         ask[0] <= (bestAskPriceInUSD ? bestAskPriceInUSD : orderBookSpotPrice * (1 + config.best_ask_price_range))
-      //     )
-      //     .reduce((acc, next) => acc + next[1], 0),
-      // },
+      {
+        fieldNames: ["best_ask_price_range"],
+        fieldTitle: "Inner Offer Bound %",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must be higher than half the spread, and must be positive!",
+        hideLabel: true,
+      },
       {
         fieldNames: ["best_ask_order_depth"],
         fieldTitle: "Best Ask Order Depth",
@@ -201,11 +204,68 @@ const AlgoControl = (props: Props) => {
           "Cannot be higher than amount of capital available ($" +
           capitalMaximumAsk.toFixed(4) +
           "), and must be positive!",
+        hideLabel: true,
+      },
+    ],
+  ];
+  const BidFieldGroups1: Field[][] = [
+    [
+      {
+        fieldNames: ["best_bid_price_range"],
+        fieldTitle: "Inner Bid Bound Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: bestBidPriceInUSD,
+        gap: true,
       },
       {
-        fieldNames: ["best_ask_random_walk"],
-        fieldTitle: "Random Walk (Best Ask)",
-        fieldType: FieldType.Select,
+        fieldNames: ["best_bid_price_range"],
+        fieldTitle: "Inner Bid Bound %",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must be higher than half the spread, and must be positive!",
+        hideLabel: true,
+      },
+
+      {
+        fieldNames: ["best_bid_order_depth"],
+        fieldTitle: "Best Bid Order Depth",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation:
+          "Cannot be higher than amount of capital available ($" +
+          capitalMaximumBid.toFixed(4) +
+          "), and must be positive!",
+        hideLabel: true,
+      },
+    ],
+    [
+      {
+        fieldNames: ["total_bid_price_range"],
+        fieldTitle: "Outer Bid Bound Price",
+        fieldType: FieldType.Output,
+        prefix: "$",
+        output: totalBidPriceInUSD,
+        gap: true,
+      },
+      {
+        fieldNames: ["total_bid_price_range"],
+        fieldTitle: "Outer Bid Bound %",
+        fieldType: FieldType.Input,
+        suffix: "%",
+        validation: "Must be higher than Lower Best Range / Best Bid, and must be positive!",
+        hideLabel: true,
+      },
+      {
+        fieldNames: ["total_bid_order_depth"],
+        fieldTitle: "Total Bid Order Depth",
+        fieldType: FieldType.Input,
+        prefix: "$",
+        validation:
+          "Cannot be higher than amount of capital available ($" +
+          capitalMaximumBid.toFixed(4) +
+          "), and must be positive!",
+        hideLabel: true,
       },
     ],
     [
@@ -228,6 +288,26 @@ const AlgoControl = (props: Props) => {
         fieldType: FieldType.Input,
         prefix: "$",
         validation: "Cannot be lower than Minimum Ask Order!",
+      },
+      {
+        fieldNames: ["best_ask_random_walk"],
+        fieldTitle: "Random Walk (Best Ask)",
+        fieldType: FieldType.Select,
+      },
+    ],
+    [
+      {
+        fieldNames: ["spread"],
+        fieldTitle: "Price Gap Allowance / Spread",
+        fieldType: FieldType.Input,
+        suffix: "%",
+      },
+    ],
+    [
+      {
+        fieldNames: ["total_ask_random_walk"],
+        fieldTitle: "Random Walk (Total Ask)",
+        fieldType: FieldType.Select,
       },
     ],
     [
@@ -280,40 +360,6 @@ const AlgoControl = (props: Props) => {
         prefix: "$",
         validation: "Cannot be lower than Minimum Bid Order!",
       },
-    ],
-    [
-      {
-        fieldNames: ["best_bid_price_range"],
-        fieldTitle: "Lower Best Range / Best Bid",
-        fieldType: FieldType.Input,
-        suffix: "%",
-        validation: "Must be higher than half the spread, and must be positive!",
-      },
-      {
-        fieldNames: ["best_bid_price_range"],
-        fieldTitle: "Lower Best Range Price / Best Bid Price",
-        fieldType: FieldType.Output,
-        prefix: "$",
-        output: bestBidPriceInUSD,
-      },
-      // {
-      //   fieldNames: ["best_bid_price_range"],
-      //   fieldTitle: "Lower Best Range Quantity",
-      //   fieldType: FieldType.Output,
-      //   output: orderBook.bid
-      //     .filter((bid, i) => bid[0] <= (bestBidPriceInUSD ? bestBidPriceInUSD : orderBookSpotPrice))
-      //     .reduce((acc, next) => acc + next[1], 0),
-      // },
-      {
-        fieldNames: ["best_bid_order_depth"],
-        fieldTitle: "Best Bid Order Depth",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation:
-          "Cannot be higher than amount of capital available ($" +
-          capitalMaximumBid.toFixed(4) +
-          "), and must be positive!",
-      },
       {
         fieldNames: ["best_bid_random_walk"],
         fieldTitle: "Random Walk (Best Bid)",
@@ -321,20 +367,6 @@ const AlgoControl = (props: Props) => {
       },
     ],
     [
-      {
-        fieldNames: ["total_bid_price_range"],
-        fieldTitle: "Lower Total Range / Total Bid",
-        fieldType: FieldType.Input,
-        suffix: "%",
-        validation: "Must be higher than Lower Best Range / Best Bid, and must be positive!",
-      },
-      {
-        fieldNames: ["total_bid_price_range"],
-        fieldTitle: "Lower Total Range Price / Total Bid Price",
-        fieldType: FieldType.Output,
-        prefix: "$",
-        output: totalBidPriceInUSD,
-      },
       // {
       //   fieldNames: ["total_bid_price_range"],
       //   fieldTitle: "Lower Total Range Quantity",
@@ -346,16 +378,6 @@ const AlgoControl = (props: Props) => {
       //     )
       //     .reduce((acc, next) => acc + next[1], 0),
       // },
-      {
-        fieldNames: ["total_bid_order_depth"],
-        fieldTitle: "Total Bid Order Depth",
-        fieldType: FieldType.Input,
-        prefix: "$",
-        validation:
-          "Cannot be higher than amount of capital available ($" +
-          capitalMaximumBid.toFixed(4) +
-          "), and must be positive!",
-      },
       {
         fieldNames: ["total_bid_random_walk"],
         fieldTitle: "Random Walk (Total Bid)",
@@ -549,8 +571,11 @@ const AlgoControl = (props: Props) => {
   };
 
   const renderField = (f: Field, i: number) => (
-    <div key={i} className={"field col" + (f.fieldNames.some((fn) => !compare[fn]) ? " highlighted" : "")}>
-      <span>{f.fieldTitle}</span>
+    <div
+      key={i}
+      className={"field " + (f.gap ? "gap" : "col") + (f.fieldNames.some((fn) => !compare[fn]) ? " highlighted" : "")}
+    >
+      {!f.hideLabel && <span>{f.fieldTitle}</span>}
       {f.fieldType !== FieldType.Output && (
         <b>
           {f.prefix}
@@ -722,11 +747,31 @@ const AlgoControl = (props: Props) => {
       </div>
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>
-        {orderBookAlgoFieldGroups.map((fg, i) => (
+        <div className="headers ask">
+          <div className="header">Offers - Order Book</div>
+          <div className="header">Ref. Price - Offers</div>
+          <div className="header">% Above Spot</div>
+          <div className="header">Total Offers Depth (USD)</div>
+        </div>
+        {AskFieldGroups1.map((fg, i) => (
           <div className="field-group" key={"fg" + i}>
             {fg.map((f, j) => renderField(f, 3 + j))}
           </div>
         ))}
+        <div className="headers bid">
+          <div className="header">Bids - Order Book</div>
+          <div className="header">Ref. Price - Bids</div>
+          <div className="header">% Below Spot</div>
+          <div className="header">Total Bids Depth (USD)</div>
+        </div>
+        {BidFieldGroups1.map((fg, i) => (
+          <div className="field-group" key={"fg" + i}>
+            {fg.map((f, j) => renderField(f, 3 + j))}
+          </div>
+        ))}
+        {/* <div className="header">Tilt - Total Offers Depth</div>
+          <div className="header">Min Order Size (USD)/Slice</div>
+          <div className="header">Max Order Size (USD)/Slice</div> */}
       </div>
     </div>
   );
