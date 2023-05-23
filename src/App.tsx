@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
@@ -84,7 +84,7 @@ export type Alert = {
   specific_config: any;
 };
 
-const tabs = ["Home Panel", "Algos Control", "Intervention Control"];
+const tabs = ["Home Panel", "Algos Control", "Intervention Control", "Alert Control"];
 
 const websocket = new WebSocket("ws://192.168.1.43:8055");
 
