@@ -164,7 +164,7 @@ const AlgoControl = (props: Props) => {
     [
       {
         fieldNames: ["total_ask_price_range"],
-        fieldTitle: "Outer Offer Bound Price",
+        fieldTitle: "Outer Offer Bound Price:",
         fieldType: FieldType.Output,
         prefix: "$",
         output: totalAskPriceInUSD,
@@ -193,7 +193,7 @@ const AlgoControl = (props: Props) => {
     [
       {
         fieldNames: ["best_ask_price_range"],
-        fieldTitle: "Inner Offer Bound Price",
+        fieldTitle: "Inner Offer Bound Price:",
         fieldType: FieldType.Output,
         prefix: "$",
         output: bestAskPriceInUSD,
@@ -224,7 +224,7 @@ const AlgoControl = (props: Props) => {
     [
       {
         fieldNames: ["best_bid_price_range"],
-        fieldTitle: "Inner Bid Bound Price",
+        fieldTitle: "Inner Bid Bound Price:",
         fieldType: FieldType.Output,
         prefix: "$",
         output: bestBidPriceInUSD,
@@ -254,7 +254,7 @@ const AlgoControl = (props: Props) => {
     [
       {
         fieldNames: ["total_bid_price_range"],
-        fieldTitle: "Outer Bid Bound Price",
+        fieldTitle: "Outer Bid Bound Price:",
         fieldType: FieldType.Output,
         prefix: "$",
         output: totalBidPriceInUSD,
@@ -366,6 +366,7 @@ const AlgoControl = (props: Props) => {
         fieldTitle: "Price Gap",
         fieldType: FieldType.Input,
         suffix: "%",
+        hideLabel: true,
         gap: true,
         extended: true,
       },
@@ -776,8 +777,8 @@ const AlgoControl = (props: Props) => {
       <div className="order-book-depth">
         <h1>Order Book Depth</h1>
         <div className="headers ask">
-          <div className="header">Offers - Order Book</div>
-          <div className="header">Ref. Price - Offers</div>
+          <div className="header">Offer Bounds</div>
+          <div className="header"></div>
           <div className="header">% Above Spot</div>
           <div className="header">Total Offers Depth (USD)</div>
         </div>
@@ -787,8 +788,8 @@ const AlgoControl = (props: Props) => {
           </div>
         ))}
         <div className="headers bid">
-          <div className="header">Bids - Order Book</div>
-          <div className="header">Ref. Price - Bids</div>
+          <div className="header">Bid Bounds</div>
+          <div className="header"></div>
           <div className="header">% Below Spot</div>
           <div className="header">Total Bids Depth (USD)</div>
         </div>
@@ -824,8 +825,8 @@ const AlgoControl = (props: Props) => {
         ))}
         <h1>Spread</h1>
         <div className="headers spread">
-          <div className="header">Spread - Order Book</div>
-          <div className="header">Allowance</div>
+          <div className="header">Spread</div>
+          <div className="header text-align-right">(Price Gap Allowance)</div>
         </div>
         {SpreadFieldGroups1.map((fg, i) => (
           <div className="field-group spread" key={"fg" + i}>
@@ -833,8 +834,8 @@ const AlgoControl = (props: Props) => {
           </div>
         ))}
         <div className="headers spread">
-          <div className="header">Spread - Order Book</div>
-          <div className="header">Allowance</div>
+          <div className="header"></div>
+          <div className="header text-align-right">Reference Price</div>
         </div>
         {SpreadFieldGroups2.map((fg, i) => (
           <div className="field-group spread" key={"fg" + i}>

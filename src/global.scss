@@ -165,15 +165,16 @@
         margin-bottom: 8px;
         padding: 8px;
         border: 1px solid white;
+
         .field {
           width: 25%;
+
           &.gap {
-            width: 35%;
-            padding-right: 15%;
-            justify-content: space-between;
+            width: 50%;
             &.extended {
               width: 100%;
               padding-right: 0;
+              justify-content: space-between;
             }
           }
         }
@@ -211,6 +212,9 @@
           }
           .header {
             width: 25%;
+            &.text-align-right {
+              text-align: right;
+            }
           }
         }
       }
