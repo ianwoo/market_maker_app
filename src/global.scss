@@ -233,6 +233,63 @@
           margin-bottom: 16px;
         }
       }
+      .order-book-shape-wrapper {
+        margin-top: 69px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .outer-bounds {
+          display: flex;
+          padding: 8px;
+          .bound {
+            display: flex;
+            flex-direction: column;
+            &.spot {
+              color: orange;
+            }
+            &.text-align-right {
+              text-align: right;
+            }
+          }
+        }
+        .order-book-shape {
+          display: flex;
+          justify-content: center;
+          .shape {
+            height: 69px;
+            transition: width 0.5s;
+            &.asks {
+              background: red;
+              border-right: 3px solid white;
+            }
+            &.spot {
+              background: orange;
+              width: 3px;
+            }
+            &.bids {
+              background: darkblue;
+              border-left: 3px solid white;
+            }
+            .tilt-blackout {
+              width: 0;
+              height: 0;
+            }
+          }
+        }
+        .inner-bounds {
+          display: flex;
+          justify-content: center;
+          padding: 8px;
+          gap: 25px;
+          .bound {
+            display: flex;
+            flex-direction: column;
+            &.text-align-right {
+              text-align: right;
+            }
+          }
+        }
+      }
       .order-book-depth {
         width: 100%;
         //copied from field-group
