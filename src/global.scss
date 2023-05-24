@@ -1,6 +1,50 @@
 .App {
   background: black;
   color: white;
+  .project {
+    display: flex;
+    flex-direction: column;
+    background: darkgrey;
+    height: 69px;
+    padding: 0 0 8px 0;
+    overflow: hidden;
+    &.collapsed {
+      height: 22px;
+      .project-dropdown-wrapper {
+        .project-dropdown {
+          height: 0;
+          padding: 0;
+        }
+      }
+    }
+
+    .project-dropdown-wrapper {
+      display: flex;
+      .project-dropdown {
+        width: 225px;
+        height: auto;
+        padding: 16px;
+        margin-left: 8px;
+        background: black;
+        color: white;
+        font-size: 16px;
+        transition: padding 0.5s, height 0.5s;
+        border: 0;
+      }
+    }
+    .collapse {
+      background: darkgrey;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      color: black;
+      font-size: 16px;
+      cursor: pointer;
+      &:hover {
+        background: lightgrey;
+      }
+    }
+  }
   .tabs {
     display: flex;
     background: darkgrey;
@@ -30,8 +74,6 @@
     }
   }
   .component {
-    padding-left: 8px;
-
     .login {
       height: 100vh;
       display: flex;
@@ -49,6 +91,7 @@
     .home {
       height: 100vh;
       .currentCapitalBalance {
+        padding-left: 8px;
         .accounts {
           text-align: center;
           display: flex;
@@ -119,7 +162,8 @@
         right: 0;
         height: 69px;
         gap: 10px;
-        margin: 8px;
+        padding: 8px;
+        background: darkgrey;
 
         .templates-wrapper {
           height: 120px;

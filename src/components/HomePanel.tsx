@@ -1,12 +1,31 @@
 type Props = {
   accountUpdate: any;
+  collapsed: boolean;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const HomePanel = (props: Props) => {
-  const { accountUpdate } = props;
+  const { accountUpdate, collapsed, setCollapsed } = props;
 
   return (
     <div className="home">
+      <div className={"project" + (collapsed ? " collapsed" : "")}>
+        <div className="project-dropdown-wrapper">
+          <select className="project-dropdown">
+            <option>Project 1</option>
+          </select>
+        </div>
+        {collapsed && (
+          <div className="collapse" onClick={() => setCollapsed(false)}>
+            &#9660;
+          </div>
+        )}
+        {!collapsed && (
+          <div className="collapse" onClick={() => setCollapsed(true)}>
+            &#9650;
+          </div>
+        )}
+      </div>
       <div className="currentCapitalBalance">
         <h1>Current Capital Balance</h1>
         <div className="accounts">

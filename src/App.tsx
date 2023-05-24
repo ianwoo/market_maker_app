@@ -96,6 +96,8 @@ function App() {
   const [accountUpdate, setAccountUpdate] = useState<AccountUpdate[]>([]);
   const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
 
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+
   const [cancellingPriceRanges, setCancellingPriceRanges] = useState<PriceRange[]>([]);
 
   const [configsLoaded, setConfigsLoaded] = useState<boolean>(false);
@@ -180,7 +182,7 @@ function App() {
 
   const components = useMemo(
     () => [
-      <HomePanel key="home" accountUpdate={accountUpdate} />,
+      <HomePanel key="home" accountUpdate={accountUpdate} collapsed={collapsed} setCollapsed={setCollapsed} />,
       // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
       <AlgoControl
         key="control"
@@ -211,6 +213,7 @@ function App() {
       accountUpdate,
       orderBookUpdate,
       orderBookSpotPrice,
+      collapsed,
       cancellingPriceRanges,
       configsLoaded,
       config,
@@ -236,6 +239,27 @@ function App() {
             </div>
           ))}
       </div>
+      {selectedTabIdx !== 0 && (
+        <div className={"project" + (collapsed ? " collapsed" : "")}>
+          <div className="project-dropdown-wrapper">
+            <div className="project-dropdown">Project 1</div>
+            <select className="project-dropdown exchange">
+              <option>Bybit</option>
+              <option>Binance</option>
+            </select>
+          </div>
+          {collapsed && (
+            <div className="collapse" onClick={() => setCollapsed(false)}>
+              &#9660;
+            </div>
+          )}
+          {!collapsed && (
+            <div className="collapse" onClick={() => setCollapsed(true)}>
+              &#9650;
+            </div>
+          )}
+        </div>
+      )}
       <div className="component">
         {!loggedIn && socketOpen && <Login websocket={websocket} />}
         {loggedIn && components[selectedTabIdx]}
