@@ -776,7 +776,7 @@ const AlgoControl = (props: Props) => {
         <div className="field-group">{volAlgoFields.map((f, i) => renderField(f, i))}</div>
       </div>
       <OrderBookShape
-        config={config}
+        configEdit={configEdit}
         totalAskPriceInUSD={totalAskPriceInUSD}
         totalBidPriceInUSD={totalBidPriceInUSD}
         bestAskPriceInUSD={bestAskPriceInUSD}
