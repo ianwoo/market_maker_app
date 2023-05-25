@@ -4,22 +4,36 @@ import { OrderBookUpdate } from "../App";
 
 type Props = {
   logarithmic: boolean;
-  concatenated: [number, number][];
+  aggregate: boolean;
+  yDomain: [number, number];
   orderBookUpdate: OrderBookUpdate[];
+  aggregateAsks: [number, number][];
+  aggregateBids: [number, number][];
   chartSupplyUSD: boolean;
   orderBookIdx: number;
   orderBookSpotPrice: number;
 };
 
 const OrderBookChart = (props: Props) => {
-  const { logarithmic, concatenated, orderBookUpdate, chartSupplyUSD, orderBookIdx, orderBookSpotPrice } = props;
+  const {
+    logarithmic,
+    aggregate,
+    yDomain,
+    orderBookUpdate,
+    aggregateAsks,
+    aggregateBids,
+    chartSupplyUSD,
+    orderBookIdx,
+    orderBookSpotPrice,
+  } = props;
+
   return (
     <VictoryChart
       scale={logarithmic ? { y: "log" } : undefined}
       domain={
         logarithmic
           ? {
-              y: [concatenated.sort((a, b) => a[1] - b[1])[0][1], concatenated.sort((a, b) => b[1] - a[1])[0][1]],
+              y: yDomain,
             }
           : undefined
       }
@@ -27,7 +41,7 @@ const OrderBookChart = (props: Props) => {
       <VictoryBar
         barWidth={2}
         style={{ data: { fill: "red" } }}
-        data={orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) => ({
+        data={(aggregate ? aggregateAsks : orderBookUpdate[orderBookIdx][OrderType.Ask]).map((o, i) => ({
           x: o[0],
           y: chartSupplyUSD ? o[1] * o[0] : o[1],
         }))}
@@ -35,7 +49,7 @@ const OrderBookChart = (props: Props) => {
       <VictoryBar
         barWidth={2}
         style={{ data: { fill: "blue" } }}
-        data={orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) => ({
+        data={(aggregate ? aggregateBids : orderBookUpdate[orderBookIdx][OrderType.Bid]).map((o, i) => ({
           x: o[0],
           y: chartSupplyUSD ? o[1] * o[0] : o[1],
         }))}

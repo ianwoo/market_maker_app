@@ -63,6 +63,7 @@ const Intervention = (props: Props) => {
   const [hideChart, setHideChart] = useState<boolean>(false);
   const [chartSupplyUSD, setChartSupplyUSD] = useState<boolean>(false);
   const [logarithmic, setLogarithmic] = useState<boolean>(false);
+  const [aggregate, setAggregate] = useState<boolean>(false);
 
   const cancelOrders = () => {
     selectedPriceRanges.forEach((pr, i) => {
@@ -219,6 +220,36 @@ const Intervention = (props: Props) => {
     [orderBookSpotPrice, aboveOfferRangeInc, highlightedGroups, orderType, orders, priceRangeInc, selectedPriceRanges]
   );
 
+  const aggregateAsks = useMemo(
+    () =>
+      orderBookUpdate[orderBookIdx][OrderType.Ask].map((o, i) =>
+        orderBookUpdate[orderBookIdx][OrderType.Ask].reduce(
+          (acc: [number, number], next: [number, number], j: number) => {
+            const price = next[0];
+            const supply = next[1];
+            return [o[0], price <= o[0] ? supply + acc[1] : acc[1]];
+          },
+          [o[0], o[1]]
+        )
+      ),
+    [orderBookIdx, orderBookUpdate]
+  );
+
+  const aggregateBids = useMemo(
+    () =>
+      orderBookUpdate[orderBookIdx][OrderType.Bid].map((o, i) =>
+        orderBookUpdate[orderBookIdx][OrderType.Bid].reduce(
+          (acc: [number, number], next: [number, number], j: number) => {
+            const price = next[0];
+            const supply = next[1];
+            return [o[0], price >= o[0] ? supply + acc[1] : acc[1]];
+          },
+          [o[0], o[1]]
+        )
+      ),
+    [orderBookIdx, orderBookUpdate]
+  );
+
   const cancellations = useMemo(
     () =>
       cancellingPriceRanges.map((cpr, i) => (
@@ -328,12 +359,22 @@ const Intervention = (props: Props) => {
                 <span>Logarithmic Scaling</span>
                 <input type="checkbox" onChange={() => setLogarithmic(!logarithmic)} />
               </div>
+              <div className="field gap">
+                <span>Aggregated Supply At Price</span>
+                <input type="checkbox" onChange={() => setAggregate(!aggregate)} />
+              </div>
             </div>
             {!hideChart && (
               <OrderBookChart
                 logarithmic={logarithmic}
-                concatenated={concatenated}
+                aggregate={aggregate}
+                yDomain={[
+                  (aggregate ? aggregateBids : concatenated).sort((a, b) => a[1] - b[1])[0][1],
+                  (aggregate ? aggregateAsks : concatenated).sort((a, b) => b[1] - a[1])[0][1],
+                ]}
                 orderBookUpdate={orderBookUpdate}
+                aggregateAsks={aggregateAsks}
+                aggregateBids={aggregateBids}
                 chartSupplyUSD={chartSupplyUSD}
                 orderBookIdx={orderBookIdx}
                 orderBookSpotPrice={orderBookSpotPrice}
