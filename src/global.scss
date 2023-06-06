@@ -522,6 +522,9 @@
     }
 
     .alerts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
       .fixed-buttons {
         display: flex;
         position: fixed;
@@ -536,6 +539,22 @@
         }
         .stop-alerts {
           background: wheat;
+        }
+      }
+      .alert {
+        &.editing {
+          display: flex;
+        }
+        .config {
+          display: flex;
+          justify-content: space-between;
+          .google_sheets_map {
+            display: flex;
+            flex-direction: column;
+            .prop {
+              margin-left: 16px;
+            }
+          }
         }
       }
     }
