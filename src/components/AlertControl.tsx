@@ -13,6 +13,7 @@ const AlertControl = (props: Props) => {
     websocket.send(
       JSON.stringify({
         action: "GET_ALERTS",
+        account: "bybit_dev_mm1", //HARDCODED
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
       })
     );
@@ -37,6 +38,8 @@ const AlertControl = (props: Props) => {
       })
     );
   };
+
+  console.log(alerts);
 
   return (
     <div className="alerts">

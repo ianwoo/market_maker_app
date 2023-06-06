@@ -250,6 +250,19 @@ const Intervention = (props: Props) => {
     [orderBookIdx, orderBookUpdate]
   );
 
+  const concatenated = useMemo(
+    () => orderBookUpdate[orderBookIdx][OrderType.Bid].concat(orderBookUpdate[orderBookIdx][OrderType.Ask]),
+    [orderBookUpdate, orderBookIdx]
+  );
+
+  const yDomain: [number, number] = useMemo(
+    () => [
+      (aggregate ? aggregateBids : concatenated).sort((a, b) => a[1] - b[1])[0][1],
+      (aggregate ? aggregateAsks : concatenated).sort((a, b) => b[1] - a[1])[0][1],
+    ],
+    [aggregate, aggregateAsks, aggregateBids, concatenated]
+  );
+
   const cancellations = useMemo(
     () =>
       cancellingPriceRanges.map((cpr, i) => (
@@ -270,10 +283,6 @@ const Intervention = (props: Props) => {
         </div>
       )),
     [setCancellingPriceRanges, cancellingPriceRanges]
-  );
-
-  const concatenated = orderBookUpdate[orderBookIdx][OrderType.Bid].concat(
-    orderBookUpdate[orderBookIdx][OrderType.Ask]
   );
 
   return (
@@ -368,10 +377,7 @@ const Intervention = (props: Props) => {
               <OrderBookChart
                 logarithmic={logarithmic}
                 aggregate={aggregate}
-                yDomain={[
-                  (aggregate ? aggregateBids : concatenated).sort((a, b) => a[1] - b[1])[0][1],
-                  (aggregate ? aggregateAsks : concatenated).sort((a, b) => b[1] - a[1])[0][1],
-                ]}
+                yDomain={yDomain}
                 orderBookUpdate={orderBookUpdate}
                 aggregateAsks={aggregateAsks}
                 aggregateBids={aggregateBids}
