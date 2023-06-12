@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AlgoControl from "./components/AlgoControl";
 import HomePanel from "./components/HomePanel";
 import Intervention from "./components/Intervention";
@@ -82,6 +82,7 @@ export type Alert = {
   alert_id: string; //ex. token_inflow_outflow_AGIX_DEV_1
   common_config: AlertCommonConfig;
   specific_config: any;
+  status: boolean;
 };
 
 const tabs = ["Home Panel", "Algos Control", "Intervention Control", "Alert Control"];
@@ -92,7 +93,8 @@ function App() {
   const [socketOpen, setSocketOpen] = useState<boolean>(false);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
-  const [projectName, setProjectName] = useState<string>("");
+  const [projectName, setProjectName] = useState<string>(""); //selected project
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [allProjects, setAllProjects] = useState<string[]>([]);
   const [algoAccounts, setAlgoAccounts] = useState<string[]>([]);
   const [manualAccounts, setManualAccounts] = useState<string[]>([]);
@@ -130,6 +132,10 @@ function App() {
         : 0,
     [allOrderBookUpdates, projectName]
   );
+
+  useEffect(() => {
+    selectedTabIdx === 1 && !algoAccounts.includes(selectedAccount) && setSelectedAccount(algoAccounts[0]);
+  }, [selectedTabIdx, algoAccounts, selectedAccount]);
 
   websocket.addEventListener("open", () => {
     setSocketOpen(true);
@@ -179,6 +185,7 @@ function App() {
     if (message.action === "GET_PROJECT_INFO") {
       setAlgoAccounts(message.algo_account);
       setManualAccounts(message.manual_account);
+      setSelectedAccount(message.algo_account[0]);
     }
     if (message.action === "GET_CONFIG") {
       setConfig(JSON.parse(message.result));
@@ -248,7 +255,7 @@ function App() {
               websocket={websocket}
               alerts={alerts}
               projectName={projectName}
-              selectedAccount={algoAccounts[0]}
+              selectedAccount={selectedAccount}
             />,
           ]
         : [],
@@ -267,6 +274,7 @@ function App() {
       selectedTemplate,
       alerts,
       algoAccounts,
+      selectedAccount,
     ]
   );
 
@@ -299,9 +307,11 @@ function App() {
                 </option>
               ))}
             </select>
-            <select className="project-dropdown account">
-              {algoAccounts.concat(manualAccounts).map((a, i) => (
-                <option key={i}>{a}</option>
+            <select className="project-dropdown account" onChange={(e) => setSelectedAccount(e.target.value)}>
+              {(selectedTabIdx !== 1 ? algoAccounts.concat(manualAccounts) : algoAccounts).map((a, i) => (
+                <option key={i} value={a}>
+                  {a}
+                </option>
               ))}
             </select>
           </div>

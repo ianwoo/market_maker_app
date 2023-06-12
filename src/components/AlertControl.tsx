@@ -25,6 +25,17 @@ const AlertControl = (props: Props) => {
     );
   }, [websocket, projectName, selectedAccount]);
 
+  const getAlerts = () => {
+    websocket.send(
+      JSON.stringify({
+        action: "GET_ALERTS",
+        project: projectName,
+        account: selectedAccount,
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+      })
+    );
+  };
+
   //start/stop ALL alerts in account
   const startAlerts = () => {
     websocket.send(
@@ -36,6 +47,7 @@ const AlertControl = (props: Props) => {
         status: true,
       })
     );
+    getAlerts();
   };
 
   //start/stop ALL alerts in account
@@ -51,7 +63,7 @@ const AlertControl = (props: Props) => {
     );
   };
 
-  const startAlert = (alertId: number) => {
+  const startAlert = (alertId: string) => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP_ALERT",
@@ -61,9 +73,10 @@ const AlertControl = (props: Props) => {
         status: true,
       })
     );
+    getAlerts();
   };
 
-  const stopAlert = (alertId: number) => {
+  const stopAlert = (alertId: string) => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP_ALERT",
@@ -73,6 +86,7 @@ const AlertControl = (props: Props) => {
         status: false,
       })
     );
+    getAlerts();
   };
 
   const setAlert = (alertId: string) => {
@@ -85,14 +99,7 @@ const AlertControl = (props: Props) => {
         alert: editingAlert,
       })
     );
-    websocket.send(
-      JSON.stringify({
-        action: "GET_ALERTS",
-        project: projectName,
-        account: selectedAccount,
-        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
-      })
-    );
+    getAlerts();
   };
 
   return (
@@ -107,6 +114,8 @@ const AlertControl = (props: Props) => {
       </div>
       {alerts.map((a, i) => (
         <div className="alert" key={i}>
+          {a.status && <button onClick={() => startAlert(a.alert_id)}>STOP</button>}
+          {!a.status && <button onClick={() => stopAlert(a.alert_id)}>START</button>}
           {editingAlertIdx !== i
             ? [
                 <h4>Common Configurations</h4>,
@@ -124,7 +133,7 @@ const AlertControl = (props: Props) => {
               ]
             : editingAlert !== undefined
             ? [
-                <h4>Common Configurations</h4>,
+                <h4 key="h4">Common Configurations</h4>,
                 Object.entries(editingAlert.common_config).map((cc, j) => (
                   <div className={"config common-config editing " + cc[0]} key={j}>
                     <span>{cc[0]}</span>
