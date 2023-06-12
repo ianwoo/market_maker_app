@@ -4,6 +4,7 @@ import SweepAndPeg from "./SweepAndPeg";
 import OrderBookChart from "./OrderBookChart";
 
 type Props = {
+  projectName: string;
   orderBookUpdate: OrderBookUpdate[];
   accountUpdate: AccountUpdate[];
   orderBookSpotPrice: number;
@@ -37,6 +38,7 @@ const countDecimals = function (value: number) {
 
 const Intervention = (props: Props) => {
   const {
+    projectName,
     orderBookUpdate,
     accountUpdate,
     orderBookSpotPrice,
@@ -72,6 +74,7 @@ const Intervention = (props: Props) => {
       websocket.send(
         JSON.stringify({
           action: "CANCEL_ORDERS",
+          project: projectName,
           account: cancelAccount,
           request_id: id, //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
           from_px: pr.from,
@@ -453,7 +456,7 @@ const Intervention = (props: Props) => {
           </div>
           {renderedBook}
         </div>
-        <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} />
+        <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} projectName={projectName} />
       </div>
     </div>
   );

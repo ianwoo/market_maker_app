@@ -25,32 +25,63 @@ const AlertControl = (props: Props) => {
     );
   }, [websocket, projectName, selectedAccount]);
 
-  const startAlert = () => {
+  //start/stop ALL alerts in account
+  const startAlerts = () => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP_ALERT",
+        project: projectName,
+        account: selectedAccount,
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
         status: true,
       })
     );
   };
 
-  const stopAlert = () => {
+  //start/stop ALL alerts in account
+  const stopAlerts = () => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP_ALERT",
+        project: projectName,
+        account: selectedAccount,
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
         status: false,
       })
     );
   };
 
-  const setAlert = (rid: string) => {
+  const startAlert = (alertId: number) => {
+    websocket.send(
+      JSON.stringify({
+        action: "START_STOP_ALERT",
+        project: projectName,
+        alert_id: alertId,
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        status: true,
+      })
+    );
+  };
+
+  const stopAlert = (alertId: number) => {
+    websocket.send(
+      JSON.stringify({
+        action: "START_STOP_ALERT",
+        project: projectName,
+        alert_id: alertId,
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        status: false,
+      })
+    );
+  };
+
+  const setAlert = (alertId: string) => {
     if (!editingAlert) return;
     websocket.send(
       JSON.stringify({
         action: "SET_ALERT",
-        request_id: rid,
+        project: projectName,
+        alert_id: alertId,
         alert: editingAlert,
       })
     );
@@ -59,10 +90,10 @@ const AlertControl = (props: Props) => {
   return (
     <div className="alerts">
       <div className="fixed-buttons">
-        <button className="stop-alerts" onClick={() => stopAlert()}>
+        <button className="stop-alerts" onClick={() => stopAlerts()}>
           STOP ALERTS
         </button>
-        <button className="start-alerts" onClick={() => startAlert()}>
+        <button className="start-alerts" onClick={() => startAlerts()}>
           START ALERTS
         </button>
       </div>

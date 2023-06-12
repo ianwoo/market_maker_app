@@ -520,6 +520,7 @@ const AlgoControl = (props: Props) => {
     websocket.send(
       JSON.stringify({
         action: "UPDATE_CONFIG",
+        project: projectName,
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
         update_params: configEdit,
       })
@@ -550,6 +551,7 @@ const AlgoControl = (props: Props) => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP",
+        project: projectName,
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
         type: type,
         status: true,
@@ -561,6 +563,7 @@ const AlgoControl = (props: Props) => {
     websocket.send(
       JSON.stringify({
         action: "START_STOP",
+        project: projectName,
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
         type: type,
         status: false,

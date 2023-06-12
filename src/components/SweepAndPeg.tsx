@@ -4,6 +4,7 @@ import { AccountUpdate } from "../App";
 type Props = {
   websocket: WebSocket;
   accountUpdate: AccountUpdate[];
+  projectName: string;
 };
 
 enum Side {
@@ -13,6 +14,7 @@ enum Side {
 
 type SweepAndPegCall = {
   action: string;
+  project: string;
   request_id: number;
   side: Side; //BUY or SELL
   account: string;
@@ -25,7 +27,7 @@ type SweepAndPegCall = {
 };
 
 const SweepAndPeg = (props: Props) => {
-  const { websocket, accountUpdate } = props;
+  const { websocket, accountUpdate, projectName } = props;
 
   // const [selected, setSelected] = useState<Tab>(0);
   const [pegAdditionalOrders, setPegAdditionalOrders] = useState<boolean>(false);
@@ -80,6 +82,7 @@ const SweepAndPeg = (props: Props) => {
     if (pegAdditionalOrders && (!addFromPrice || !addToPrice || !addNumberOrders || !pegAmount)) return;
     let payload: SweepAndPegCall = {
       action: "SWEEP_AND_PEG",
+      project: projectName,
       side: side,
       request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
       account: SPAccount,

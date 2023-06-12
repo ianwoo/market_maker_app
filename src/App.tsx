@@ -179,14 +179,10 @@ function App() {
       );
     }
     if (message.action === "GET_PROJECT_INFO") {
-      console.log("got project info");
-      console.log(message);
       setAlgoAccounts(message.algo_account);
       setManualAccounts(message.manual_account);
     }
     if (message.action === "GET_CONFIG") {
-      console.log("got config");
-      console.log(message);
       setConfig(JSON.parse(message.result));
       setConfigEdit(JSON.parse(message.result));
       setConfigsLoaded(true);
@@ -240,6 +236,7 @@ function App() {
             />,
             <Intervention
               key="intervention"
+              projectName={projectName}
               orderBookUpdate={allOrderBookUpdates[projectName]}
               accountUpdate={allAccountUpdates[projectName]}
               orderBookSpotPrice={orderBookSpotPrice}
