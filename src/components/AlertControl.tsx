@@ -85,6 +85,14 @@ const AlertControl = (props: Props) => {
         alert: editingAlert,
       })
     );
+    websocket.send(
+      JSON.stringify({
+        action: "GET_ALERTS",
+        project: projectName,
+        account: selectedAccount,
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+      })
+    );
   };
 
   return (
