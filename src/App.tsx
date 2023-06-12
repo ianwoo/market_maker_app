@@ -93,6 +93,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   const [projectName, setProjectName] = useState<string>("");
+  const [allProjects, setAllProjects] = useState<string[]>([]);
   const [algoAccounts, setAlgoAccounts] = useState<string[]>([]);
   const [manualAccounts, setManualAccounts] = useState<string[]>([]);
 
@@ -137,10 +138,6 @@ function App() {
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
 
-    console.log("message");
-    console.log(projectName);
-    console.log(message);
-
     //type
     message.type === "ACCOUNT_UPDATE_REQ" && setAllAccountUpdates(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE_REQ" && setAllOrderBookUpdates(JSON.parse(message.content));
@@ -158,6 +155,7 @@ function App() {
       setCancellingPriceRanges(priceRangesCopy);
     }
     if (message.action === "2FA" && message.result) {
+      setAllProjects(message.projects);
       setProjectName(message.projects[0]);
       websocket.send(
         JSON.stringify({
@@ -216,6 +214,8 @@ function App() {
               accountUpdate={allAccountUpdates[projectName]}
               collapsed={collapsed}
               setCollapsed={setCollapsed}
+              projectName={projectName}
+              allProjects={allProjects}
             />,
             // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
             <AlgoControl
@@ -255,6 +255,7 @@ function App() {
     [
       allAccountUpdates,
       allOrderBookUpdates,
+      allProjects,
       projectName,
       orderBookSpotPrice,
       collapsed,
@@ -291,10 +292,15 @@ function App() {
       {selectedTabIdx !== 0 && (
         <div className={"project" + (collapsed ? " collapsed" : "")}>
           <div className="project-dropdown-wrapper">
-            <div className="project-dropdown">Project 1</div>
-            <select className="project-dropdown exchange">
-              <option>Bybit</option>
-              <option>Binance</option>
+            <select className="project-dropdown">
+              {allProjects.map((p, i) => (
+                <option key={i}>{p}</option>
+              ))}
+            </select>
+            <select className="project-dropdown account">
+              {algoAccounts.concat(manualAccounts).map((a, i) => (
+                <option key={i}>{a}</option>
+              ))}
             </select>
           </div>
           {collapsed && (

@@ -4,6 +4,8 @@ type Props = {
   accountUpdate: any;
   collapsed: boolean;
   setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  projectName: string;
+  allProjects: string[];
 };
 
 const dummyData = [
@@ -14,14 +16,16 @@ const dummyData = [
 ];
 
 const HomePanel = (props: Props) => {
-  const { accountUpdate, collapsed, setCollapsed } = props;
+  const { accountUpdate, collapsed, setCollapsed, projectName, allProjects } = props;
 
   return (
     <div className="home">
       <div className={"project" + (collapsed ? " collapsed" : "")}>
         <div className="project-dropdown-wrapper">
           <select className="project-dropdown">
-            <option>Project 1</option>
+            {allProjects.map((p, i) => (
+              <option key={i}>{p}</option>
+            ))}
           </select>
         </div>
         {collapsed && (
