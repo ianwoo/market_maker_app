@@ -214,8 +214,8 @@ function App() {
               accountUpdate={allAccountUpdates[projectName]}
               collapsed={collapsed}
               setCollapsed={setCollapsed}
-              projectName={projectName}
               allProjects={allProjects}
+              setProjectName={setProjectName}
             />,
             // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
             <AlgoControl
@@ -292,9 +292,11 @@ function App() {
       {selectedTabIdx !== 0 && (
         <div className={"project" + (collapsed ? " collapsed" : "")}>
           <div className="project-dropdown-wrapper">
-            <select className="project-dropdown">
+            <select className="project-dropdown" onChange={(e) => setProjectName(e.target.value)}>
               {allProjects.map((p, i) => (
-                <option key={i}>{p}</option>
+                <option key={i} value={p}>
+                  {p}
+                </option>
               ))}
             </select>
             <select className="project-dropdown account">
