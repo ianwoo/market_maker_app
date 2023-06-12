@@ -206,6 +206,7 @@ function App() {
       );
     }
     if (message.action === "GET_ALERTS") {
+      console.log(message);
       setAlerts(JSON.parse(message.result));
     }
   };
@@ -246,7 +247,12 @@ function App() {
               setCancellingPriceRanges={setCancellingPriceRanges}
               websocket={websocket}
             />,
-            <AlertControl websocket={websocket} alerts={alerts} />,
+            <AlertControl
+              websocket={websocket}
+              alerts={alerts}
+              projectName={projectName}
+              selectedAccount={algoAccounts[0]}
+            />,
           ]
         : [],
     [
@@ -262,6 +268,7 @@ function App() {
       templates,
       selectedTemplate,
       alerts,
+      algoAccounts,
     ]
   );
 

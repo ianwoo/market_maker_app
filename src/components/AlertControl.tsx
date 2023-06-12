@@ -4,10 +4,12 @@ import { Alert } from "../App";
 type Props = {
   websocket: WebSocket;
   alerts: Alert[];
+  projectName: string;
+  selectedAccount: string;
 };
 
 const AlertControl = (props: Props) => {
-  const { websocket, alerts } = props;
+  const { websocket, alerts, projectName, selectedAccount } = props;
 
   const [editingAlertIdx, setEditingAlertIdx] = useState<number>(-1);
   const [editingAlert, setEditingAlert] = useState<Alert | undefined>();
@@ -16,11 +18,12 @@ const AlertControl = (props: Props) => {
     websocket.send(
       JSON.stringify({
         action: "GET_ALERTS",
-        account: "bybit_dev_mm1", //HARDCODED
+        project: projectName,
+        account: selectedAccount,
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
       })
     );
-  }, [websocket]);
+  }, [websocket, projectName, selectedAccount]);
 
   const startAlert = () => {
     websocket.send(
