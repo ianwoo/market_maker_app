@@ -86,15 +86,20 @@ export type Alert = {
 
 const tabs = ["Home Panel", "Algos Control", "Intervention Control", "Alert Control"];
 
-const websocket = new WebSocket("ws://192.168.1.43:8055");
+const websocket = new WebSocket("ws://192.168.10.101:8055");
 
 function App() {
   const [socketOpen, setSocketOpen] = useState<boolean>(false);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
+  const [projectName, setProjectName] = useState<string>("");
+  const [algoAccounts, setAlgoAccounts] = useState<string[]>([]);
+  const [manualAccounts, setManualAccounts] = useState<string[]>([]);
+
   const [selectedTabIdx, setSelectedTabIdx] = useState<number>(0);
-  const [accountUpdate, setAccountUpdate] = useState<AccountUpdate[]>([]);
-  const [orderBookUpdate, setOrderBookUpdate] = useState<OrderBookUpdate[]>([]);
+
+  const [allAccountUpdates, setAllAccountUpdates] = useState<any>();
+  const [allOrderBookUpdates, setAllOrderBookUpdates] = useState<any>();
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
@@ -111,12 +116,18 @@ function App() {
 
   const orderBookSpotPrice = useMemo(
     () =>
-      orderBookUpdate.length > 0
-        ? (orderBookUpdate[0].ask.sort((a, b) => a[0] - b[0])[0][0] +
-            orderBookUpdate[0].bid.sort((a, b) => b[0] - a[0])[0][0]) /
-          2
+      projectName !== ""
+        ? allOrderBookUpdates[projectName].length > 0
+          ? (allOrderBookUpdates[projectName][0].ask.sort(
+              (a: [number, number], b: [number, number]) => a[0] - b[0]
+            )[0][0] +
+              allOrderBookUpdates[projectName][0].bid.sort(
+                (a: [number, number], b: [number, number]) => b[0] - a[0]
+              )[0][0]) /
+            2
+          : 0
         : 0,
-    [orderBookUpdate]
+    [allOrderBookUpdates, projectName]
   );
 
   websocket.addEventListener("open", () => {
@@ -126,11 +137,15 @@ function App() {
   websocket.onmessage = (event) => {
     const message = JSON.parse(event.data);
 
+    console.log("message");
+    console.log(projectName);
+    console.log(message);
+
     //type
-    message.type === "ACCOUNT_UPDATE_REQ" && setAccountUpdate(JSON.parse(message.content));
-    message.type === "ORDER_BOOK_UPDATE_REQ" && setOrderBookUpdate(JSON.parse(message.content));
-    message.type === "ACCOUNT_UPDATE" && setAccountUpdate(JSON.parse(message.content));
-    message.type === "ORDER_BOOK_UPDATE" && setOrderBookUpdate(JSON.parse(message.content));
+    message.type === "ACCOUNT_UPDATE_REQ" && setAllAccountUpdates(JSON.parse(message.content));
+    message.type === "ORDER_BOOK_UPDATE_REQ" && setAllOrderBookUpdates(JSON.parse(message.content));
+    message.type === "ACCOUNT_UPDATE" && setAllAccountUpdates(JSON.parse(message.content));
+    message.type === "ORDER_BOOK_UPDATE" && setAllOrderBookUpdates(JSON.parse(message.content));
 
     //action
     if (message.action === "CANCEL_ORDERS") {
@@ -143,7 +158,14 @@ function App() {
       setCancellingPriceRanges(priceRangesCopy);
     }
     if (message.action === "2FA" && message.result) {
-      console.log("success!");
+      setProjectName(message.projects[0]);
+      websocket.send(
+        JSON.stringify({
+          action: "GET_PROJECT_INFO",
+          request_id: Date.now(),
+          project: message.projects[0],
+        })
+      );
       setLoggedIn(true);
       websocket.send(
         JSON.stringify({
@@ -156,7 +178,15 @@ function App() {
         })
       );
     }
+    if (message.action === "GET_PROJECT_INFO") {
+      console.log("got project info");
+      console.log(message);
+      setAlgoAccounts(message.algo_account);
+      setManualAccounts(message.manual_account);
+    }
     if (message.action === "GET_CONFIG") {
+      console.log("got config");
+      console.log(message);
       setConfig(JSON.parse(message.result));
       setConfigEdit(JSON.parse(message.result));
       setConfigsLoaded(true);
@@ -181,37 +211,48 @@ function App() {
   };
 
   const components = useMemo(
-    () => [
-      <HomePanel key="home" accountUpdate={accountUpdate} collapsed={collapsed} setCollapsed={setCollapsed} />,
-      // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
-      <AlgoControl
-        key="control"
-        websocket={websocket}
-        orderBook={orderBookUpdate[1]} //this needs to change once we activate more than just one mm account
-        orderBookSpotPrice={orderBookSpotPrice}
-        accountUpdate={accountUpdate}
-        configsLoaded={configsLoaded}
-        config={config}
-        configEdit={configEdit}
-        setConfigEdit={setConfigEdit}
-        templates={templates}
-        selectedTemplate={selectedTemplate ? selectedTemplate : ""}
-        setSelectedTemplate={setSelectedTemplate}
-      />,
-      <Intervention
-        key="intervention"
-        orderBookUpdate={orderBookUpdate}
-        accountUpdate={accountUpdate}
-        orderBookSpotPrice={orderBookSpotPrice}
-        cancellingPriceRanges={cancellingPriceRanges}
-        setCancellingPriceRanges={setCancellingPriceRanges}
-        websocket={websocket}
-      />,
-      <AlertControl websocket={websocket} alerts={alerts} />,
-    ],
+    () =>
+      projectName
+        ? [
+            <HomePanel
+              key="home"
+              accountUpdate={allAccountUpdates[projectName]}
+              collapsed={collapsed}
+              setCollapsed={setCollapsed}
+            />,
+            // note: taking upper price (first price above spot) and lower price (first price below spot) from EXTERNAL orderbook which is always index 0
+            <AlgoControl
+              key="control"
+              websocket={websocket}
+              projectName={projectName}
+              algoAccounts={algoAccounts}
+              orderBook={allOrderBookUpdates[projectName][1]} //this needs to change once we activate more than just one mm account
+              orderBookSpotPrice={orderBookSpotPrice}
+              accountUpdate={allAccountUpdates[projectName]}
+              configsLoaded={configsLoaded}
+              config={config}
+              configEdit={configEdit}
+              setConfigEdit={setConfigEdit}
+              templates={templates}
+              selectedTemplate={selectedTemplate ? selectedTemplate : ""}
+              setSelectedTemplate={setSelectedTemplate}
+            />,
+            <Intervention
+              key="intervention"
+              orderBookUpdate={allOrderBookUpdates[projectName]}
+              accountUpdate={allAccountUpdates[projectName]}
+              orderBookSpotPrice={orderBookSpotPrice}
+              cancellingPriceRanges={cancellingPriceRanges}
+              setCancellingPriceRanges={setCancellingPriceRanges}
+              websocket={websocket}
+            />,
+            <AlertControl websocket={websocket} alerts={alerts} />,
+          ]
+        : [],
     [
-      accountUpdate,
-      orderBookUpdate,
+      allAccountUpdates,
+      allOrderBookUpdates,
+      projectName,
       orderBookSpotPrice,
       collapsed,
       cancellingPriceRanges,
@@ -233,7 +274,11 @@ function App() {
               key={i}
               className={"tab" + (selectedTabIdx === i ? " selected" : "")}
               // conditions are to ensure websocket packages are received before switching component
-              onClick={() => accountUpdate.length > 0 && orderBookUpdate.length > 0 && setSelectedTabIdx(i)}
+              onClick={() =>
+                allAccountUpdates[projectName].length > 0 &&
+                allOrderBookUpdates[projectName].length > 0 &&
+                setSelectedTabIdx(i)
+              }
             >
               <span>{tab}</span>
             </div>

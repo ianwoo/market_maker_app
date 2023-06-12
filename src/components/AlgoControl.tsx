@@ -4,6 +4,8 @@ import OrderBookShape from "./OrderBookShape";
 
 type Props = {
   websocket: WebSocket;
+  projectName: string;
+  algoAccounts: string[];
   orderBook: OrderBookUpdate;
   orderBookSpotPrice: number;
   accountUpdate: AccountUpdate[];
@@ -132,6 +134,8 @@ const volAlgoFields: Field[] = [
 const AlgoControl = (props: Props) => {
   const {
     websocket,
+    projectName,
+    algoAccounts,
     // orderBook, we don't need this right now because supply quantity calc is inaccurate, orderbook is incomplete
     orderBookSpotPrice,
     accountUpdate,
@@ -441,15 +445,18 @@ const AlgoControl = (props: Props) => {
       JSON.stringify({
         action: "GET_CONFIG",
         request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        project: projectName,
+        account: algoAccounts[0],
       })
     );
     websocket.send(
       JSON.stringify({
         action: "GET_TEMPLATES",
         request_id: Date.now(),
+        // project: projectName,
       })
     );
-  }, [websocket]);
+  }, [websocket, projectName, algoAccounts]);
 
   useEffect(() => {
     let comparison: any = {}; //type later;
