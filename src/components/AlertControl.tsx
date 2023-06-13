@@ -89,33 +89,74 @@ const AlertControl = (props: Props) => {
     getAlerts();
   };
 
+  const removeAlert = (alertId: string) => {
+    websocket.send(
+      JSON.stringify({
+        action: "REMOVE_ALERT",
+        project: projectName,
+        alert_id: alertId,
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+      })
+    );
+  };
+
   const setAlert = (alertId: string) => {
     if (!editingAlert) return;
     websocket.send(
       JSON.stringify({
         action: "SET_ALERT",
+        request_id: Date.now(),
         project: projectName,
         alert_id: alertId,
         alert: editingAlert,
       })
     );
-    getAlerts();
   };
 
   return (
     <div className="alerts">
       <div className="fixed-buttons">
-        <button className="stop-alerts" onClick={() => stopAlerts()}>
+        <button
+          className="stop-alerts"
+          onClick={() => {
+            stopAlerts();
+            getAlerts();
+          }}
+        >
           STOP ALERTS
         </button>
-        <button className="start-alerts" onClick={() => startAlerts()}>
+        <button
+          className="start-alerts"
+          onClick={() => {
+            startAlerts();
+            getAlerts();
+          }}
+        >
           START ALERTS
         </button>
       </div>
       {alerts.map((a, i) => (
         <div className="alert" key={i}>
-          {a.status && <button onClick={() => startAlert(a.alert_id)}>STOP</button>}
-          {!a.status && <button onClick={() => stopAlert(a.alert_id)}>START</button>}
+          {a.status && (
+            <button
+              onClick={() => {
+                startAlert(a.alert_id);
+                getAlerts();
+              }}
+            >
+              STOP
+            </button>
+          )}
+          {!a.status && (
+            <button
+              onClick={() => {
+                stopAlert(a.alert_id);
+                getAlerts();
+              }}
+            >
+              START
+            </button>
+          )}
           {editingAlertIdx !== i
             ? [
                 <h4>Common Configurations</h4>,
@@ -200,9 +241,20 @@ const AlertControl = (props: Props) => {
                 setAlert(editingAlert.alert_id);
                 setEditingAlertIdx(-1);
                 setEditingAlert(undefined);
+                getAlerts();
               }}
             >
               SAVE
+            </button>
+          )}
+          {editingAlertIdx === i && editingAlert && (
+            <button
+              onClick={() => {
+                removeAlert(editingAlert.alert_id);
+                getAlerts();
+              }}
+            >
+              DELETE
             </button>
           )}
           {editingAlertIdx === i && (
