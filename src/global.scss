@@ -525,6 +525,40 @@
       display: flex;
       flex-wrap: wrap;
       gap: 16px;
+
+      //may need to move this elsewhere MODALS
+      .mask {
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transition: 0.125s opacity ease-out;
+        pointer-events: none;
+
+        &.visible {
+          opacity: 0.5;
+          background-color: #000000;
+          pointer-events: all;
+        }
+        .modal {
+          position: fixed;
+          top: 69px;
+          width: calc(100% - 267px);
+          height: fit-content;
+          margin: 69px;
+          @media screen and (max-width: 1024px) {
+            width: 100%;
+          }
+          border-radius: 8px;
+          padding: 64px;
+          background: #0d2837;
+          color: #ffffff;
+          z-index: 99;
+        }
+      }
+
       .fixed-buttons {
         display: flex;
         position: fixed;

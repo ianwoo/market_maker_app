@@ -14,6 +14,8 @@ const AlertControl = (props: Props) => {
   const [editingAlertIdx, setEditingAlertIdx] = useState<number>(-1);
   const [editingAlert, setEditingAlert] = useState<Alert | undefined>();
 
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState<boolean>(false);
+
   useEffect(() => {
     websocket.send(
       JSON.stringify({
@@ -115,6 +117,22 @@ const AlertControl = (props: Props) => {
 
   return (
     <div className="alerts">
+      {/* may need to decompose this modal stuff and shove it into a higher level component */}
+      <div
+        className={"mask" + (confirmDeleteModal ? " visible" : "")}
+        onClick={() => !confirmDeleteModal && setConfirmDeleteModal(false)}
+      >
+        <div className="modal">Are you sure you wish to delete this alert?</div>
+        <button
+          onClick={() => {
+            editingAlert && removeAlert(editingAlert.alert_id);
+            getAlerts();
+          }}
+        >
+          Confirm
+        </button>
+        <button onClick={() => setConfirmDeleteModal(false)}>Cancel</button>
+      </div>
       <div className="fixed-buttons">
         <button
           className="stop-alerts"
