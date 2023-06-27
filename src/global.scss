@@ -1,7 +1,7 @@
 .App {
   background: black;
   color: white;
-  .project {
+  .project-select {
     display: flex;
     flex-direction: column;
     background: darkgrey;
@@ -524,7 +524,8 @@
     .alerts {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 42px;
+      padding-bottom: 169px;
 
       //may need to move this elsewhere MODALS
       .mask {
@@ -592,6 +593,31 @@
         }
       }
       .alert {
+        padding-top: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 666px;
+
+        button {
+          color: #fff;
+          margin-top: 16px;
+          &.edit-alert,
+          &.cancel-edit-alert {
+            background: #696969;
+          }
+          &.stop-alert,
+          &.delete-alert {
+            background: darkred;
+          }
+          &.save-alert {
+            background: green;
+          }
+          &.start-alert {
+            background: darkblue;
+          }
+        }
+
         &.editing {
           display: flex;
         }

@@ -175,8 +175,9 @@ const AlertControl = (props: Props) => {
         <div className="alert" key={i}>
           {a.status && (
             <button
+              className="stop-alert"
               onClick={() => {
-                startAlert(a.alert_id);
+                stopAlert(a.alert_id);
                 getAlerts();
               }}
             >
@@ -185,8 +186,9 @@ const AlertControl = (props: Props) => {
           )}
           {!a.status && (
             <button
+              className="start-alert"
               onClick={() => {
-                stopAlert(a.alert_id);
+                startAlert(a.alert_id);
                 getAlerts();
               }}
             >
@@ -263,6 +265,7 @@ const AlertControl = (props: Props) => {
             : null}
           {editingAlertIdx === -1 && (
             <button
+              className="edit-alert"
               onClick={() => {
                 setEditingAlertIdx(i);
                 setEditingAlert(alerts[i]);
@@ -273,6 +276,7 @@ const AlertControl = (props: Props) => {
           )}
           {editingAlertIdx === i && editingAlert && (
             <button
+              className="save-alert"
               onClick={() => {
                 setAlert(editingAlert.alert_id);
                 setEditingAlertIdx(-1);
@@ -285,6 +289,7 @@ const AlertControl = (props: Props) => {
           )}
           {editingAlertIdx === i && editingAlert && (
             <button
+              className="delete-alert"
               onClick={() => {
                 setConfirmDeleteModal(true);
               }}
@@ -294,6 +299,7 @@ const AlertControl = (props: Props) => {
           )}
           {editingAlertIdx === i && (
             <button
+              className="cancel-edit-alert"
               onClick={() => {
                 setEditingAlertIdx(-1);
                 setEditingAlert(undefined);

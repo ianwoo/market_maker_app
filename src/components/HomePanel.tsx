@@ -20,7 +20,7 @@ const HomePanel = (props: Props) => {
 
   return (
     <div className="home">
-      <div className={"project" + (collapsed ? " collapsed" : "")}>
+      <div className={"project-select" + (collapsed ? " collapsed" : "")}>
         <div className="project-dropdown-wrapper">
           <select className="project-dropdown" onChange={(e) => setProjectName(e.target.value)}>
             {allProjects.map((p, i) => (

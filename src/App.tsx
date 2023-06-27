@@ -298,7 +298,7 @@ function App() {
           ))}
       </div>
       {selectedTabIdx !== 0 && (
-        <div className={"project" + (collapsed ? " collapsed" : "")}>
+        <div className={"project-select" + (collapsed ? " collapsed" : "")}>
           <div className="project-dropdown-wrapper">
             <select className="project-dropdown" onChange={(e) => setProjectName(e.target.value)}>
               {allProjects.map((p, i) => (
