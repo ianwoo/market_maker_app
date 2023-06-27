@@ -557,6 +557,22 @@
         background: #0d2837;
         color: #ffffff;
         z-index: 99;
+        display: flex;
+        text-align: center;
+        flex-direction: column;
+        span {
+          margin-bottom: 42px;
+        }
+        .buttons {
+          display: flex;
+          width: 100%;
+          gap: 16px;
+          justify-content: center;
+          margin-top: 42px;
+          button {
+            width: 69px;
+          }
+        }
       }
 
       .fixed-buttons {

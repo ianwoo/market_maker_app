@@ -124,16 +124,31 @@ const AlertControl = (props: Props) => {
       />
       {confirmDeleteModal && (
         <div className="modal">
-          Are you sure you wish to delete this alert?{" "}
-          <button
-            onClick={() => {
-              editingAlert && removeAlert(editingAlert.alert_id);
-              getAlerts();
-            }}
-          >
-            Confirm
-          </button>
-          <button onClick={() => setConfirmDeleteModal(false)}>Cancel</button>
+          <span>Are you sure you wish to delete this alert?</span>
+          {editingAlert && [
+            Object.entries(editingAlert.common_config).map((cc, j) => (
+              <div className="config common-config" key={"cc" + j}>
+                {cc[0] + " : " + (cc[0] === "google_sheets_map" ? JSON.stringify(cc[1]) : cc[1])}
+              </div>
+            )),
+            <h4 key="h42">Specific Configurations</h4>,
+            Object.entries(editingAlert.specific_config).map((cc, j) => (
+              <div className="config specific-config" key={"sc" + j}>
+                {cc[0] + " : " + cc[1]}
+              </div>
+            )),
+          ]}
+          <div className="buttons">
+            <button
+              onClick={() => {
+                editingAlert && removeAlert(editingAlert.alert_id);
+                getAlerts();
+              }}
+            >
+              Confirm
+            </button>
+            <button onClick={() => setConfirmDeleteModal(false)}>Cancel</button>
+          </div>
         </div>
       )}
       <div className="fixed-buttons">
