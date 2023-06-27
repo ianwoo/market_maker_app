@@ -177,22 +177,22 @@ const AlertControl = (props: Props) => {
           )}
           {editingAlertIdx !== i
             ? [
-                <h4>Common Configurations</h4>,
+                <h4 key="h41">Common Configurations</h4>,
                 Object.entries(a.common_config).map((cc, j) => (
-                  <div className="config common-config" key={j}>
+                  <div className="config common-config" key={"cc" + j}>
                     {cc[0] + " : " + (cc[0] === "google_sheets_map" ? JSON.stringify(cc[1]) : cc[1])}
                   </div>
                 )),
-                <h4>Specific Configurations</h4>,
+                <h4 key="h42">Specific Configurations</h4>,
                 Object.entries(a.specific_config).map((cc, j) => (
-                  <div className="config specific-config" key={j}>
+                  <div className="config specific-config" key={"sc" + j}>
                     {cc[0] + " : " + cc[1]}
                   </div>
                 )),
               ]
             : editingAlert !== undefined
             ? [
-                <h4 key="h4">Common Configurations</h4>,
+                <h4 key="h43">Common Configurations</h4>,
                 Object.entries(editingAlert.common_config).map((cc, j) => (
                   <div className={"config common-config editing " + cc[0]} key={j}>
                     <span>{cc[0]}</span>
@@ -226,7 +226,7 @@ const AlertControl = (props: Props) => {
                     )}
                   </div>
                 )),
-                <h4>Specific Configurations</h4>,
+                <h4 key="h44">Specific Configurations</h4>,
                 Object.entries(editingAlert.specific_config).map((sc: [string, any], i) => (
                   <div className={"config specific-config editing " + sc[0]} key={i}>
                     <span>{sc[0]}</span>
