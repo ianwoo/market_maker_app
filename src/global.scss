@@ -542,21 +542,21 @@
           background-color: #000000;
           pointer-events: all;
         }
-        .modal {
-          position: fixed;
-          top: 69px;
-          width: calc(100% - 267px);
-          height: fit-content;
-          margin: 69px;
-          @media screen and (max-width: 1024px) {
-            width: 100%;
-          }
-          border-radius: 8px;
-          padding: 64px;
-          background: #0d2837;
-          color: #ffffff;
-          z-index: 99;
+      }
+      .modal {
+        position: fixed;
+        top: 69px;
+        width: calc(100% - 267px);
+        height: fit-content;
+        margin: 69px;
+        @media screen and (max-width: 1024px) {
+          width: 100%;
         }
+        border-radius: 8px;
+        padding: 64px;
+        background: #0d2837;
+        color: #ffffff;
+        z-index: 99;
       }
 
       .fixed-buttons {

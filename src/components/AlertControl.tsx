@@ -121,18 +121,21 @@ const AlertControl = (props: Props) => {
       <div
         className={"mask" + (confirmDeleteModal ? " visible" : "")}
         onClick={() => !confirmDeleteModal && setConfirmDeleteModal(false)}
-      >
-        <div className="modal">Are you sure you wish to delete this alert?</div>
-        <button
-          onClick={() => {
-            editingAlert && removeAlert(editingAlert.alert_id);
-            getAlerts();
-          }}
-        >
-          Confirm
-        </button>
-        <button onClick={() => setConfirmDeleteModal(false)}>Cancel</button>
-      </div>
+      />
+      {confirmDeleteModal && (
+        <div className="modal">
+          Are you sure you wish to delete this alert?{" "}
+          <button
+            onClick={() => {
+              editingAlert && removeAlert(editingAlert.alert_id);
+              getAlerts();
+            }}
+          >
+            Confirm
+          </button>
+          <button onClick={() => setConfirmDeleteModal(false)}>Cancel</button>
+        </div>
+      )}
       <div className="fixed-buttons">
         <button
           className="stop-alerts"
@@ -268,8 +271,7 @@ const AlertControl = (props: Props) => {
           {editingAlertIdx === i && editingAlert && (
             <button
               onClick={() => {
-                removeAlert(editingAlert.alert_id);
-                getAlerts();
+                setConfirmDeleteModal(true);
               }}
             >
               DELETE
