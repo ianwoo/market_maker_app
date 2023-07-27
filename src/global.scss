@@ -597,7 +597,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 666px;
 
         button {
           color: #fff;
@@ -624,6 +623,7 @@
         .config {
           display: flex;
           justify-content: space-between;
+          height: 24px;
           .google_sheets_map {
             display: flex;
             flex-direction: column;
