@@ -87,7 +87,7 @@ export type Alert = {
 
 const tabs = ["Home Panel", "Algos Control", "Intervention Control", "Alert Control"];
 
-const websocket = new WebSocket("ws://210.5.185.130:50008");
+const websocket = new WebSocket("wss://210.5.185.130:50007");
 
 function App() {
   const [socketOpen, setSocketOpen] = useState<boolean>(false);
