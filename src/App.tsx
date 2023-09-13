@@ -5,6 +5,7 @@ import Intervention from "./components/Intervention";
 import "./global.scss";
 import Login from "./components/Login";
 import AlertControl from "./components/AlertControl";
+import websocket_address_config from "./websocket_address_config.json";
 
 export type AccountUpdate = {
   account: string;
@@ -87,7 +88,7 @@ export type Alert = {
 
 const tabs = ["Home Panel", "Algos Control", "Intervention Control", "Alert Control"];
 
-const websocket = new WebSocket("ws://192.168.1.43:8055");
+const websocket = new WebSocket(websocket_address_config.url);
 
 function App() {
   const [socketOpen, setSocketOpen] = useState<boolean>(false);
