@@ -149,6 +149,7 @@ function App() {
     message.type === "ACCOUNT_UPDATE_REQ" && setAllAccountUpdates(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE_REQ" && setAllOrderBookUpdates(JSON.parse(message.content));
     message.type === "ACCOUNT_UPDATE" && setAllAccountUpdates(JSON.parse(message.content));
+    message.type === "ACCOUNT_UPDATE" && console.log(JSON.parse(message.content));
     message.type === "ORDER_BOOK_UPDATE" && setAllOrderBookUpdates(JSON.parse(message.content));
 
     //action
@@ -208,7 +209,6 @@ function App() {
       );
     }
     if (message.action === "GET_ALERTS") {
-      console.log(message);
       setAlerts(JSON.parse(message.result));
     }
   };
@@ -248,6 +248,7 @@ function App() {
               orderBookUpdate={allOrderBookUpdates[projectName]}
               accountUpdate={allAccountUpdates[projectName]}
               orderBookSpotPrice={orderBookSpotPrice}
+              config={config}
               cancellingPriceRanges={cancellingPriceRanges}
               setCancellingPriceRanges={setCancellingPriceRanges}
               websocket={websocket}
@@ -278,6 +279,9 @@ function App() {
       selectedAccount,
     ]
   );
+
+  console.log("config");
+  console.log(config);
 
   return (
     <div className="App">

@@ -8,6 +8,7 @@ type Props = {
   orderBookUpdate: OrderBookUpdate[];
   accountUpdate: AccountUpdate[];
   orderBookSpotPrice: number;
+  config: any;
   cancellingPriceRanges: PriceRange[];
   setCancellingPriceRanges: React.Dispatch<React.SetStateAction<PriceRange[]>>;
   websocket: WebSocket;
@@ -42,10 +43,13 @@ const Intervention = (props: Props) => {
     orderBookUpdate,
     accountUpdate,
     orderBookSpotPrice,
+    config,
     cancellingPriceRanges,
     setCancellingPriceRanges,
     websocket,
   } = props;
+
+  console.log(config);
 
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);

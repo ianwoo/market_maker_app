@@ -118,6 +118,17 @@ const SweepAndPeg = (props: Props) => {
     return retbool;
   };
 
+  const selectDynamicLogic = (logic: string) => {
+    websocket.send(
+      JSON.stringify({
+        action: "SELECT_DYNAMIC_LOGIC",
+        project: projectName,
+        request_id: Date.now(), //id used will be milliseconds from 1970 since request was sent, which conveniently provides us with timestamp
+        command: logic,
+      })
+    );
+  };
+
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
@@ -203,6 +214,12 @@ const SweepAndPeg = (props: Props) => {
           </div>
         </div>
       ) : null}
+      <div className="field gap">
+        <b>Dynamic Logic</b>
+        <button onClick={() => selectDynamicLogic("common")}>Set to Common</button>
+        <button onClick={() => selectDynamicLogic("logic_1")}>Set to Logic 1</button>
+        <button onClick={() => selectDynamicLogic("logic_2")}>Set to Logic 2</button>
+      </div>
       <button className="buy" disabled={!checkValidations()} onClick={() => handleSweepAndPeg(Side.Buy)}>
         BUY
       </button>
