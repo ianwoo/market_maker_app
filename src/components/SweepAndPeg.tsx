@@ -237,7 +237,8 @@ const SweepAndPeg = (props: Props) => {
       </button>
       <div className="field col" style={{ marginTop: 69 }}>
         <b>Dynamic Logic</b>
-        <button onClick={() => selectDynamicLogic("common")}>Set to Common</button>
+        <b>Current Values:</b>
+        {/* <button onClick={() => selectDynamicLogic("common")}>Set to Common</button> */}
         {common.map((l) => (
           <span>{l[0] + " : " + l[1]}</span>
         ))}
