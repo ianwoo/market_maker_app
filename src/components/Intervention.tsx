@@ -49,8 +49,6 @@ const Intervention = (props: Props) => {
     websocket,
   } = props;
 
-  console.log(config);
-
   const [orderType, setOrderType] = useState<OrderType>(OrderType.Ask);
   const [orderBookIdx, setOrderBookIdx] = useState<number>(0);
   const [orders, setOrders] = useState<[number, number][]>(orderBookUpdate[0].ask);
@@ -460,7 +458,7 @@ const Intervention = (props: Props) => {
           </div>
           {renderedBook}
         </div>
-        <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} projectName={projectName} />
+        <SweepAndPeg websocket={websocket} accountUpdate={accountUpdate} projectName={projectName} config={config} />
       </div>
     </div>
   );

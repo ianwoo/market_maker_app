@@ -191,6 +191,7 @@ function App() {
     }
     if (message.action === "GET_CONFIG") {
       setConfig(JSON.parse(message.result));
+      console.log(config);
       setConfigEdit(JSON.parse(message.result));
       setConfigsLoaded(true);
     }
@@ -279,9 +280,6 @@ function App() {
       selectedAccount,
     ]
   );
-
-  console.log("config");
-  console.log(config);
 
   return (
     <div className="App">

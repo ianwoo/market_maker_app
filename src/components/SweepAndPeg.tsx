@@ -5,6 +5,7 @@ type Props = {
   websocket: WebSocket;
   accountUpdate: AccountUpdate[];
   projectName: string;
+  config: any;
 };
 
 enum Side {
@@ -27,7 +28,7 @@ type SweepAndPegCall = {
 };
 
 const SweepAndPeg = (props: Props) => {
-  const { websocket, accountUpdate, projectName } = props;
+  const { websocket, accountUpdate, projectName, config } = props;
 
   // const [selected, setSelected] = useState<Tab>(0);
   const [pegAdditionalOrders, setPegAdditionalOrders] = useState<boolean>(false);
@@ -129,6 +130,20 @@ const SweepAndPeg = (props: Props) => {
     );
   };
 
+  const common = [];
+  const logic1 = [];
+  const logic2 = [];
+
+  for (const prop in config) {
+    if (prop.slice(0, 8) === "logic_1_") {
+      logic1.push([prop, config[prop]]);
+    } else if (prop.slice(0, 8) === "logic_2_") {
+      logic2.push([prop, config[prop]]);
+    } else {
+      common.push([prop, config[prop]]);
+    }
+  }
+
   return (
     <div className="sweep-and-peg">
       <h2>Sweep and Peg</h2>
@@ -214,18 +229,27 @@ const SweepAndPeg = (props: Props) => {
           </div>
         </div>
       ) : null}
-      <div className="field gap">
-        <b>Dynamic Logic</b>
-        <button onClick={() => selectDynamicLogic("common")}>Set to Common</button>
-        <button onClick={() => selectDynamicLogic("logic_1")}>Set to Logic 1</button>
-        <button onClick={() => selectDynamicLogic("logic_2")}>Set to Logic 2</button>
-      </div>
       <button className="buy" disabled={!checkValidations()} onClick={() => handleSweepAndPeg(Side.Buy)}>
         BUY
       </button>
       <button className="sell" disabled={!checkValidations()} onClick={() => handleSweepAndPeg(Side.Sell)}>
         SELL
       </button>
+      <div className="field col" style={{ marginTop: 69 }}>
+        <b>Dynamic Logic</b>
+        <button onClick={() => selectDynamicLogic("common")}>Set to Common</button>
+        {common.map((l) => (
+          <span>{l[0] + " : " + l[1]}</span>
+        ))}
+        <button onClick={() => selectDynamicLogic("logic_1")}>Set to Logic 1</button>
+        {logic1.map((l) => (
+          <span>{l[0] + " : " + l[1]}</span>
+        ))}
+        <button onClick={() => selectDynamicLogic("logic_2")}>Set to Logic 2</button>
+        {logic2.map((l) => (
+          <span>{l[0] + " : " + l[1]}</span>
+        ))}
+      </div>
     </div>
   );
 };
